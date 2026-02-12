@@ -1,0 +1,426 @@
+<Window x:Class="AdminDashboardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        mc:Ignorable="d"
+        Title="EduManager Dashboard"
+        Width="1540"
+        Height="900"
+        MinWidth="1220"
+        MinHeight="760"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        StateChanged="AdminDashboardWindow_StateChanged"
+        Background="{StaticResource DashboardPageBackgroundBrush}">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="0"
+                            CornerRadius="0"
+                            GlassFrameThickness="0"
+                            ResizeBorderThickness="6"
+                            UseAeroCaptionButtons="False"/>
+    </shell:WindowChrome.WindowChrome>
+    <Grid Background="{StaticResource DashboardPageBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="44"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Style="{StaticResource DashboardTitleBarBorderStyle}"
+                MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="10,0,0,0">
+
+
+                </StackPanel>
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="0,0,8,0">
+                    <Button Style="{StaticResource TitleBarButtonStyle}"
+                            Click="MinimizeButton_Click"
+                            ToolTip="Minimize">
+                        <TextBlock Text="&#xE921;"
+                                   FontSize="15"
+                                   Style="{StaticResource LoginTitleBarGlyphStyle}"/>
+                    </Button>
+                    <Button Style="{StaticResource TitleBarButtonStyle}"
+                            Click="MaximizeRestoreButton_Click"
+                            ToolTip="Maximize/Restore">
+                        <TextBlock x:Name="MaximizeRestoreIcon"
+                                   Text="&#xE922;"
+                                   FontSize="12"
+                                   Style="{StaticResource LoginTitleBarGlyphStyle}"/>
+                    </Button>
+                    <Button Style="{StaticResource TitleBarCloseButtonStyle}"
+                            Click="CloseButton_Click"
+                            ToolTip="Close">
+                        <TextBlock Text="&#xE8BB;"
+                                   FontSize="11"
+                                   Style="{StaticResource LoginTitleBarGlyphStyle}"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="272"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="{StaticResource DashboardSurfaceBrush}"
+                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                    BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                            BorderThickness="0,0,0,1"
+                            Padding="22,20,20,18">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="44"
+                                    Height="44"
+                                    CornerRadius="22"
+                                    Background="#032538"
+                                    VerticalAlignment="Center">
+                                <Image Source="/Resources/Images/prmsu-logo.png"
+                                       Width="28"
+                                       Height="28"
+                                       Stretch="Uniform"/>
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Admin"
+                                           FontSize="21"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                <TextBlock Text="Admin Panel"
+                                           FontSize="12"
+                                           Margin="0,2,0,0"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Padding="14,14,14,0">
+                        <StackPanel>
+                            <Button Style="{StaticResource DashboardSidebarNavSelectedButtonStyle}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Width="24" Height="24" VerticalAlignment="Center">
+                                        <TextBlock Style="{StaticResource DashboardSidebarIconGlyphSelectedStyle}" Text="&#xE80F;"/>
+                                    </Grid>
+                                    <TextBlock Grid.Column="1"
+                                               Style="{StaticResource DashboardSidebarNavTextSelectedStyle}"
+                                               Text="Dashboard"/>
+                                </Grid>
+                            </Button>
+
+                            <Button Style="{StaticResource DashboardSidebarNavButtonStyle}" Margin="0,6,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE77B;"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource DashboardSidebarNavTextStyle}" Text="Students"/>
+                                </Grid>
+                            </Button>
+
+                            <Button Style="{StaticResource DashboardSidebarNavButtonStyle}" Margin="0,6,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE716;"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource DashboardSidebarNavTextStyle}" Text="Teachers"/>
+                                </Grid>
+                            </Button>
+
+                            <Button Style="{StaticResource DashboardSidebarNavButtonStyle}" Margin="0,6,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE8A5;"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource DashboardSidebarNavTextStyle}" Text="Academics"/>
+                                </Grid>
+                            </Button>
+
+                            <Button Style="{StaticResource DashboardSidebarNavButtonStyle}" Margin="0,6,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE8C7;"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource DashboardSidebarNavTextStyle}" Text="Finance"/>
+                                </Grid>
+                            </Button>
+
+                            <Button Style="{StaticResource DashboardSidebarNavButtonStyle}" Margin="0,6,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE7F1;"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource DashboardSidebarNavTextStyle}" Text="Transport"/>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2"
+                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                            BorderThickness="0,1,0,0"
+                            Padding="14,10,14,14">
+                        <Button Style="{StaticResource DashboardSidebarNavButtonStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                    <TextBlock Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE713;"/>
+                                </Border>
+                                <TextBlock Grid.Column="1" Style="{StaticResource DashboardSidebarNavTextStyle}" Text="Settings"/>
+                            </Grid>
+                        </Button>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="{StaticResource DashboardSurfaceBrush}" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="0,0,0,1" Padding="18,14">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Overview" FontSize="28" FontWeight="Bold" Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <Grid Width="420" Height="36" Margin="20,0,0,0">
+                                <TextBox x:Name="SearchActionsTextBox"
+                                         Style="{StaticResource DashboardSearchTextBoxStyle}"/>
+                                <TextBlock FontFamily="Segoe MDL2 Assets"
+                                           Text="&#xE721;"
+                                           Margin="12,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           IsHitTestVisible="False"/>
+                                <TextBlock Text="Search students, staff, or actions..."
+                                           Margin="36,0,10,0"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           FontSize="13"
+                                           IsHitTestVisible="False">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Text, ElementName=SearchActionsTextBox}" Value=""/>
+                                                        <Condition Binding="{Binding IsKeyboardFocused, ElementName=SearchActionsTextBox}" Value="False"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Style="{StaticResource DashboardHeaderIconButtonStyle}" Margin="0,0,4,0">
+                                <Grid>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7ED;" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                    <Ellipse Width="7" Height="7" Fill="#EF4444" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,3,4,0"/>
+                                </Grid>
+                            </Button>
+                            <Button Style="{StaticResource DashboardHeaderIconButtonStyle}">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8BD;" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            </Button>
+                            <Border Width="1" Height="26" Background="{StaticResource DashboardBorderBrush}" Margin="12,0"/>
+                            <Border Width="36" Height="36" CornerRadius="18" Background="#DCE8F8" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="1">
+                                <TextBlock Text="AM" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" FontWeight="Bold" Foreground="#1F3E6F"/>
+                            </Border>
+                            <StackPanel Margin="8,0,0,0">
+                                <TextBlock Text="Alex Morgan" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                <TextBlock Text="Administrator" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="20,18,20,22">
+                        <UniformGrid Columns="4">
+                            <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,8,0">
+                                <StackPanel Margin="16,14,16,12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Total Students" FontSize="13" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            <TextBlock Text="1,245" FontSize="34" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <Border Grid.Column="1" Width="34" Height="34" Background="#EAF4FF" CornerRadius="8">
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE80C;" Foreground="{StaticResource DashboardPrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                    <TextBlock Margin="0,12,0,0" FontSize="12"><Run Foreground="{StaticResource DashboardSuccessBrush}" Text="1.2%"/><Run Text=" vs last month" Foreground="{StaticResource DashboardTextMutedBrush}"/></TextBlock>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0">
+                                <StackPanel Margin="16,14,16,12">
+                                    <TextBlock Text="Total Teachers" FontSize="13" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                    <TextBlock Text="84" FontSize="34" FontWeight="Bold"/>
+                                    <TextBlock Margin="0,12,0,0" FontSize="12"><Run Foreground="{StaticResource DashboardSuccessBrush}" Text="0.5%"/><Run Text=" vs last month" Foreground="{StaticResource DashboardTextMutedBrush}"/></TextBlock>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0">
+                                <StackPanel Margin="16,14,16,12">
+                                    <TextBlock Text="Fees Collected" FontSize="13" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                    <TextBlock Text="$120.4k" FontSize="34" FontWeight="Bold"/>
+                                    <TextBlock Margin="0,12,0,0" FontSize="12"><Run Foreground="{StaticResource DashboardDangerBrush}" Text="2.1%"/><Run Text=" vs last month" Foreground="{StaticResource DashboardTextMutedBrush}"/></TextBlock>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0,0,0">
+                                <StackPanel Margin="16,14,16,12">
+                                    <TextBlock Text="New Applications" FontSize="13" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                    <TextBlock Text="28" FontSize="34" FontWeight="Bold"/>
+                                    <TextBlock Margin="0,12,0,0" FontSize="12"><Run Foreground="{StaticResource DashboardSuccessBrush}" Text="5 new"/><Run Text=" today" Foreground="{StaticResource DashboardTextMutedBrush}"/></TextBlock>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <Grid Margin="0,18,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2.1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,10,0">
+                                <StackPanel Margin="18">
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="Attendance Trends" FontSize="23" FontWeight="Bold"/>
+                                            <TextBlock Text="Monthly overview for Students &amp; Staff" FontSize="13" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                        </StackPanel>
+                                        <ComboBox Grid.Column="1"
+                                                  Style="{StaticResource DashboardFilterComboBoxStyle}"
+                                                  SelectedIndex="0">
+                                            <ComboBoxItem Content="Last 30 Days"/>
+                                            <ComboBoxItem Content="This Semester"/>
+                                            <ComboBoxItem Content="This Year"/>
+                                        </ComboBox>
+                                    </Grid>
+                                    <Grid Height="300">
+                                        <Viewbox Stretch="Fill">
+                                            <Canvas Width="760" Height="250">
+                                                <Path Fill="{StaticResource DashboardStudentAreaBrush}" Data="M0,220 C50,210 100,235 150,170 C200,120 250,145 300,140 C350,135 400,102 450,110 C500,120 550,85 600,92 C650,98 700,58 750,66 L760,66 L760,250 L0,250 Z"/>
+                                                <Path Data="M0,220 C50,210 100,235 150,170 C200,120 250,145 300,140 C350,135 400,102 450,110 C500,120 550,85 600,92 C650,98 700,58 750,66 L760,66" Stroke="{StaticResource DashboardPrimaryBrush}" StrokeThickness="4" Fill="Transparent"/>
+                                                <Path Data="M0,246 C60,235 120,252 180,212 C240,176 300,188 360,180 C420,172 480,150 540,158 C600,166 660,142 720,132 L760,128" Stroke="{StaticResource DashboardPurpleBrush}" StrokeThickness="3" StrokeDashArray="6 5" Fill="Transparent"/>
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Grid>
+                                    <TextBlock HorizontalAlignment="Center" Margin="0,8,0,0" Foreground="{StaticResource DashboardTextMutedBrush}" Text="Week 1     Week 2     Week 3     Week 4"/>
+                                </StackPanel>
+                            </Border>
+                            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                <Border Style="{StaticResource DashboardCardBorderStyle}">
+                                    <StackPanel Margin="18">
+                                        <TextBlock Text="Recent Activity" FontSize="18" FontWeight="Bold"/>
+                                        <TextBlock Margin="0,10,0,0" FontSize="13"><Run FontWeight="SemiBold" Text="Sarah Smith"/><Run Text=" paid tuition fees."/></TextBlock>
+                                        <TextBlock FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}" Text="2 mins ago"/>
+                                        <TextBlock Margin="0,10,0,0" FontSize="13" Text="New admission application received."/>
+                                        <TextBlock FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}" Text="1 hour ago"/>
+                                        <TextBlock Margin="0,10,0,0" FontSize="13" Text="Grade reports published for Class 10A."/>
+                                        <TextBlock FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}" Text="3 hours ago"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Margin="0,18,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,10,0">
+                                <StackPanel Margin="18">
+                                    <TextBlock Text="Department Performance" FontSize="22" FontWeight="Bold"/>
+                                    <TextBlock Margin="0,12,0,0" Text="Science" FontWeight="SemiBold"/>
+                                    <ProgressBar Height="8" Maximum="100" Value="88" Margin="0,4,0,0"/>
+                                    <TextBlock Margin="0,10,0,0" Text="Mathematics" FontWeight="SemiBold"/>
+                                    <ProgressBar Height="8" Maximum="100" Value="76" Margin="0,4,0,0"/>
+                                    <TextBlock Margin="0,10,0,0" Text="Literature" FontWeight="SemiBold"/>
+                                    <ProgressBar Height="8" Maximum="100" Value="92" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Margin="10,0,0,0" Background="{StaticResource DashboardHelpGradientBrush}" CornerRadius="12">
+                                <Grid Margin="20">
+                                    <StackPanel>
+                                        <TextBlock Text="Need Help?" FontSize="30" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Margin="0,8,0,0" MaxWidth="360" FontSize="14" Foreground="#D7E9FF" TextWrapping="Wrap" Text="Check our documentation for guides on how to manage students, set up exams, and handle finances effectively."/>
+                                        <Button Margin="0,20,0,0" Width="152" Height="36" HorizontalAlignment="Left" Style="{StaticResource DashboardPrimaryActionButtonStyle}" Content="View Documentation"/>
+                                    </StackPanel>
+                                    <TextBlock Text="&#xE8A5;" FontFamily="Segoe MDL2 Assets" FontSize="156" Opacity="0.18" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-12,-34"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

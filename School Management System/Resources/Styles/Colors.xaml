@@ -1,0 +1,18 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="Color.Primary">#135BEC</Color>
+    <Color x:Key="Color.PrimaryHover">#0F4FD0</Color>
+    <Color x:Key="Color.InputBorder">#DCE5F3</Color>
+    <Color x:Key="Color.PageBackground">#0E2C7A</Color>
+
+    <SolidColorBrush x:Key="Brush.Primary" Color="{StaticResource Color.Primary}"/>
+    <SolidColorBrush x:Key="Brush.PrimaryHover" Color="{StaticResource Color.PrimaryHover}"/>
+    <SolidColorBrush x:Key="Brush.InputBorder" Color="{StaticResource Color.InputBorder}"/>
+    <SolidColorBrush x:Key="Brush.PageBackground" Color="{StaticResource Color.PageBackground}"/>
+
+    <LinearGradientBrush x:Key="Brush.PageGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0D57D6" Offset="0"/>
+        <GradientStop Color="#0B3E9D" Offset="0.45"/>
+        <GradientStop Color="#0A275F" Offset="1"/>
+    </LinearGradientBrush>
+</ResourceDictionary>
