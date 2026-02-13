@@ -1,0 +1,373 @@
+<UserControl x:Class="DashboardPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1200">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20,18,20,22">
+
+            <!-- KPI Cards (6) -->
+            <UniformGrid Columns="3" Margin="0,0,0,14">
+                <!-- Total Students -->
+                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,8,0">
+                    <StackPanel Margin="16,14,16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Total Students" FontSize="13"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Text="{Binding TotalStudents}" FontSize="34" FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="34" Height="34"
+                                    Background="{StaticResource DashboardPrimarySoftBrush}" CornerRadius="8">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE77B;"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Total Teachers -->
+                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0">
+                    <StackPanel Margin="16,14,16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Total Teachers" FontSize="13"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Text="{Binding TotalTeachers}" FontSize="34" FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="34" Height="34"
+                                    Background="{StaticResource DashboardPrimarySoftBrush}" CornerRadius="8">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE716;"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Total Courses -->
+                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0,0,0">
+                    <StackPanel Margin="16,14,16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Total Courses" FontSize="13"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Text="{Binding TotalCourses}" FontSize="34" FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="34" Height="34"
+                                    Background="{StaticResource DashboardPrimarySoftBrush}" CornerRadius="8">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7BE;"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <UniformGrid Columns="3" Margin="0,0,0,14">
+                <!-- Total Subjects -->
+                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,8,0">
+                    <StackPanel Margin="16,14,16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Total Subjects" FontSize="13"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Text="{Binding TotalSubjects}" FontSize="34" FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="34" Height="34"
+                                    Background="{StaticResource DashboardPrimarySoftBrush}" CornerRadius="8">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Total Sections -->
+                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0">
+                    <StackPanel Margin="16,14,16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Total Sections" FontSize="13"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Text="{Binding TotalSections}" FontSize="34" FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="34" Height="34"
+                                    Background="{StaticResource DashboardPrimarySoftBrush}" CornerRadius="8">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8F1;"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Scheduled Classes Today -->
+                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0,0,0">
+                    <StackPanel Margin="16,14,16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Classes Today" FontSize="13"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Text="{Binding ScheduledClassesToday}" FontSize="34" FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="34" Height="34"
+                                    Background="{StaticResource DashboardPrimarySoftBrush}" CornerRadius="8">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE787;"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- Quick Actions + Panels Row -->
+            <Grid Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Quick Actions -->
+                <Border Grid.Column="0" Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,8,0">
+                    <StackPanel Margin="18">
+                        <TextBlock Text="Quick Actions" FontSize="18" FontWeight="Bold"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+                        <WrapPanel>
+                            <Button Command="{Binding AddStudentCommand}"
+                                    Margin="0,0,8,8" Padding="12,9" FontSize="13"
+                                    FontWeight="SemiBold" Cursor="Hand"
+                                    Foreground="{StaticResource DashboardPrimaryBrush}"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1" Background="{StaticResource DashboardSurfaceBrush}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE77B;"
+                                               VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Add Student"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding AddTeacherCommand}"
+                                    Margin="0,0,8,8" Padding="12,9" FontSize="13"
+                                    FontWeight="SemiBold" Cursor="Hand"
+                                    Foreground="{StaticResource DashboardPrimaryBrush}"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1" Background="{StaticResource DashboardSurfaceBrush}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE716;"
+                                               VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Add Teacher"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding CreateCourseCommand}"
+                                    Margin="0,0,8,8" Padding="12,9" FontSize="13"
+                                    FontWeight="SemiBold" Cursor="Hand"
+                                    Foreground="{StaticResource DashboardPrimaryBrush}"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1" Background="{StaticResource DashboardSurfaceBrush}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7BE;"
+                                               VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Create Course"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding CreateSubjectCommand}"
+                                    Margin="0,0,8,8" Padding="12,9" FontSize="13"
+                                    FontWeight="SemiBold" Cursor="Hand"
+                                    Foreground="{StaticResource DashboardPrimaryBrush}"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1" Background="{StaticResource DashboardSurfaceBrush}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8A5;"
+                                               VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Create Subject"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding OpenSchedulingCommand}"
+                                    Margin="0,0,8,8" Padding="12,9" FontSize="13"
+                                    FontWeight="SemiBold" Cursor="Hand"
+                                    Foreground="White"
+                                    Background="{StaticResource DashboardPrimaryBrush}"
+                                    BorderThickness="0">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE787;"
+                                               VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Open Scheduling"/>
+                                </StackPanel>
+                            </Button>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Announcements / Notes -->
+                <Border Grid.Column="1" Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0,0,0">
+                    <StackPanel Margin="18">
+                        <TextBlock Text="Announcements" FontSize="18" FontWeight="Bold"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20,0,20">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE789;"
+                                       FontSize="36" HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Margin="0,0,0,10"/>
+                            <TextBlock Text="No announcements yet"
+                                       FontSize="15" FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <TextBlock Text="Announcements and notes will appear here."
+                                       FontSize="13" HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Recent Activity + Chart Placeholder Row -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Recent Activity -->
+                <Border Grid.Column="0" Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,8,0">
+                    <Grid Margin="18">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Recent Activity" FontSize="18" FontWeight="Bold"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+
+                        <!-- Activity list (empty) -->
+                        <ItemsControl x:Name="ActivityList" Grid.Row="1"
+                                      ItemsSource="{Binding RecentActivities}"/>
+
+                        <!-- Empty state overlay -->
+                        <Border Grid.Row="1" Padding="0,20">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Items.Count, ElementName=ActivityList}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE823;"
+                                           FontSize="36" HorizontalAlignment="Center"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           Margin="0,0,0,10"/>
+                                <TextBlock Text="No recent activity"
+                                           FontSize="15" FontWeight="SemiBold"
+                                           HorizontalAlignment="Center"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                <TextBlock Text="Activity will appear here once the system is in use."
+                                           FontSize="13" HorizontalAlignment="Center"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Chart Placeholder -->
+                <Border Grid.Column="1" Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0,0,0">
+                    <Grid Margin="18">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Attendance Overview" FontSize="18" FontWeight="Bold"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                   Margin="0,0,0,14"/>
+
+                        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                    Margin="0,20,0,20">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9D2;"
+                                       FontSize="36" HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Margin="0,0,0,10"/>
+                            <TextBlock Text="No chart data available"
+                                       FontSize="15" FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <TextBlock Text="Connect the database to see attendance trends here."
+                                       FontSize="13" HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

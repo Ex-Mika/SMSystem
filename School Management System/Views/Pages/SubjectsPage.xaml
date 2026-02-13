@@ -1,0 +1,350 @@
+<UserControl x:Class="SubjectsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1200">
+    <Grid Margin="20,18,20,22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Bar: Search + Filters -->
+        <Border Grid.Row="0" Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,0,14">
+            <Grid Margin="16,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0"
+                         Style="{StaticResource DashboardSearchTextBoxStyle}"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Tag="Search subjects..."
+                         Margin="0,0,10,0"/>
+
+                <ComboBox Grid.Column="1"
+                          Style="{StaticResource DashboardFilterComboBoxStyle}"
+                          ItemsSource="{Binding CourseOptions}"
+                          SelectedItem="{Binding SelectedCourseFilter}"
+                          Width="160"
+                          Margin="0,0,10,0"/>
+
+                <ComboBox Grid.Column="2"
+                          Style="{StaticResource DashboardFilterComboBoxStyle}"
+                          ItemsSource="{Binding StatusOptions}"
+                          SelectedItem="{Binding SelectedStatusFilter}"
+                          Width="140"
+                          Margin="0,0,10,0"/>
+
+                <Button Grid.Column="3"
+                        Style="{StaticResource DashboardHeaderIconButtonStyle}"
+                        Command="{Binding ClearFiltersCommand}"
+                        ToolTip="Clear filters"
+                        Margin="0,0,6,0">
+                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE894;" FontSize="14"/>
+                </Button>
+
+                <Button Grid.Column="4"
+                        Style="{StaticResource DashboardHeaderIconButtonStyle}"
+                        Command="{Binding RefreshCommand}"
+                        ToolTip="Refresh">
+                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72C;" FontSize="14"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Main Content: DataGrid + Form -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="340"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Column: DataGrid -->
+            <Border Grid.Column="0" Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,14,0">
+                <Grid>
+                    <DataGrid x:Name="SubjectsGrid"
+                              ItemsSource="{Binding Subjects}"
+                              SelectedItem="{Binding SelectedSubject}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              SelectionMode="Single"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal"
+                              BorderThickness="0"
+                              Background="Transparent"
+                              RowBackground="Transparent"
+                              AlternatingRowBackground="#FAFBFD"
+                              HorizontalGridLinesBrush="{StaticResource DashboardBorderBrush}"
+                              Margin="0"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserResizeRows="False">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="{StaticResource DashboardSurfaceBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="Padding" Value="16,10"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="16,10"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="DataGridCell">
+                                            <Border Padding="{TemplateBinding Padding}"
+                                                    Background="{TemplateBinding Background}">
+                                                <ContentPresenter VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource DashboardPrimarySoftBrush}"/>
+                                        <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource DashboardPrimarySoftBrush}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#F5F8FC"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Subject Code" Binding="{Binding SubjectCode}" Width="130"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                            <DataGridTextColumn Header="Units" Binding="{Binding Units}" Width="70"/>
+                            <DataGridTextColumn Header="Course" Binding="{Binding Course}" Width="130"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="110"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Empty State Overlay -->
+                    <Border x:Name="EmptyOverlay" Background="{StaticResource DashboardSurfaceBrush}" IsHitTestVisible="False">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE7BE;"
+                                       FontSize="40" HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Margin="0,0,0,12"/>
+                            <TextBlock Text="No subjects yet"
+                                       FontSize="16" FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <TextBlock Text="Subjects will appear here once added."
+                                       FontSize="13" HorizontalAlignment="Center"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Items.Count, ElementName=SubjectsGrid}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Right Column: Form -->
+            <Border Grid.Column="1" Style="{StaticResource DashboardCardBorderStyle}">
+                <StackPanel Margin="20,18,20,20">
+                    <TextBlock Text="Subject Details"
+                               FontSize="16" FontWeight="Bold"
+                               Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                               Margin="0,0,0,18"/>
+
+                    <!-- Subject Code -->
+                    <TextBlock Text="Subject Code"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding FormSubjectCode, UpdateSourceTrigger=PropertyChanged}"
+                             Padding="10,8" FontSize="13"
+                             BorderBrush="{StaticResource DashboardBorderBrush}"
+                             BorderThickness="1"
+                             Margin="0,0,0,14">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+
+                    <!-- Description -->
+                    <TextBlock Text="Description"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding FormDescription, UpdateSourceTrigger=PropertyChanged}"
+                             Padding="10,8" FontSize="13"
+                             BorderBrush="{StaticResource DashboardBorderBrush}"
+                             BorderThickness="1"
+                             Margin="0,0,0,14">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+
+                    <!-- Units -->
+                    <TextBlock Text="Units"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Margin="0,0,0,6"/>
+                    <TextBox Text="{Binding FormUnits, UpdateSourceTrigger=PropertyChanged}"
+                             Padding="10,8" FontSize="13"
+                             BorderBrush="{StaticResource DashboardBorderBrush}"
+                             BorderThickness="1"
+                             Margin="0,0,0,14">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+
+                    <!-- Course -->
+                    <TextBlock Text="Course"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Margin="0,0,0,6"/>
+                    <ComboBox SelectedItem="{Binding FormCourse}"
+                              ItemsSource="{Binding CourseOptions}"
+                              Padding="10,8" FontSize="13"
+                              BorderBrush="{StaticResource DashboardBorderBrush}"
+                              BorderThickness="1"
+                              Margin="0,0,0,14"/>
+
+                    <!-- Status -->
+                    <TextBlock Text="Status"
+                               FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Margin="0,0,0,6"/>
+                    <ComboBox SelectedItem="{Binding FormStatus}"
+                              Padding="10,8" FontSize="13"
+                              BorderBrush="{StaticResource DashboardBorderBrush}"
+                              BorderThickness="1"
+                              Margin="0,0,0,22">
+                        <sys:String>Active</sys:String>
+                        <sys:String>Inactive</sys:String>
+                    </ComboBox>
+
+                    <!-- Action Buttons -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Row 0: New + Edit -->
+                        <Button Grid.Row="0" Grid.Column="0"
+                                Content="New" Command="{Binding NewCommand}"
+                                Margin="0,0,4,8" Padding="0,9" FontSize="13"
+                                FontWeight="SemiBold" Cursor="Hand"
+                                Foreground="{StaticResource DashboardPrimaryBrush}"
+                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                BorderThickness="1" Background="{StaticResource DashboardSurfaceBrush}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Content="Edit" Command="{Binding EditCommand}"
+                                Margin="4,0,0,8" Padding="0,9" FontSize="13"
+                                FontWeight="SemiBold" Cursor="Hand"
+                                Foreground="{StaticResource DashboardPrimaryBrush}"
+                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                BorderThickness="1" Background="{StaticResource DashboardSurfaceBrush}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                        <!-- Row 1: Save + Cancel -->
+                        <Button Grid.Row="1" Grid.Column="0"
+                                Content="Save" Command="{Binding SaveCommand}"
+                                Margin="0,0,4,8" Padding="0,9" FontSize="13"
+                                FontWeight="SemiBold" Cursor="Hand"
+                                Foreground="White"
+                                Background="{StaticResource DashboardPrimaryBrush}"
+                                BorderThickness="0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Content="Cancel" Command="{Binding CancelCommand}"
+                                Margin="4,0,0,8" Padding="0,9" FontSize="13"
+                                FontWeight="SemiBold" Cursor="Hand"
+                                Foreground="{StaticResource DashboardTextMutedBrush}"
+                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                BorderThickness="1" Background="{StaticResource DashboardSurfaceBrush}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                        <!-- Row 2: Deactivate (full width) -->
+                        <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                Content="Deactivate" Command="{Binding DeactivateCommand}"
+                                Padding="0,9" FontSize="13"
+                                FontWeight="SemiBold" Cursor="Hand"
+                                Foreground="{StaticResource DashboardDangerBrush}"
+                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                BorderThickness="1" Background="{StaticResource DashboardSurfaceBrush}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
