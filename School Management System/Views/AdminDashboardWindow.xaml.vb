@@ -1,8 +1,22 @@
-Class AdminDashboardWindow
+﻿Class AdminDashboardWindow
+    Private Enum AdminDashboardSection
+        Dashboard
+        Students
+        Teachers
+        Administrators
+        Courses
+        Departments
+        Subjects
+        Reports
+        Scheduling
+    End Enum
+
+    Private _activeSection As AdminDashboardSection = AdminDashboardSection.Dashboard
+
     Public Sub New()
         InitializeComponent()
         UpdateMaximizeRestoreIcon()
-
+        SetActiveSection(AdminDashboardSection.Dashboard)
     End Sub
 
     Private Sub TitleBar_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs)
@@ -15,6 +29,7 @@ Class AdminDashboardWindow
             If TypeOf sourceElement Is Button Then
                 Return
             End If
+
             sourceElement = VisualTreeHelper.GetParent(sourceElement)
         End While
 
@@ -46,8 +61,160 @@ Class AdminDashboardWindow
         UpdateMaximizeRestoreIcon()
     End Sub
 
-    Private Sub DashboardCalendarHost_SizeChanged(sender As Object, e As SizeChangedEventArgs)
+    Private Sub DashboardNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Dashboard)
+    End Sub
 
+    Private Sub StudentsNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Students)
+    End Sub
+
+    Private Sub TeachersNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Teachers)
+    End Sub
+
+    Private Sub AdministratorsNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Administrators)
+    End Sub
+
+    Private Sub CoursesNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Courses)
+    End Sub
+
+    Private Sub DepartmentsNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Departments)
+    End Sub
+
+    Private Sub SubjectsNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Subjects)
+    End Sub
+
+    Private Sub ReportsNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Reports)
+    End Sub
+
+    Private Sub SchedulingNavButton_Click(sender As Object, e As RoutedEventArgs)
+        SetActiveSection(AdminDashboardSection.Scheduling)
+    End Sub
+
+    Private Sub SetActiveSection(section As AdminDashboardSection)
+        _activeSection = section
+
+        DashboardContentView.Visibility = If(section = AdminDashboardSection.Dashboard, Visibility.Visible, Visibility.Collapsed)
+        StudentsContentView.Visibility = If(section = AdminDashboardSection.Students, Visibility.Visible, Visibility.Collapsed)
+        TeachersContentView.Visibility = If(section = AdminDashboardSection.Teachers, Visibility.Visible, Visibility.Collapsed)
+        AdministratorsContentView.Visibility = If(section = AdminDashboardSection.Administrators, Visibility.Visible, Visibility.Collapsed)
+        CoursesContentView.Visibility = If(section = AdminDashboardSection.Courses, Visibility.Visible, Visibility.Collapsed)
+        DepartmentsContentView.Visibility = If(section = AdminDashboardSection.Departments, Visibility.Visible, Visibility.Collapsed)
+        SubjectsContentView.Visibility = If(section = AdminDashboardSection.Subjects, Visibility.Visible, Visibility.Collapsed)
+        ReportsContentView.Visibility = If(section = AdminDashboardSection.Reports, Visibility.Visible, Visibility.Collapsed)
+        SchedulingContentView.Visibility = If(section = AdminDashboardSection.Scheduling, Visibility.Visible, Visibility.Collapsed)
+
+        ContentTitleTextBlock.Text = GetSectionTitle(section)
+        SearchPlaceholderTextBlock.Text = GetSectionSearchPlaceholder(section)
+
+        ApplySidebarSelectionStyles(section)
+
+        If section = AdminDashboardSection.Students Then
+            StudentsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf section = AdminDashboardSection.Teachers Then
+            TeachersContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf section = AdminDashboardSection.Administrators Then
+            AdministratorsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf section = AdminDashboardSection.Courses Then
+            CoursesContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf section = AdminDashboardSection.Reports Then
+            ReportsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf section = AdminDashboardSection.Scheduling Then
+            SchedulingContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        End If
+    End Sub
+
+    Private Sub SearchActionsTextBox_TextChanged(sender As Object, e As TextChangedEventArgs)
+        If _activeSection = AdminDashboardSection.Students Then
+            StudentsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf _activeSection = AdminDashboardSection.Teachers Then
+            TeachersContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf _activeSection = AdminDashboardSection.Administrators Then
+            AdministratorsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf _activeSection = AdminDashboardSection.Courses Then
+            CoursesContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf _activeSection = AdminDashboardSection.Reports Then
+            ReportsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf _activeSection = AdminDashboardSection.Scheduling Then
+            SchedulingContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        End If
+    End Sub
+
+    Private Sub ApplySidebarSelectionStyles(activeSection As AdminDashboardSection)
+        ApplySidebarButtonState(DashboardNavButton, DashboardNavIconBorder, DashboardNavIconText, DashboardNavText, activeSection = AdminDashboardSection.Dashboard)
+        ApplySidebarButtonState(StudentsNavButton, StudentsNavIconBorder, StudentsNavIconText, StudentsNavText, activeSection = AdminDashboardSection.Students)
+        ApplySidebarButtonState(TeachersNavButton, TeachersNavIconBorder, TeachersNavIconText, TeachersNavText, activeSection = AdminDashboardSection.Teachers)
+        ApplySidebarButtonState(AdministratorsNavButton, AdministratorsNavIconBorder, AdministratorsNavIconText, AdministratorsNavText, activeSection = AdminDashboardSection.Administrators)
+        ApplySidebarButtonState(CoursesNavButton, CoursesNavIconBorder, CoursesNavIconText, CoursesNavText, activeSection = AdminDashboardSection.Courses)
+        ApplySidebarButtonState(DepartmentsNavButton, DepartmentsNavIconBorder, DepartmentsNavIconText, DepartmentsNavText, activeSection = AdminDashboardSection.Departments)
+        ApplySidebarButtonState(SubjectsNavButton, SubjectsNavIconBorder, SubjectsNavIconText, SubjectsNavText, activeSection = AdminDashboardSection.Subjects)
+        ApplySidebarButtonState(ReportsNavButton, ReportsNavIconBorder, ReportsNavIconText, ReportsNavText, activeSection = AdminDashboardSection.Reports)
+        ApplySidebarButtonState(SchedulingNavButton, SchedulingNavIconBorder, SchedulingNavIconText, SchedulingNavText, activeSection = AdminDashboardSection.Scheduling)
+    End Sub
+
+    Private Sub ApplySidebarButtonState(navButton As Button, navIconBorder As Border, navIconText As TextBlock, navText As TextBlock, isSelected As Boolean)
+        navButton.Style = CType(FindResource(If(isSelected, "DashboardSidebarNavSelectedButtonStyle", "DashboardSidebarNavButtonStyle")), Style)
+        navIconBorder.Style = CType(FindResource(If(isSelected, "DashboardSidebarIconSelectedBadgeStyle", "DashboardSidebarIconBadgeStyle")), Style)
+        navIconText.Style = CType(FindResource(If(isSelected, "DashboardSidebarIconGlyphSelectedStyle", "DashboardSidebarIconGlyphStyle")), Style)
+        navText.Style = CType(FindResource(If(isSelected, "DashboardSidebarNavTextSelectedStyle", "DashboardSidebarNavTextStyle")), Style)
+    End Sub
+
+    Private Function GetSectionTitle(section As AdminDashboardSection) As String
+        Select Case section
+            Case AdminDashboardSection.Students
+                Return "Students"
+            Case AdminDashboardSection.Teachers
+                Return "Teachers"
+            Case AdminDashboardSection.Administrators
+                Return "Administrators"
+            Case AdminDashboardSection.Courses
+                Return "Courses"
+            Case AdminDashboardSection.Departments
+                Return "Departments"
+            Case AdminDashboardSection.Subjects
+                Return "Subjects"
+            Case AdminDashboardSection.Reports
+                Return "Reports"
+            Case AdminDashboardSection.Scheduling
+                Return "Scheduling"
+            Case Else
+                Return "Overview"
+        End Select
+    End Function
+
+    Private Function GetSectionSearchPlaceholder(section As AdminDashboardSection) As String
+        Select Case section
+            Case AdminDashboardSection.Students
+                Return "Search students..."
+            Case AdminDashboardSection.Teachers
+                Return "Search teachers..."
+            Case AdminDashboardSection.Administrators
+                Return "Search administrators..."
+            Case AdminDashboardSection.Courses
+                Return "Search courses..."
+            Case AdminDashboardSection.Departments
+                Return "Search departments..."
+            Case AdminDashboardSection.Subjects
+                Return "Search subjects..."
+            Case AdminDashboardSection.Reports
+                Return "Search reports..."
+            Case AdminDashboardSection.Scheduling
+                Return "Search schedules..."
+            Case Else
+                Return "Search students, staff, or actions..."
+        End Select
+    End Function
+
+    Private Sub SignOutButton_Click(sender As Object, e As RoutedEventArgs)
+        Dim loginWindow As New LoginWindow()
+        loginWindow.Show()
+        Close()
     End Sub
 
     Private Sub ToggleWindowState()
@@ -66,7 +233,4 @@ Class AdminDashboardWindow
 
         MaximizeRestoreIcon.Text = If(WindowState = WindowState.Maximized, ChrW(&HE923), ChrW(&HE922))
     End Sub
-
-
-
 End Class

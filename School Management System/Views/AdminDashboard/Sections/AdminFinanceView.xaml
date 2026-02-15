@@ -1,0 +1,44 @@
+<UserControl x:Class="AdminFinanceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20,18,20,22">
+            <Border Style="{StaticResource DashboardCardBorderStyle}">
+                <StackPanel Margin="18">
+                    <TextBlock Text="Department Management"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="12"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Text="Manage departments, program ownership, and related metadata."/>
+                    <Border Margin="0,14,0,0"
+                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <DataGrid x:Name="DepartmentsDataGrid"
+                                  Style="{StaticResource DashboardManagementDataGridStyle}"
+                                  ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                  CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                  RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                  MinHeight="560">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Department ID" Binding="{Binding [Department ID]}" Width="1.2*"/>
+                                <DataGridTextColumn Header="Department Name" Binding="{Binding [Department Name]}" Width="1.6*"/>
+                                <DataGridTextColumn Header="Head" Binding="{Binding [Head]}" Width="1.4*"/>
+                                <DataGridTextColumn Header="Courses" Binding="{Binding [Courses]}" Width="1*"/>
+                                <DataGridTextColumn Header="Faculty Count" Binding="{Binding [Faculty Count]}" Width="1*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
+
+

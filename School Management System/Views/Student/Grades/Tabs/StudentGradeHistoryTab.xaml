@@ -1,0 +1,85 @@
+<UserControl x:Class="StudentGradeHistoryTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <StackPanel>
+        <TextBlock Text="Grade History"
+                   FontSize="22"
+                   FontWeight="Bold"/>
+
+        <Grid Margin="0,14,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Margin="0,0,8,0"
+                    Padding="12,10"
+                    CornerRadius="8"
+                    Background="#F4F8FD"
+                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Terms Completed" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                    <TextBlock Text="0" FontSize="20" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Margin="8,0,0,0"
+                    Padding="12,10"
+                    CornerRadius="8"
+                    Background="#F4F8FD"
+                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Overall GWA" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                    <TextBlock Text="0" FontSize="20" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Margin="0,14,0,0"
+                BorderBrush="{StaticResource DashboardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1.4*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Term"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                <TextBlock Grid.Column="1"
+                           Text="Units"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                <TextBlock Grid.Column="2"
+                           Text="GWA"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+
+                <Rectangle Grid.Row="1"
+                           Grid.ColumnSpan="3"
+                           Height="1"
+                           Fill="{StaticResource DashboardBorderBrush}"
+                           Margin="0,10,0,10"/>
+
+                <TextBlock Grid.Row="2" Text=" "/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="0"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="0"/>
+            </Grid>
+        </Border>
+    </StackPanel>
+</UserControl>

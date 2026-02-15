@@ -70,6 +70,52 @@
         </Setter>
     </Style>
 
+    <Style x:Key="DashboardManagementDataGridStyle" TargetType="DataGrid">
+        <Setter Property="AutoGenerateColumns" Value="False"/>
+        <Setter Property="HeadersVisibility" Value="Column"/>
+        <Setter Property="GridLinesVisibility" Value="All"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource DashboardBorderBrush}"/>
+        <Setter Property="VerticalGridLinesBrush" Value="{StaticResource DashboardBorderBrush}"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="RowHeaderWidth" Value="0"/>
+        <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="CanUserDeleteRows" Value="False"/>
+        <Setter Property="CanUserResizeRows" Value="False"/>
+        <Setter Property="CanUserResizeColumns" Value="False"/>
+        <Setter Property="SelectionUnit" Value="FullRow"/>
+        <Setter Property="SelectionMode" Value="Single"/>
+        <Setter Property="MinColumnWidth" Value="90"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+    </Style>
+
+    <Style x:Key="DashboardManagementDataGridHeaderStyle" TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="#F8FBFF"/>
+        <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        <Setter Property="SeparatorVisibility" Value="Collapsed"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+    </Style>
+
+    <Style x:Key="DashboardManagementDataGridCellStyle" TargetType="DataGridCell">
+        <Setter Property="Padding" Value="10,11"/>
+        <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style x:Key="DashboardManagementDataGridRowStyle" TargetType="DataGridRow">
+        <Setter Property="Background" Value="White"/>
+    </Style>
+
     <Style x:Key="DashboardWindowButtonStyle" TargetType="Button">
         <Setter Property="Width" Value="44"/>
         <Setter Property="Height" Value="30"/>
@@ -120,10 +166,10 @@
     </Style>
 
     <Style x:Key="DashboardSidebarNavButtonStyle" TargetType="Button">
-        <Setter Property="Padding" Value="14,11"/>
-        <Setter Property="MinHeight" Value="46"/>
+        <Setter Property="Padding" Value="16,14"/>
+        <Setter Property="MinHeight" Value="56"/>
         <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="16"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
@@ -163,10 +209,10 @@
     </Style>
 
     <Style x:Key="DashboardSidebarIconBadgeStyle" TargetType="Border">
-        <Setter Property="Width" Value="24"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="CornerRadius" Value="7"/>
-        <Setter Property="Background" Value="{StaticResource DashboardSidebarIconSurfaceBrush}"/>
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
@@ -174,12 +220,12 @@
     <Style x:Key="DashboardSidebarIconSelectedBadgeStyle"
            TargetType="Border"
            BasedOn="{StaticResource DashboardSidebarIconBadgeStyle}">
-        <Setter Property="Background" Value="{StaticResource DashboardSidebarIconSelectedSurfaceBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
     </Style>
 
     <Style x:Key="DashboardSidebarIconGlyphStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="16"/>
         <Setter Property="Foreground" Value="{StaticResource DashboardSidebarIconBrush}"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -192,9 +238,9 @@
     </Style>
 
     <Style x:Key="DashboardSidebarNavTextStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="12,0,0,0"/>
+        <Setter Property="Margin" Value="14,0,0,0"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="16"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
     </Style>
@@ -203,6 +249,192 @@
            TargetType="TextBlock"
            BasedOn="{StaticResource DashboardSidebarNavTextStyle}">
         <Setter Property="Foreground" Value="{StaticResource DashboardPrimaryBrush}"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileTabControlStyle" TargetType="TabControl">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabControl">
+                    <Grid KeyboardNavigation.TabNavigation="Local">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TabPanel Grid.Row="0"
+                                  Margin="0,0,0,12"
+                                  IsItemsHost="True"
+                                  ClipToBounds="False"
+                                  Background="Transparent"
+                                  KeyboardNavigation.TabIndex="1"/>
+
+                        <Border Grid.Row="1"
+                                Background="Transparent"
+                                BorderThickness="0">
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                              ContentSource="SelectedContent"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DashboardProfileTabItemStyle" TargetType="TabItem">
+        <Setter Property="Margin" Value="0,0,10,0"/>
+        <Setter Property="Padding" Value="16,9"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Panel.ZIndex" Value="0"/>
+        <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+        <Setter Property="Background" Value="#F5F8FC"/>
+        <Setter Property="BorderBrush" Value="#BFD0E4"/>
+        <Setter Property="BorderThickness" Value="1,1,1,1"/>
+        <Setter Property="SnapsToDevicePixels" Value="False"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Grid SnapsToDevicePixels="True">
+                        <Rectangle x:Name="TabSurface"
+                                   RadiusX="6"
+                                   RadiusY="6"
+                                   Fill="{TemplateBinding Background}"
+                                   Stroke="{TemplateBinding BorderBrush}"
+                                   StrokeThickness="1"/>
+                        <ContentPresenter ContentSource="Header"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="TabSurface" Property="Fill" Value="#EDF4FC"/>
+                            <Setter TargetName="TabSurface" Property="Stroke" Value="#AFC4DE"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Panel.ZIndex" Value="10"/>
+                            <Setter Property="Foreground" Value="{StaticResource DashboardPrimaryBrush}"/>
+                            <Setter TargetName="TabSurface" Property="Fill" Value="#E5F1FF"/>
+                            <Setter TargetName="TabSurface" Property="Stroke" Value="#7CAAE0"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DashboardProfileSegmentButtonStyle" TargetType="Button">
+        <Setter Property="Height" Value="36"/>
+        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="#6D8097"/>
+        <Setter Property="Background" Value="#F2F6FB"/>
+        <Setter Property="BorderBrush" Value="#D7E1EE"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="SegmentSurface"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="7">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="SegmentSurface" Property="Background" Value="#ECF3FB"/>
+                            <Setter TargetName="SegmentSurface" Property="BorderBrush" Value="#C8D8EB"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="SegmentSurface" Property="Opacity" Value="0.92"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DashboardProfileSegmentSelectedButtonStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource DashboardProfileSegmentButtonStyle}">
+        <Setter Property="Foreground" Value="{StaticResource DashboardPrimaryBrush}"/>
+        <Setter Property="Background" Value="#E4F0FF"/>
+        <Setter Property="BorderBrush" Value="#82AFE4"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileSectionCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="#F8FBFF"/>
+        <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileSectionTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileSectionSubtitleStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,4,0,0"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileFieldLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileFieldValueContainerStyle" TargetType="Border">
+        <Setter Property="Margin" Value="0,6,0,0"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#DEE7F3"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileFieldValueStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileStatCardStyle" TargetType="Border">
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="Background" Value="#F2F8FF"/>
+        <Setter Property="BorderBrush" Value="#D7E8FC"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileStatValueStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+    </Style>
+
+    <Style x:Key="DashboardProfileTagBorderStyle" TargetType="Border">
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="#EAF4FF"/>
+        <Setter Property="BorderBrush" Value="#D4E7FD"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Margin" Value="0,0,8,0"/>
     </Style>
 
     <Style x:Key="DashboardHeaderIconButtonStyle" TargetType="Button">

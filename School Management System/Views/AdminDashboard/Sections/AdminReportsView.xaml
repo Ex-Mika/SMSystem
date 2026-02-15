@@ -1,0 +1,325 @@
+<UserControl x:Class="AdminReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="ReportOptionCardStyle" TargetType="Border">
+            <Setter Property="Width" Value="430"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="Background" Value="#FCFDFE"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
+
+        <Style x:Key="ReportActionButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource DashboardPrimaryActionButtonStyle}">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="MinWidth" Value="160"/>
+            <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="ReportExportButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ReportActionButtonStyle}">
+            <Setter Property="Background" Value="#F3F6FA"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20,18,20,22">
+            <Border Style="{StaticResource DashboardCardBorderStyle}">
+                <StackPanel Margin="18">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="Reports"
+                                   FontSize="22"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock x:Name="ReportsCountTextBlock"
+                                   Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   Text="6 report options"/>
+                    </Grid>
+
+                    <TextBlock Margin="0,6,0,0"
+                               FontSize="12"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Text="Choose which section report to print."/>
+
+                    <WrapPanel Margin="0,14,0,0" HorizontalAlignment="Center">
+                        <Border x:Name="StudentsReportCard" Style="{StaticResource ReportOptionCardStyle}">
+                            <StackPanel Margin="16">
+                                <Border Width="42"
+                                        Height="42"
+                                        CornerRadius="21"
+                                        Background="#EAF4FF"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               Text="&#xE77B;"
+                                               FontSize="18"
+                                               Foreground="{StaticResource DashboardPrimaryBrush}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Margin="0,12,0,0"
+                                           FontSize="19"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                           Text="Students Report"/>
+                                <TextBlock Margin="0,6,0,0"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           Text="Print current students list including ID, full name, year level, course, and section."/>
+                                <UniformGrid Columns="2" Margin="0,14,0,0">
+                                    <Button Margin="0,0,6,0"
+                                            Style="{StaticResource ReportActionButtonStyle}"
+                                            Background="#137FEC"
+                                            Foreground="White"
+                                            Click="PrintStudentsReportButton_Click"
+                                            Content="Print"/>
+                                    <Button Margin="6,0,0,0"
+                                            Style="{StaticResource ReportExportButtonStyle}"
+                                            Click="ExportStudentsReportButton_Click"
+                                            Content="Export Excel"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="TeachersReportCard" Style="{StaticResource ReportOptionCardStyle}">
+                            <StackPanel Margin="16">
+                                <Border Width="42"
+                                        Height="42"
+                                        CornerRadius="21"
+                                        Background="#ECF8F2"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               Text="&#xE716;"
+                                               FontSize="18"
+                                               Foreground="#2A7E46"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Margin="0,12,0,0"
+                                           FontSize="19"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                           Text="Teachers Report"/>
+                                <TextBlock Margin="0,6,0,0"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           Text="Print current teachers list including ID, full name, department, and advisory."/>
+                                <UniformGrid Columns="2" Margin="0,14,0,0">
+                                    <Button Margin="0,0,6,0"
+                                            Style="{StaticResource ReportActionButtonStyle}"
+                                            Background="#2A7E46"
+                                            Foreground="White"
+                                            Click="PrintTeachersReportButton_Click"
+                                            Content="Print"/>
+                                    <Button Margin="6,0,0,0"
+                                            Style="{StaticResource ReportExportButtonStyle}"
+                                            Click="ExportTeachersReportButton_Click"
+                                            Content="Export Excel"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="CoursesReportCard" Style="{StaticResource ReportOptionCardStyle}">
+                            <StackPanel Margin="16">
+                                <Border Width="42"
+                                        Height="42"
+                                        CornerRadius="21"
+                                        Background="#FFF5E6"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               Text="&#xE8A5;"
+                                               FontSize="18"
+                                               Foreground="#B36B00"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Margin="0,12,0,0"
+                                           FontSize="19"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                           Text="Courses Report"/>
+                                <TextBlock Margin="0,6,0,0"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           Text="Print available courses with code, title, department, and units."/>
+                                <UniformGrid Columns="2" Margin="0,14,0,0">
+                                    <Button Margin="0,0,6,0"
+                                            Style="{StaticResource ReportActionButtonStyle}"
+                                            Background="#B36B00"
+                                            Foreground="White"
+                                            Click="PrintCoursesReportButton_Click"
+                                            Content="Print"/>
+                                    <Button Margin="6,0,0,0"
+                                            Style="{StaticResource ReportExportButtonStyle}"
+                                            Click="ExportCoursesReportButton_Click"
+                                            Content="Export Excel"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="DepartmentsReportCard" Style="{StaticResource ReportOptionCardStyle}">
+                            <StackPanel Margin="16">
+                                <Border Width="42"
+                                        Height="42"
+                                        CornerRadius="21"
+                                        Background="#F2F1FF"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               Text="&#xE8C7;"
+                                               FontSize="18"
+                                               Foreground="#5A4AB2"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Margin="0,12,0,0"
+                                           FontSize="19"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                           Text="Departments Report"/>
+                                <TextBlock Margin="0,6,0,0"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           Text="Print departments with identifier, department name, and department head."/>
+                                <UniformGrid Columns="2" Margin="0,14,0,0">
+                                    <Button Margin="0,0,6,0"
+                                            Style="{StaticResource ReportActionButtonStyle}"
+                                            Background="#5A4AB2"
+                                            Foreground="White"
+                                            Click="PrintDepartmentsReportButton_Click"
+                                            Content="Print"/>
+                                    <Button Margin="6,0,0,0"
+                                            Style="{StaticResource ReportExportButtonStyle}"
+                                            Click="ExportDepartmentsReportButton_Click"
+                                            Content="Export Excel"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="SubjectsReportCard" Style="{StaticResource ReportOptionCardStyle}">
+                            <StackPanel Margin="16">
+                                <Border Width="42"
+                                        Height="42"
+                                        CornerRadius="21"
+                                        Background="#E8F7FF"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               Text="&#xE8EF;"
+                                               FontSize="18"
+                                               Foreground="#0B74A5"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Margin="0,12,0,0"
+                                           FontSize="19"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                           Text="Subjects Report"/>
+                                <TextBlock Margin="0,6,0,0"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           Text="Print available subjects including code, title, units, course, and year level."/>
+                                <UniformGrid Columns="2" Margin="0,14,0,0">
+                                    <Button Margin="0,0,6,0"
+                                            Style="{StaticResource ReportActionButtonStyle}"
+                                            Background="#0B74A5"
+                                            Foreground="White"
+                                            Click="PrintSubjectsReportButton_Click"
+                                            Content="Print"/>
+                                    <Button Margin="6,0,0,0"
+                                            Style="{StaticResource ReportExportButtonStyle}"
+                                            Click="ExportSubjectsReportButton_Click"
+                                            Content="Export Excel"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="SchedulingReportCard" Style="{StaticResource ReportOptionCardStyle}">
+                            <StackPanel Margin="16">
+                                <Border Width="42"
+                                        Height="42"
+                                        CornerRadius="21"
+                                        Background="#EFFFF5"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets"
+                                               Text="&#xE823;"
+                                               FontSize="18"
+                                               Foreground="#238E55"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Margin="0,12,0,0"
+                                           FontSize="19"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                           Text="Scheduling Report"/>
+                                <TextBlock Margin="0,6,0,0"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           Text="Print professor schedules with day, session, subject, and room assignments."/>
+                                <UniformGrid Columns="2" Margin="0,14,0,0">
+                                    <Button Margin="0,0,6,0"
+                                            Style="{StaticResource ReportActionButtonStyle}"
+                                            Background="#238E55"
+                                            Foreground="White"
+                                            Click="PrintSchedulingReportButton_Click"
+                                            Content="Print"/>
+                                    <Button Margin="6,0,0,0"
+                                            Style="{StaticResource ReportExportButtonStyle}"
+                                            Click="ExportSchedulingReportButton_Click"
+                                            Content="Export Excel"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+                    </WrapPanel>
+
+                    <TextBlock x:Name="NoReportsMatchTextBlock"
+                               Margin="0,4,0,0"
+                               FontSize="12"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Text="No report option matches your search."
+                               Visibility="Collapsed"/>
+                </StackPanel>
+            </Border>
+
+            <Border Margin="0,12,0,0"
+                    Style="{StaticResource DashboardCardBorderStyle}">
+                <TextBlock x:Name="ReportsActionStatusTextBlock"
+                           Margin="16,12"
+                           FontSize="12"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                           Text="Select a report option to print."
+                           TextWrapping="Wrap"/>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

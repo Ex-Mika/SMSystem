@@ -1,0 +1,67 @@
+<UserControl x:Class="StudentScheduleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:School_Management_System"
+             mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20,18,20,22">
+            <Border Style="{StaticResource DashboardCardBorderStyle}">
+                <Grid Margin="18">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="Class Schedule"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock x:Name="ScheduleStudentIdTextBlock"
+                                   Text=""
+                                   Margin="0,4,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="1"
+                            Padding="12,8"
+                            CornerRadius="8"
+                            Background="#F4F8FD"
+                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                            BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="Total Sessions"
+                                       FontSize="11"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            <TextBlock Text="0"
+                                       FontSize="17"
+                                       FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,18,0,0">
+                <TabControl Margin="18"
+                            Background="Transparent"
+                            BorderThickness="0">
+                    <TabItem Header="Weekly">
+                        <local:StudentWeeklyScheduleTab x:Name="WeeklyScheduleTabView"
+                                                        Margin="0,14,0,0"/>
+                    </TabItem>
+
+                    <TabItem Header="Exams">
+                        <local:StudentExamScheduleTab Margin="0,14,0,0"/>
+                    </TabItem>
+
+                    <TabItem Header="Consultations">
+                        <local:StudentConsultationScheduleTab Margin="0,14,0,0"/>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

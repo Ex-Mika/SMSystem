@@ -1,0 +1,271 @@
+<UserControl x:Class="AdminCoursesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:School_Management_System"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="CourseFormLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,12,0,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+        </Style>
+
+        <Style x:Key="CourseFormTextInputStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="CourseDetailsValueBorderStyle" TargetType="Border">
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+
+        <Style x:Key="CourseDetailsValueTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+            <Setter Property="Text" Value="--"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20,18,20,22">
+                <Border Style="{StaticResource DashboardCardBorderStyle}">
+                    <StackPanel Margin="18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Courses"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <TextBlock x:Name="CoursesCountTextBlock"
+                                       Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Text="0 courses"/>
+                        </Grid>
+
+                        <TextBlock Margin="0,6,0,0"
+                                   FontSize="12"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   Text="Manage available courses. Select a row to view details on the left."/>
+
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="460"/>
+                                <ColumnDefinition Width="14"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Background="White">
+                                <Grid>
+                                    <Grid x:Name="CourseDetailsPanel">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock Text="Course Details"
+                                                           FontSize="20"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="CourseDetailsSubtitleTextBlock"
+                                                           Margin="0,3,0,0"
+                                                           Text="Select a course from the table."
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <TextBlock Style="{StaticResource CourseFormLabelStyle}" Margin="0,0,0,0" Text="Course Code"/>
+                                                <Border Style="{StaticResource CourseDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="CourseDetailsCodeTextBlock" Style="{StaticResource CourseDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource CourseFormLabelStyle}" Text="Course Title"/>
+                                                <Border Style="{StaticResource CourseDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="CourseDetailsTitleTextBlock" Style="{StaticResource CourseDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource CourseFormLabelStyle}" Text="Department"/>
+                                                <Border Style="{StaticResource CourseDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="CourseDetailsDepartmentTextBlock" Style="{StaticResource CourseDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource CourseFormLabelStyle}" Text="Units"/>
+                                                <Border Style="{StaticResource CourseDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="CourseDetailsUnitsTextBlock" Style="{StaticResource CourseDetailsValueTextStyle}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Border Grid.Row="2"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Background="#FCFDFE">
+                                            <UniformGrid Columns="3">
+                                                <Button Height="38"
+                                                        Margin="0,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#137FEC"
+                                                        Foreground="White"
+                                                        Click="OpenAddCourseButton_Click"
+                                                        Content="New"/>
+                                                <Button x:Name="EditSelectedCourseButton"
+                                                        Height="38"
+                                                        Margin="6,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#EAF4FF"
+                                                        Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                        Click="EditSelectedCourseButton_Click"
+                                                        Content="Edit"/>
+                                                <Button x:Name="DeleteSelectedCourseButton"
+                                                        Height="38"
+                                                        Margin="6,0,0,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#FFECEE"
+                                                        Foreground="#D64545"
+                                                        Click="DeleteSelectedCourseButton_Click"
+                                                        Content="Delete"/>
+                                            </UniformGrid>
+                                        </Border>
+                                    </Grid>
+
+                                    <Grid x:Name="CourseFormPanel" Visibility="Collapsed">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock x:Name="CourseFormTitleTextBlock"
+                                                           Text="Add Course"
+                                                           FontSize="20"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="CourseFormSubtitleTextBlock"
+                                                           Margin="0,3,0,0"
+                                                           Text="Create a new course record."
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <TextBlock Style="{StaticResource CourseFormLabelStyle}" Margin="0,0,0,0" Text="Course Code"/>
+                                                <TextBox x:Name="CourseFormCodeTextBox" Style="{StaticResource CourseFormTextInputStyle}"/>
+
+                                                <TextBlock Style="{StaticResource CourseFormLabelStyle}" Text="Course Title"/>
+                                                <TextBox x:Name="CourseFormTitleTextBox" Style="{StaticResource CourseFormTextInputStyle}"/>
+
+                                                <TextBlock Style="{StaticResource CourseFormLabelStyle}" Text="Department"/>
+                                                <TextBox x:Name="CourseFormDepartmentTextBox" Style="{StaticResource CourseFormTextInputStyle}"/>
+
+                                                <TextBlock Style="{StaticResource CourseFormLabelStyle}" Text="Units"/>
+                                                <TextBox x:Name="CourseFormUnitsTextBox" Style="{StaticResource CourseFormTextInputStyle}"/>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Border Grid.Row="2"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Background="#FCFDFE">
+                                            <UniformGrid Columns="2">
+                                                <Button x:Name="SaveCourseFormButton"
+                                                        Height="38"
+                                                        Margin="0,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#137FEC"
+                                                        Foreground="White"
+                                                        Click="SaveCourseFormButton_Click"
+                                                        Content="Add Course"/>
+                                                <Button Height="38"
+                                                        Margin="6,0,0,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#F3F6FA"
+                                                        Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                        Click="CancelCourseFormButton_Click"
+                                                        Content="Cancel"/>
+                                            </UniformGrid>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="2"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Background="White"
+                                    local:RoundedClipHelper.CornerRadius="10"
+                                    ClipToBounds="True"
+                                    SnapsToDevicePixels="True">
+                                <DataGrid x:Name="CoursesDataGrid"
+                                          Style="{StaticResource DashboardManagementDataGridStyle}"
+                                          ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                          CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                          RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                          BorderThickness="0"
+                                          ColumnWidth="*"
+                                          local:RoundedClipHelper.CornerRadius="10"
+                                          ClipToBounds="True"
+                                          CanUserSortColumns="True"
+                                          SelectionChanged="CoursesDataGrid_SelectionChanged"
+                                          MinHeight="640">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Course Code" Binding="{Binding [Course Code]}" Width="*"/>
+                                        <DataGridTextColumn Header="Course Title" Binding="{Binding [Course Title]}" Width="*"/>
+                                        <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" Width="*"/>
+                                        <DataGridTextColumn Header="Units" Binding="{Binding [Units]}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

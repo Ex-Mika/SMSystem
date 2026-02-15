@@ -162,6 +162,20 @@ Class LoginWindow
         IdentifierLabelTextBlock.Text = "Email"
     End Sub
 
+    Private Sub LoginButton_Click(sender As Object, e As RoutedEventArgs)
+        If StudentRoleRadioButton IsNot Nothing AndAlso StudentRoleRadioButton.IsChecked = True Then
+            Dim studentDashboard As New StudentDashboardWindow()
+            studentDashboard.SetLoggedInStudent(UsernameTextBox.Text)
+            studentDashboard.Show()
+            Close()
+            Return
+        End If
+
+        Dim adminDashboard As New AdminDashboardWindow()
+        adminDashboard.Show()
+        Close()
+    End Sub
+
     Private Sub ToggleWindowState()
         If ResizeMode = ResizeMode.NoResize Then
             Return

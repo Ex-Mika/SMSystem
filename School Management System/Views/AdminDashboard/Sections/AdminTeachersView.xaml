@@ -1,0 +1,301 @@
+<UserControl x:Class="AdminTeachersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:School_Management_System"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="TeacherFormLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,12,0,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+        </Style>
+
+        <Style x:Key="TeacherFormTextInputStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="TeacherDetailsValueBorderStyle" TargetType="Border">
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+
+        <Style x:Key="TeacherDetailsValueTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+            <Setter Property="Text" Value="--"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20,18,20,22">
+                <Border Style="{StaticResource DashboardCardBorderStyle}">
+                    <StackPanel Margin="18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Teachers"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <TextBlock x:Name="TeachersCountTextBlock"
+                                       Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Text="0 teachers"/>
+                        </Grid>
+
+                        <TextBlock Margin="0,6,0,0"
+                                   FontSize="12"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   Text="Select a row to view teacher details on the left. Use New, Edit, or Delete to manage records."/>
+
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="460"/>
+                                <ColumnDefinition Width="14"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Background="White">
+                                <Grid>
+                                    <Grid x:Name="TeacherDetailsPanel">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock Text="Teacher Details"
+                                                           FontSize="20"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="TeacherDetailsSubtitleTextBlock"
+                                                           Margin="0,3,0,0"
+                                                           Text="Select a teacher from the table."
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}"
+                                                           Margin="0,0,0,0"
+                                                           Text="Teacher ID"/>
+                                                <Border Style="{StaticResource TeacherDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="TeacherDetailsTeacherIdTextBlock" Style="{StaticResource TeacherDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Full Name"/>
+                                                <Border Style="{StaticResource TeacherDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="TeacherDetailsFullNameTextBlock" Style="{StaticResource TeacherDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Department"/>
+                                                <Border Style="{StaticResource TeacherDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="TeacherDetailsDepartmentTextBlock" Style="{StaticResource TeacherDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Advisory"/>
+                                                <Border Style="{StaticResource TeacherDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="TeacherDetailsAdvisoryTextBlock" Style="{StaticResource TeacherDetailsValueTextStyle}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Border Grid.Row="2"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Background="#FCFDFE">
+                                            <UniformGrid Columns="3">
+                                                <Button Height="38"
+                                                        Margin="0,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#137FEC"
+                                                        Foreground="White"
+                                                        Click="OpenAddTeacherButton_Click"
+                                                        Content="New"/>
+                                                <Button x:Name="EditSelectedTeacherButton"
+                                                        Height="38"
+                                                        Margin="6,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#EAF4FF"
+                                                        Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                        Click="EditSelectedTeacherButton_Click"
+                                                        Content="Edit"/>
+                                                <Button x:Name="DeleteSelectedTeacherButton"
+                                                        Height="38"
+                                                        Margin="6,0,0,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#FFECEE"
+                                                        Foreground="#D64545"
+                                                        Click="DeleteSelectedTeacherButton_Click"
+                                                        Content="Delete"/>
+                                            </UniformGrid>
+                                        </Border>
+                                    </Grid>
+
+                                    <Grid x:Name="TeacherFormPanel" Visibility="Collapsed">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock x:Name="TeacherFormTitleTextBlock"
+                                                           Text="Add Teacher"
+                                                           FontSize="20"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="TeacherFormSubtitleTextBlock"
+                                                           Margin="0,3,0,0"
+                                                           Text="Create a new teacher record."
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}"
+                                                           Margin="0,0,0,0"
+                                                           Text="Teacher ID"/>
+                                                <TextBox x:Name="TeacherFormTeacherIdTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+
+                                                <Grid Margin="0,12,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="12"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Margin="0" Text="First Name"/>
+                                                        <TextBox x:Name="TeacherFormFirstNameTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Margin="0" Text="Last Name"/>
+                                                        <TextBox x:Name="TeacherFormLastNameTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Middle Name"/>
+                                                <TextBox x:Name="TeacherFormMiddleNameTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+
+                                                <Grid Margin="0,12,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="12"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Margin="0" Text="Department"/>
+                                                        <TextBox x:Name="TeacherFormDepartmentTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Margin="0" Text="Advisory"/>
+                                                        <TextBox x:Name="TeacherFormAdvisoryTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Border Grid.Row="2"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Background="#FCFDFE">
+                                            <UniformGrid Columns="2">
+                                                <Button x:Name="SaveTeacherFormButton"
+                                                        Height="38"
+                                                        Margin="0,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#137FEC"
+                                                        Foreground="White"
+                                                        Click="SaveTeacherFormButton_Click"
+                                                        Content="Add Teacher"/>
+                                                <Button Height="38"
+                                                        Margin="6,0,0,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#F3F6FA"
+                                                        Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                        Click="CancelTeacherFormButton_Click"
+                                                        Content="Cancel"/>
+                                            </UniformGrid>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="2"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Background="White"
+                                    local:RoundedClipHelper.CornerRadius="10"
+                                    ClipToBounds="True"
+                                    SnapsToDevicePixels="True">
+                                <DataGrid x:Name="TeachersDataGrid"
+                                          Style="{StaticResource DashboardManagementDataGridStyle}"
+                                          ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                          CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                          RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                          BorderThickness="0"
+                                          ColumnWidth="*"
+                                          local:RoundedClipHelper.CornerRadius="10"
+                                          ClipToBounds="True"
+                                          CanUserSortColumns="True"
+                                          SelectionChanged="TeachersDataGrid_SelectionChanged"
+                                          MinHeight="640">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Teacher ID" Binding="{Binding [Teacher ID]}" Width="*"/>
+                                        <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" Width="*"/>
+                                        <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" Width="*"/>
+                                        <DataGridTextColumn Header="Advisory" Binding="{Binding [Advisory]}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

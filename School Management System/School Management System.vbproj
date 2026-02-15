@@ -26,4 +26,11 @@
     <Resource Include="Resources\Images\prmsu-logo.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Remove="Views\AdminDashboard\Sections\AdminFinanceView.xaml" />
+    <Compile Remove="Views\AdminDashboard\Sections\AdminFinanceView.xaml.vb" />
+    <Page Remove="Views\AdminDashboard\Sections\AdminTransportView.xaml" />
+    <Compile Remove="Views\AdminDashboard\Sections\AdminTransportView.xaml.vb" />
+  </ItemGroup>
+
 </Project>

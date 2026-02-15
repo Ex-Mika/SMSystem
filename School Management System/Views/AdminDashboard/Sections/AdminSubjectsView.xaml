@@ -1,0 +1,42 @@
+<UserControl x:Class="AdminSubjectsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20,18,20,22">
+            <Border Style="{StaticResource DashboardCardBorderStyle}">
+                <StackPanel Margin="18">
+                    <TextBlock Text="Subject Management"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                    <TextBlock Margin="0,4,0,0"
+                               FontSize="12"
+                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                               Text="Review and maintain available subjects per program and year level."/>
+                    <Border Margin="0,14,0,0"
+                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <DataGrid x:Name="SubjectsDataGrid"
+                                  Style="{StaticResource DashboardManagementDataGridStyle}"
+                                  ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                  CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                  RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                  MinHeight="560">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Subject Code" Binding="{Binding [Subject Code]}" Width="1.2*"/>
+                                <DataGridTextColumn Header="Subject Name" Binding="{Binding [Subject Name]}" Width="1.8*"/>
+                                <DataGridTextColumn Header="Units" Binding="{Binding [Units]}" Width="0.8*"/>
+                                <DataGridTextColumn Header="Course" Binding="{Binding [Course]}" Width="1.2*"/>
+                                <DataGridTextColumn Header="Year Level" Binding="{Binding [Year Level]}" Width="1*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

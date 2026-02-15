@@ -1,0 +1,556 @@
+<Window x:Class="StudentDashboardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:local="clr-namespace:School_Management_System"
+        mc:Ignorable="d"
+        Title="Student Dashboard"
+        Width="1540"
+        Height="900"
+        MinWidth="1220"
+        MinHeight="760"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        StateChanged="StudentDashboardWindow_StateChanged"
+        Background="{StaticResource DashboardPageBackgroundBrush}">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="0"
+                            CornerRadius="0"
+                            GlassFrameThickness="0"
+                            ResizeBorderThickness="6"
+                            UseAeroCaptionButtons="False"/>
+    </shell:WindowChrome.WindowChrome>
+    <Grid Background="{StaticResource DashboardPageBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="44"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Style="{StaticResource DashboardTitleBarBorderStyle}"
+                MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="12,0,0,0">
+                    <TextBlock Text="Student Portal"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="White"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="0,0,8,0">
+                    <Button Style="{StaticResource TitleBarButtonStyle}"
+                            Click="MinimizeButton_Click"
+                            ToolTip="Minimize">
+                        <TextBlock Text="&#xE921;"
+                                   FontSize="15"
+                                   Style="{StaticResource LoginTitleBarGlyphStyle}"/>
+                    </Button>
+                    <Button Style="{StaticResource TitleBarButtonStyle}"
+                            Click="MaximizeRestoreButton_Click"
+                            ToolTip="Maximize/Restore">
+                        <TextBlock x:Name="MaximizeRestoreIcon"
+                                   Text="&#xE922;"
+                                   FontSize="12"
+                                   Style="{StaticResource LoginTitleBarGlyphStyle}"/>
+                    </Button>
+                    <Button Style="{StaticResource TitleBarCloseButtonStyle}"
+                            Click="CloseButton_Click"
+                            ToolTip="Close">
+                        <TextBlock Text="&#xE8BB;"
+                                   FontSize="11"
+                                   Style="{StaticResource LoginTitleBarGlyphStyle}"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="272"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="{StaticResource DashboardSurfaceBrush}"
+                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                    BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                            BorderThickness="0,0,0,1"
+                            Padding="22,20,20,18">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="44"
+                                    Height="44"
+                                    CornerRadius="22"
+                                    Background="#032538"
+                                    VerticalAlignment="Center">
+                                <Image Source="/Resources/Images/prmsu-logo.png"
+                                       Width="28"
+                                       Height="28"
+                                       Stretch="Uniform"/>
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="Student"
+                                           FontSize="21"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                <TextBlock x:Name="SidebarStudentSubtitleTextBlock"
+                                           Text="Student Dashboard"
+                                           FontSize="12"
+                                           Margin="0,2,0,0"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Padding="14,14,14,0">
+                        <StackPanel>
+                            <Button x:Name="DashboardNavButton"
+                                    Style="{StaticResource DashboardSidebarNavSelectedButtonStyle}"
+                                    Click="DashboardNavButton_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="DashboardNavIconBorder" Style="{StaticResource DashboardSidebarIconSelectedBadgeStyle}">
+                                        <TextBlock x:Name="DashboardNavIconText" Style="{StaticResource DashboardSidebarIconGlyphSelectedStyle}" Text="&#xE80F;"/>
+                                    </Border>
+                                    <TextBlock x:Name="DashboardNavText"
+                                               Grid.Column="1"
+                                               Style="{StaticResource DashboardSidebarNavTextSelectedStyle}"
+                                               Text="Dashboard"/>
+                                </Grid>
+                            </Button>
+
+                            <Button x:Name="ProfileNavButton"
+                                    Style="{StaticResource DashboardSidebarNavButtonStyle}"
+                                    Margin="0,6,0,0"
+                                    Click="ProfileNavButton_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="ProfileNavIconBorder" Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock x:Name="ProfileNavIconText" Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE77B;"/>
+                                    </Border>
+                                    <TextBlock x:Name="ProfileNavText"
+                                               Grid.Column="1"
+                                               Style="{StaticResource DashboardSidebarNavTextStyle}"
+                                               Text="Profile"/>
+                                </Grid>
+                            </Button>
+
+                            <Button x:Name="MySubjectsNavButton"
+                                    Style="{StaticResource DashboardSidebarNavButtonStyle}"
+                                    Margin="0,6,0,0"
+                                    Click="MySubjectsNavButton_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="MySubjectsNavIconBorder" Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock x:Name="MySubjectsNavIconText" Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE7BE;"/>
+                                    </Border>
+                                    <TextBlock x:Name="MySubjectsNavText"
+                                               Grid.Column="1"
+                                               Style="{StaticResource DashboardSidebarNavTextStyle}"
+                                               Text="My Subjects"/>
+                                </Grid>
+                            </Button>
+
+                            <Button x:Name="ClassScheduleNavButton"
+                                    Style="{StaticResource DashboardSidebarNavButtonStyle}"
+                                    Margin="0,6,0,0"
+                                    Click="ClassScheduleNavButton_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="ClassScheduleNavIconBorder" Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock x:Name="ClassScheduleNavIconText" Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE823;"/>
+                                    </Border>
+                                    <TextBlock x:Name="ClassScheduleNavText"
+                                               Grid.Column="1"
+                                               Style="{StaticResource DashboardSidebarNavTextStyle}"
+                                               Text="Class Schedule"/>
+                                </Grid>
+                            </Button>
+
+                            <Button x:Name="GradesNavButton"
+                                    Style="{StaticResource DashboardSidebarNavButtonStyle}"
+                                    Margin="0,6,0,0"
+                                    Click="GradesNavButton_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="GradesNavIconBorder" Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock x:Name="GradesNavIconText" Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE9D9;"/>
+                                    </Border>
+                                    <TextBlock x:Name="GradesNavText"
+                                               Grid.Column="1"
+                                               Style="{StaticResource DashboardSidebarNavTextStyle}"
+                                               Text="Grades"/>
+                                </Grid>
+                            </Button>
+
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2"
+                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                            BorderThickness="0,1,0,0"
+                            Padding="14,10,14,14">
+                        <StackPanel>
+                            <Button Style="{StaticResource DashboardSidebarNavButtonStyle}"
+                                    Click="SignOutButton_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource DashboardSidebarIconBadgeStyle}">
+                                        <TextBlock Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xF3B1;"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource DashboardSidebarNavTextStyle}" Text="Sign Out"/>
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="{StaticResource DashboardSurfaceBrush}"
+                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                        BorderThickness="0,0,0,1"
+                        Padding="18,14">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="ContentTitleTextBlock"
+                                       Text="Overview"
+                                       FontSize="28"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <Grid Width="340" Height="36" Margin="20,0,0,0">
+                                <TextBox x:Name="SearchDashboardTextBox"
+                                         Style="{StaticResource DashboardSearchTextBoxStyle}"/>
+                                <TextBlock FontFamily="Segoe MDL2 Assets"
+                                           Text="&#xE721;"
+                                           Margin="12,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           IsHitTestVisible="False"/>
+                                <TextBlock Text="Search..."
+                                           Margin="36,0,10,0"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           FontSize="13"
+                                           IsHitTestVisible="False">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Text, ElementName=SearchDashboardTextBox}" Value=""/>
+                                                        <Condition Binding="{Binding IsKeyboardFocused, ElementName=SearchDashboardTextBox}" Value="False"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            
+                            <Border Width="1"
+                                    Height="26"
+                                    Background="{StaticResource DashboardBorderBrush}"
+                                    Margin="12,0"/>
+                            <Border Width="36"
+                                    Height="36"
+                                    CornerRadius="18"
+                                    Background="#DCE8F8"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1">
+                                <TextBlock Text="S"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="#1F3E6F"/>
+                            </Border>
+                            <StackPanel Margin="8,0,0,0">
+                                <TextBlock x:Name="HeaderStudentNameTextBlock"
+                                           Text="Student"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                <TextBlock x:Name="HeaderStudentIdTextBlock"
+                                           Text="Section"
+                                           FontSize="11"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="1">
+                    <ScrollViewer x:Name="DashboardContentScrollViewer" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="20,18,20,22">
+                            <UniformGrid Columns="3">
+                                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,8,0">
+                                    <StackPanel Margin="16,14,16,12">
+                                        <TextBlock Text="Current Subjects"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                        <TextBlock Text="0"
+                                                   FontSize="34"
+                                                   FontWeight="Bold"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0">
+                                    <StackPanel Margin="16,14,16,12">
+                                        <TextBlock Text="Pending Tasks"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                        <TextBlock Text="0"
+                                                   FontSize="34"
+                                                   FontWeight="Bold"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0,0,0">
+                                    <StackPanel Margin="16,14,16,12">
+                                        <TextBlock Text="Unread Notices"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                        <TextBlock Text="0"
+                                                   FontSize="34"
+                                                   FontWeight="Bold"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <Grid Margin="0,18,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.7*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,10,0">
+                                    <StackPanel Margin="18">
+                                        <TextBlock Text="Weekly Timetable"
+                                                   FontSize="22"
+                                                   FontWeight="Bold"/>
+                                        <Border Margin="0,14,0,0"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Padding="0">
+                                            <DataGrid x:Name="DashboardTimetableDataGrid"
+                                                      AutoGenerateColumns="False"
+                                                      HeadersVisibility="Column"
+                                                      GridLinesVisibility="All"
+                                                      HorizontalGridLinesBrush="{StaticResource DashboardBorderBrush}"
+                                                      VerticalGridLinesBrush="{StaticResource DashboardBorderBrush}"
+                                                      IsReadOnly="True"
+                                                      BorderThickness="0"
+                                                      Background="Transparent"
+                                                      RowHeaderWidth="0"
+                                                      CanUserAddRows="False"
+                                                      CanUserDeleteRows="False"
+                                                      CanUserResizeRows="False"
+                                                      CanUserResizeColumns="False"
+                                                      CanUserSortColumns="False"
+                                                      SelectionUnit="Cell"
+                                                      SelectionMode="Single"
+                                                      ColumnWidth="*"
+                                                      MinColumnWidth="70">
+                                                <DataGrid.Resources>
+                                                    <Style TargetType="DataGridColumnHeader">
+                                                        <Setter Property="Background" Value="#F8FBFF"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                        <Setter Property="Padding" Value="10,8"/>
+                                                        <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+                                                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                                                    </Style>
+                                                    <Style TargetType="DataGridCell">
+                                                        <Setter Property="Padding" Value="10,12"/>
+                                                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+                                                        <Setter Property="BorderThickness" Value="0"/>
+                                                    </Style>
+                                                    <Style TargetType="DataGridRow">
+                                                        <Setter Property="Background" Value="White"/>
+                                                    </Style>
+                                                </DataGrid.Resources>
+                                            </DataGrid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="1" Style="{StaticResource DashboardCardBorderStyle}" Margin="10,0,0,0">
+                                    <StackPanel Margin="18">
+                                        <TextBlock Text="Upcoming Deadlines"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"/>
+                                        <Border Margin="0,12,0,0"
+                                                Padding="12,10"
+                                                CornerRadius="8"
+                                                Background="#F8FBFF"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="1">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xE915;"
+                                                           FontFamily="Segoe MDL2 Assets"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Text=" "
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Margin="0,8,0,0"
+                                                Padding="12,10"
+                                                CornerRadius="8"
+                                                Background="#F8FBFF"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="1">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xE915;"
+                                                           FontFamily="Segoe MDL2 Assets"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Text=" "
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Margin="0,8,0,0"
+                                                Padding="12,10"
+                                                CornerRadius="8"
+                                                Background="#F8FBFF"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="1">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="&#xE915;"
+                                                           FontFamily="Segoe MDL2 Assets"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                           Margin="0,0,10,0"/>
+                                                <TextBlock Text=" "
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <Grid Margin="0,18,0,0">
+                                <Grid.ColumnDefinitions>
+                                    
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+
+                               
+
+                                <Border Grid.Column="1"
+                                        Margin="10,0,0,0"
+                                        HorizontalAlignment="Center"
+                                        Background="{StaticResource DashboardHelpGradientBrush}"
+                                        CornerRadius="12">
+                                    <Grid Margin="20">
+                                        <StackPanel>
+                                            <TextBlock Text="Student Support"
+                                                       FontSize="30"
+                                                       FontWeight="Bold"
+                                                       HorizontalAlignment="Center"
+                                                       Foreground="White"/>
+                                            <TextBlock Margin="0,8,0,0"
+                                                       MaxWidth="360"
+                                                       FontSize="14"
+                                                       Foreground="#D7E9FF"
+                                                       TextWrapping="Wrap"
+                                                       Text="Use the sidebar to navigate your modules."/>
+                                            <Button Margin="0,20,0,0"
+                                                    Width="140"
+                                                    Height="36"
+                                                    HorizontalAlignment="Center"
+                                                    Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                    Content="Open Help"/>
+                                        </StackPanel>
+                                        <TextBlock Text="&#xE897;"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   FontSize="156"
+                                                   Opacity="0.18"
+                                                   Foreground="White"
+                                                   HorizontalAlignment="Right"
+                                                   VerticalAlignment="Bottom"
+                                                   Margin="0,0,-12,-34"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <local:StudentSubjectsView x:Name="MySubjectsContentView"
+                                               Visibility="Collapsed"/>
+
+                    <local:StudentScheduleView x:Name="ClassScheduleContentView"
+                                               Visibility="Collapsed"/>
+
+                    <local:StudentGradesView x:Name="GradesContentView"
+                                             Visibility="Collapsed"/>
+
+                    <local:StudentProfileView x:Name="ProfileContentView"
+                                              Visibility="Collapsed"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
+    
