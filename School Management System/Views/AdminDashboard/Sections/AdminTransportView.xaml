@@ -27,11 +27,11 @@
                                   RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
                                   MinHeight="560">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Route" Binding="{Binding [Route]}" Width="1.2*"/>
-                                <DataGridTextColumn Header="Vehicle" Binding="{Binding [Vehicle]}" Width="1.4*"/>
-                                <DataGridTextColumn Header="Driver" Binding="{Binding [Driver]}" Width="1.6*"/>
-                                <DataGridTextColumn Header="Schedule" Binding="{Binding [Schedule]}" Width="1.4*"/>
-                                <DataGridTextColumn Header="Status" Binding="{Binding [Status]}" Width="1*"/>
+                                <DataGridTextColumn Header="Route" Binding="{Binding [Route]}" SortMemberPath="Route" Width="1.2*"/>
+                                <DataGridTextColumn Header="Vehicle" Binding="{Binding [Vehicle]}" SortMemberPath="Vehicle" Width="1.4*"/>
+                                <DataGridTextColumn Header="Driver" Binding="{Binding [Driver]}" SortMemberPath="Driver" Width="1.6*"/>
+                                <DataGridTextColumn Header="Schedule" Binding="{Binding [Schedule]}" SortMemberPath="Schedule" Width="1.4*"/>
+                                <DataGridTextColumn Header="Status" Binding="{Binding [Status]}" SortMemberPath="Status" Width="1*"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>
@@ -40,3 +40,4 @@
         </StackPanel>
     </ScrollViewer>
 </UserControl>
+

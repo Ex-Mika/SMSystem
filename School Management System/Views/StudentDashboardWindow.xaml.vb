@@ -124,7 +124,7 @@ Class StudentDashboardWindow
         ElseIf isMySubjectsSelected Then
             ContentTitleTextBlock.Text = "My Subjects"
         ElseIf isClassScheduleSelected Then
-            ContentTitleTextBlock.Text = "Class Schedule"
+            ContentTitleTextBlock.Text = "Enrollment"
         ElseIf isGradesSelected Then
             ContentTitleTextBlock.Text = "Grades"
         Else

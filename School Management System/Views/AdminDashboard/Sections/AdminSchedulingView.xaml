@@ -1,10 +1,4 @@
-<UserControl x:Class="AdminSchedulingView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:School_Management_System"
-             mc:Ignorable="d">
+<UserControl x:Class="AdminSchedulingView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:School_Management_System" mc:Ignorable="d">
     <UserControl.Resources>
         <Style x:Key="SchedulingFormLabelStyle" TargetType="TextBlock">
             <Setter Property="Margin" Value="0,12,0,0"/>
@@ -12,7 +6,6 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
         </Style>
-
         <Style x:Key="SchedulingFormTextInputStyle" TargetType="TextBox">
             <Setter Property="Height" Value="36"/>
             <Setter Property="Margin" Value="0,6,0,0"/>
@@ -23,14 +16,20 @@
             <Setter Property="Background" Value="#F8FBFF"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
-
-        <Style x:Key="SchedulingComboBoxStyle"
-               TargetType="ComboBox"
-               BasedOn="{StaticResource DashboardFilterComboBoxStyle}">
-            <Setter Property="Width" Value="380"/>
-            <Setter Property="Height" Value="36"/>
+        <Style x:Key="SchedulingTimeTextInputStyle" TargetType="TextBox" BasedOn="{StaticResource SchedulingFormTextInputStyle}">
+            <Setter Property="Width" Value="78"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
         </Style>
-
+        <Style x:Key="SchedulingComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource DashboardFilterComboBoxStyle}">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
         <Style x:Key="SchedulingDetailsValueBorderStyle" TargetType="Border">
             <Setter Property="Margin" Value="0,6,0,0"/>
             <Setter Property="Padding" Value="10,8"/>
@@ -39,15 +38,34 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="8"/>
         </Style>
-
         <Style x:Key="SchedulingDetailsValueTextStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
             <Setter Property="Text" Value="--"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
+        <Style x:Key="SchedulingProfessorListRowStyle" TargetType="DataGridRow" BasedOn="{StaticResource DashboardManagementDataGridRowStyle}">
+            <Setter Property="MinHeight" Value="44"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#EAF4FF"/></Trigger>
+                <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="#CFE6FF"/></Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="SchedulingProfessorListCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DashboardManagementDataGridCellStyle}">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="SchedulingCenteredDataGridCellStyle" TargetType="DataGridCell" BasedOn="{StaticResource DashboardManagementDataGridCellStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+            <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style x:Key="SchedulingCenteredDataGridHeaderStyle" TargetType="DataGridColumnHeader" BasedOn="{StaticResource DashboardManagementDataGridHeaderStyle}">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
     </UserControl.Resources>
-
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="20,18,20,22">
@@ -57,326 +75,179 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0"
-                                       Text="Scheduling"
-                                       FontSize="22"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                            <TextBlock x:Name="SchedulingCountTextBlock"
-                                       Grid.Column="1"
-                                       VerticalAlignment="Center"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"
-                                       Text="0 professors"/>
+                            <TextBlock Grid.Column="0" Text="Scheduling" FontSize="22" FontWeight="Bold" Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <TextBlock x:Name="SchedulingCountTextBlock" Grid.Column="1" Margin="0,0,12,0" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource DashboardTextMutedBrush}" Text="0 professors"/>
+                            <Button Grid.Column="2" Width="86" Height="34" Style="{StaticResource DashboardPrimaryActionButtonStyle}" Background="#EAF4FF" Foreground="{StaticResource DashboardPrimaryBrush}" Click="RefreshSchedulingDataButton_Click" Content="Refresh"/>
                         </Grid>
-
-                         <TextBlock Margin="0,6,0,0"
-                                    FontSize="12"
-                                    Foreground="{StaticResource DashboardTextMutedBrush}"
-                                    Text="Filter professors and subjects, then assign day, session, section, and room slots."/>
-
-                         <Grid Margin="0,14,0,0">
-                             <Grid.ColumnDefinitions>
-                                 <ColumnDefinition Width="470"/>
-                                 <ColumnDefinition Width="14"/>
-                                 <ColumnDefinition Width="*"/>
-                             </Grid.ColumnDefinitions>
-
-                            <Border Grid.Column="0"
-                                    BorderBrush="{StaticResource DashboardBorderBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="10"
-                                    Background="White">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-
-                                    <Border Grid.Row="0"
-                                            Padding="18,14"
-                                            BorderBrush="{StaticResource DashboardBorderBrush}"
-                                            BorderThickness="0,0,0,1"
-                                            Background="#FCFDFE">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Grid.Column="0">
-                                                <TextBlock Text="Schedule Builder"
-                                                           FontSize="20"
-                                                           FontWeight="Bold"
-                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                                                <TextBlock x:Name="ScheduleBuilderSubtitleTextBlock"
-                                                           Margin="0,3,0,0"
-                                                           Text="Choose a professor and assign subjects to timetable slots."
-                                                           FontSize="12"
-                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                        <TextBlock Margin="0,6,0,0" FontSize="12" Foreground="{StaticResource DashboardTextMutedBrush}" Text="Select a professor from the list to build schedule and view the timetable."/>
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="ScheduleLeftColumn" Width="*"/>
+                                <ColumnDefinition x:Name="ScheduleMiddleColumn" Width="0"/>
+                                <ColumnDefinition x:Name="ScheduleRightColumn" Width="0"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition x:Name="ProfessorListPanelRow" Height="*"/>
+                                    <RowDefinition x:Name="ListBuilderSpacerRow" Height="0"/>
+                                    <RowDefinition x:Name="ScheduleBuilderPanelRow" Height="0"/>
+                                </Grid.RowDefinitions>
+                                <Border x:Name="ProfessorListPanelBorder" Grid.Row="0" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="1" CornerRadius="10" Background="White">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Border Grid.Row="0" Padding="16,12" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="0,0,0,1" Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock Text="Professor List" FontSize="20" FontWeight="Bold" Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="ProfessorListSubtitleTextBlock" Margin="0,3,0,0" FontSize="12" Foreground="{StaticResource DashboardTextMutedBrush}" Text="Choose a professor to open the schedule builder."/>
                                             </StackPanel>
-                                            <Button Grid.Column="1"
-                                                    Width="84"
-                                                    Height="34"
-                                                    Margin="10,0,0,0"
-                                                    Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                    Background="#EAF4FF"
-                                                    Foreground="{StaticResource DashboardPrimaryBrush}"
-                                                    Click="RefreshSchedulingDataButton_Click"
-                                                    Content="Refresh"/>
-                                        </Grid>
-                                    </Border>
-
-                                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                         <StackPanel Margin="18,12,18,14">
-                                             <Border Margin="0,0,0,12"
-                                                     Padding="12"
-                                                     Background="#F8FBFF"
-                                                     BorderBrush="{StaticResource DashboardBorderBrush}"
-                                                     BorderThickness="1"
-                                                     CornerRadius="8">
-                                                 <StackPanel>
-                                                     <TextBlock Text="Filters"
-                                                                FontSize="13"
-                                                                FontWeight="SemiBold"
-                                                                Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
- 
-                                                     <Grid Margin="0,8,0,0">
-                                                         <Grid.ColumnDefinitions>
-                                                             <ColumnDefinition Width="*"/>
-                                                             <ColumnDefinition Width="10"/>
-                                                             <ColumnDefinition Width="*"/>
-                                                         </Grid.ColumnDefinitions>
- 
-                                                         <StackPanel Grid.Column="0">
-                                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Department"/>
-                                                             <ComboBox x:Name="ProfessorDepartmentFilterComboBox"
-                                                                       Style="{StaticResource SchedulingComboBoxStyle}"
-                                                                       Width="200"
-                                                                       SelectionChanged="ProfessorDepartmentFilterComboBox_SelectionChanged"/>
-                                                         </StackPanel>
- 
-                                                         <StackPanel Grid.Column="2">
-                                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Schedule View"/>
-                                                             <ComboBox x:Name="ProfessorScheduleFilterComboBox"
-                                                                       Style="{StaticResource SchedulingComboBoxStyle}"
-                                                                       Width="200"
-                                                                       SelectionChanged="ProfessorScheduleFilterComboBox_SelectionChanged"/>
-                                                         </StackPanel>
-                                                     </Grid>
- 
-                                                     <Grid Margin="0,10,0,0">
-                                                         <Grid.ColumnDefinitions>
-                                                             <ColumnDefinition Width="*"/>
-                                                             <ColumnDefinition Width="10"/>
-                                                             <ColumnDefinition Width="*"/>
-                                                         </Grid.ColumnDefinitions>
- 
-                                                         <StackPanel Grid.Column="0">
-                                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Professor Filter"/>
-                                                             <TextBox x:Name="ProfessorFilterTextBox"
-                                                                      Style="{StaticResource SchedulingFormTextInputStyle}"
-                                                                      TextChanged="ProfessorFilterTextBox_TextChanged"/>
-                                                         </StackPanel>
- 
-                                                         <StackPanel Grid.Column="2">
-                                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Subject Filter"/>
-                                                             <TextBox x:Name="SubjectFilterTextBox"
-                                                                      Style="{StaticResource SchedulingFormTextInputStyle}"
-                                                                      TextChanged="SubjectFilterTextBox_TextChanged"/>
-                                                         </StackPanel>
-                                                     </Grid>
- 
-                                                     <TextBlock x:Name="ProfessorScheduleBreakdownTextBlock"
-                                                                Margin="0,10,0,0"
-                                                                FontSize="11"
-                                                                Foreground="{StaticResource DashboardTextMutedBrush}"
-                                                                TextWrapping="Wrap"
-                                                                Text="0 with schedules | 0 without schedules"/>
-                                                 </StackPanel>
-                                             </Border>
-
-                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}"
-                                                        Margin="0,0,0,0"
-                                                        Text="Professor"/>
-                                            <ComboBox x:Name="ProfessorComboBox"
-                                                      Style="{StaticResource SchedulingComboBoxStyle}"
-                                                      DisplayMemberPath="DisplayName"
-                                                      SelectionChanged="ProfessorComboBox_SelectionChanged"/>
-
-                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Text="Selected Professor"/>
-                                             <Border Style="{StaticResource SchedulingDetailsValueBorderStyle}">
-                                                 <TextBlock x:Name="SelectedProfessorTextBlock" Style="{StaticResource SchedulingDetailsValueTextStyle}"/>
-                                             </Border>
-
-                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Text="Subject"/>
-                                             <ComboBox x:Name="SubjectComboBox"
-                                                       Style="{StaticResource SchedulingComboBoxStyle}"
-                                                       DisplayMemberPath="DisplayName"/>
-
-                                            <Grid Margin="0,12,0,0">
+                                        </Border>
+                                        <Border Grid.Row="1" Margin="16,12,16,10" Padding="12" Background="#F8FBFF" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="1" CornerRadius="8">
+                                            <StackPanel>
+                                                <TextBlock Text="Filters" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <Grid Margin="0,8,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="10"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Department"/>
+                                                        <ComboBox x:Name="ProfessorDepartmentFilterComboBox" Style="{StaticResource SchedulingComboBoxStyle}" SelectionChanged="ProfessorDepartmentFilterComboBox_SelectionChanged"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Schedule View"/>
+                                                        <ComboBox x:Name="ProfessorScheduleFilterComboBox" Style="{StaticResource SchedulingComboBoxStyle}" SelectionChanged="ProfessorScheduleFilterComboBox_SelectionChanged"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                                <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Text="Search Professor"/>
+                                                <TextBox x:Name="ProfessorFilterTextBox" Style="{StaticResource SchedulingFormTextInputStyle}" TextChanged="ProfessorFilterTextBox_TextChanged"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <DataGrid x:Name="ProfessorListDataGrid" Grid.Row="2" Margin="16,0,16,0" Style="{StaticResource DashboardManagementDataGridStyle}" ColumnHeaderStyle="{StaticResource SchedulingCenteredDataGridHeaderStyle}" CellStyle="{StaticResource SchedulingProfessorListCellStyle}" RowStyle="{StaticResource SchedulingProfessorListRowStyle}" BorderThickness="0" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" CanUserSortColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionChanged="ProfessorListDataGrid_SelectionChanged">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Professor" Binding="{Binding DisplayName}" Width="2*"/>
+                                                <DataGridTextColumn Header="Department" Binding="{Binding Department}" Width="*"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <TextBlock x:Name="ProfessorScheduleBreakdownTextBlock" Grid.Row="3" Margin="16,10,16,14" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}" TextWrapping="Wrap" Text="0 with schedules | 0 without schedules | 0 shown"/>
+                                    </Grid>
+                                </Border>
+                                <Border x:Name="ScheduleBuilderPanelBorder" Grid.Row="2" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="1" CornerRadius="10" Background="White" Visibility="Collapsed">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Border Grid.Row="0" Padding="16,12" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="0,0,0,1" Background="#FCFDFE">
+                                            <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="12"/>
-                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-
                                                 <StackPanel Grid.Column="0">
-                                                    <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Day"/>
-                                                    <ComboBox x:Name="DayComboBox"
-                                                              Style="{StaticResource SchedulingComboBoxStyle}"
-                                                              Width="184"/>
+                                                    <TextBlock Text="Schedule Builder" FontSize="20" FontWeight="Bold" Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                    <TextBlock x:Name="ScheduleBuilderSubtitleTextBlock" Margin="0,3,0,0" FontSize="12" Foreground="{StaticResource DashboardTextMutedBrush}" Text="Select a professor from the list to start building."/>
                                                 </StackPanel>
-
-                                                <StackPanel Grid.Column="2">
-                                                    <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Room"/>
-                                                    <TextBox x:Name="RoomTextBox" Style="{StaticResource SchedulingFormTextInputStyle}"/>
-                                                </StackPanel>
-                                            </Grid>
-
-                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Text="Session (24-hour clock)"/>
-                                             <Grid Margin="0,6,0,0">
-                                                 <Grid.ColumnDefinitions>
-                                                     <ColumnDefinition Width="*"/>
-                                                     <ColumnDefinition Width="36"/>
-                                                     <ColumnDefinition Width="*"/>
-                                                 </Grid.ColumnDefinitions>
- 
-                                                 <ComboBox x:Name="SessionStartComboBox"
-                                                           Grid.Column="0"
-                                                           Style="{StaticResource SchedulingComboBoxStyle}"
-                                                           Width="184"/>
- 
-                                                 <TextBlock Grid.Column="1"
-                                                            HorizontalAlignment="Center"
-                                                            VerticalAlignment="Center"
-                                                            FontSize="13"
-                                                            FontWeight="SemiBold"
-                                                            Foreground="{StaticResource DashboardTextMutedBrush}"
-                                                            Text="to"/>
- 
-                                                 <ComboBox x:Name="SessionEndComboBox"
-                                                           Grid.Column="2"
-                                                           Style="{StaticResource SchedulingComboBoxStyle}"
-                                                           Width="184"/>
-                                             </Grid>
-
-                                             <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Text="Section"/>
-                                             <TextBox x:Name="SectionTextBox" Style="{StaticResource SchedulingFormTextInputStyle}"/>
-
-                                             <TextBlock Margin="0,10,0,0"
-                                                        FontSize="11"
-                                                        Foreground="{StaticResource DashboardTextMutedBrush}"
-                                                        TextWrapping="Wrap"
-                                                        Text="Tip: click a timetable cell on the right to auto-fill Day, Session, and Section for quick updates."/>
-                                         </StackPanel>
-                                     </ScrollViewer>
-
-                                    <Border Grid.Row="2"
-                                            Padding="18,14"
-                                            BorderBrush="{StaticResource DashboardBorderBrush}"
-                                            BorderThickness="0,1,0,0"
-                                            Background="#FCFDFE">
-                                        <StackPanel>
-                                            <UniformGrid Columns="3">
-                                                <Button x:Name="SaveScheduleSlotButton"
-                                                        Height="38"
-                                                        Margin="0,0,6,0"
-                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#137FEC"
-                                                        Foreground="White"
-                                                        Click="SaveScheduleSlotButton_Click"
-                                                        Content="Save Slot"/>
-                                                <Button x:Name="RemoveScheduleSlotButton"
-                                                        Height="38"
-                                                        Margin="6,0,6,0"
-                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#FFECEE"
-                                                        Foreground="#D64545"
-                                                        Click="RemoveScheduleSlotButton_Click"
-                                                        Content="Remove Slot"/>
-                                                <Button Height="38"
-                                                        Margin="6,0,0,0"
+                                                <Button Grid.Column="1"
+                                                        Width="96"
+                                                        Height="34"
+                                                        Margin="12,0,0,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
                                                         Background="#F3F6FA"
                                                         Foreground="{StaticResource DashboardTextMutedBrush}"
-                                                        Click="ClearScheduleFormButton_Click"
-                                                        Content="Clear Form"/>
-                                            </UniformGrid>
-                                            <TextBlock x:Name="SchedulingActionStatusTextBlock"
-                                                       Margin="0,10,0,0"
-                                                       FontSize="11"
-                                                       Foreground="{StaticResource DashboardTextMutedBrush}"
-                                                       TextWrapping="Wrap"
-                                                       Text="Ready."/>
-                                        </StackPanel>
-                                    </Border>
-                                </Grid>
-                            </Border>
-
-                            <Border Grid.Column="2"
-                                    BorderBrush="{StaticResource DashboardBorderBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="10"
-                                    Background="White"
-                                    local:RoundedClipHelper.CornerRadius="10"
-                                    ClipToBounds="True"
-                                    SnapsToDevicePixels="True">
+                                                        Click="BackToProfessorListButton_Click"
+                                                        Content="Back to List"/>
+                                            </Grid>
+                                        </Border>
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <StackPanel x:Name="ScheduleBuilderEmptyStatePanel">
+                                                    <TextBlock FontSize="12" Foreground="{StaticResource DashboardTextMutedBrush}" TextWrapping="Wrap" Text="Select a professor from the table above to open the schedule form."/>
+                                                </StackPanel>
+                                                <StackPanel x:Name="ScheduleBuilderEditorPanel" Visibility="Collapsed">
+                                                    <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Text="Subject"/>
+                                                    <ComboBox x:Name="SubjectComboBox" Margin="0,6,0,0" Style="{StaticResource SchedulingComboBoxStyle}" DisplayMemberPath="DisplayName"/>
+                                                    <Grid Margin="0,12,0,0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="12"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Grid.Column="0">
+                                                            <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Day"/>
+                                                            <ComboBox x:Name="DayComboBox" Margin="0,6,0,0" Style="{StaticResource SchedulingComboBoxStyle}"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2">
+                                                            <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Margin="0" Text="Room"/>
+                                                            <TextBox x:Name="RoomTextBox" Style="{StaticResource SchedulingFormTextInputStyle}"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Text="Session (24-hour clock)"/>
+                                                    <Grid Margin="0,6,0,0" HorizontalAlignment="Left">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="78"/>
+                                                            <ColumnDefinition Width="20"/>
+                                                            <ColumnDefinition Width="78"/>
+                                                            <ColumnDefinition Width="46"/>
+                                                            <ColumnDefinition Width="78"/>
+                                                            <ColumnDefinition Width="20"/>
+                                                            <ColumnDefinition Width="78"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBox x:Name="SessionStartHourTextBox" Grid.Column="0" MaxLength="2" Text="00" Style="{StaticResource SchedulingTimeTextInputStyle}" PreviewTextInput="SessionTimeTextBox_PreviewTextInput" LostFocus="SessionTimeTextBox_LostFocus"/>
+                                                        <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource DashboardTextMutedBrush}" Text=":"/>
+                                                        <TextBox x:Name="SessionStartMinuteTextBox" Grid.Column="2" MaxLength="2" Text="00" Style="{StaticResource SchedulingTimeTextInputStyle}" PreviewTextInput="SessionTimeTextBox_PreviewTextInput" LostFocus="SessionTimeTextBox_LostFocus"/>
+                                                        <TextBlock Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource DashboardTextMutedBrush}" Text="to"/>
+                                                        <TextBox x:Name="SessionEndHourTextBox" Grid.Column="4" MaxLength="2" Text="00" Style="{StaticResource SchedulingTimeTextInputStyle}" PreviewTextInput="SessionTimeTextBox_PreviewTextInput" LostFocus="SessionTimeTextBox_LostFocus"/>
+                                                        <TextBlock Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource DashboardTextMutedBrush}" Text=":"/>
+                                                        <TextBox x:Name="SessionEndMinuteTextBox" Grid.Column="6" MaxLength="2" Text="00" Style="{StaticResource SchedulingTimeTextInputStyle}" PreviewTextInput="SessionTimeTextBox_PreviewTextInput" LostFocus="SessionTimeTextBox_LostFocus"/>
+                                                    </Grid>
+                                                    <TextBlock Style="{StaticResource SchedulingFormLabelStyle}" Text="Section"/>
+                                                    <TextBox x:Name="SectionTextBox" Style="{StaticResource SchedulingFormTextInputStyle}"/>
+                                                    <TextBlock Margin="0,10,0,0" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}" TextWrapping="Wrap" Text="Tip: click a timetable cell on the right to auto-fill Day, Session, and Section for quick updates."/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                        <Border Grid.Row="2" Padding="18,14" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="0,1,0,0" Background="#FCFDFE">
+                                            <StackPanel>
+                                                <UniformGrid Columns="3">
+                                                    <Button x:Name="SaveScheduleSlotButton" Height="38" Margin="0,0,6,0" Style="{StaticResource DashboardPrimaryActionButtonStyle}" Background="#137FEC" Foreground="White" Click="SaveScheduleSlotButton_Click" Content="Save Slot"/>
+                                                    <Button x:Name="RemoveScheduleSlotButton" Height="38" Margin="6,0,6,0" Style="{StaticResource DashboardPrimaryActionButtonStyle}" Background="#FFECEE" Foreground="#D64545" Click="RemoveScheduleSlotButton_Click" Content="Remove Slot"/>
+                                                    <Button Height="38" Margin="6,0,0,0" Style="{StaticResource DashboardPrimaryActionButtonStyle}" Background="#F3F6FA" Foreground="{StaticResource DashboardTextMutedBrush}" Click="ClearScheduleFormButton_Click" Content="Clear Form"/>
+                                                </UniformGrid>
+                                                <TextBlock x:Name="SchedulingActionStatusTextBlock" Margin="0,10,0,0" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}" TextWrapping="Wrap" Text="Ready."/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                            <Border x:Name="ProfessorTimetableBorder" Grid.Column="2" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="1" CornerRadius="10" Background="White" local:RoundedClipHelper.CornerRadius="10" ClipToBounds="True" SnapsToDevicePixels="True" Visibility="Collapsed">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-
-                                    <Border Grid.Row="0"
-                                            Padding="16,12"
-                                            BorderBrush="{StaticResource DashboardBorderBrush}"
-                                            BorderThickness="0,0,0,1"
-                                            Background="#FCFDFE">
+                                    <Border Grid.Row="0" Padding="16,12" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="0,0,0,1" Background="#FCFDFE">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <StackPanel>
-                                                <TextBlock Text="Professor Timetable"
-                                                           FontSize="20"
-                                                           FontWeight="Bold"
-                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                                                <TextBlock x:Name="TimetableSubtitleTextBlock"
-                                                           Margin="0,3,0,0"
-                                                           Text="Select a professor to load timetable."
-                                                           FontSize="12"
-                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                                <TextBlock Text="Professor Timetable" FontSize="20" FontWeight="Bold" Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="TimetableSubtitleTextBlock" Margin="0,3,0,0" Text="Select a professor to load timetable." FontSize="12" Foreground="{StaticResource DashboardTextMutedBrush}"/>
                                             </StackPanel>
-                                            <TextBlock x:Name="TimetableEntriesCountTextBlock"
-                                                       Grid.Column="1"
-                                                       Margin="12,0,0,0"
-                                                       VerticalAlignment="Center"
-                                                       FontSize="12"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="{StaticResource DashboardTextMutedBrush}"
-                                                       Text="0 slots"/>
+                                            <TextBlock x:Name="TimetableEntriesCountTextBlock" Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource DashboardTextMutedBrush}" Text="0 slots"/>
                                         </Grid>
                                     </Border>
-
-                                    <DataGrid x:Name="SchedulingTimetableDataGrid"
-                                              Grid.Row="1"
-                                              Style="{StaticResource DashboardManagementDataGridStyle}"
-                                              ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
-                                              CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
-                                              RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
-                                              BorderThickness="0"
-                                              ColumnWidth="*"
-                                              local:RoundedClipHelper.CornerRadius="10"
-                                              ClipToBounds="True"
-                                              CanUserSortColumns="False"
-                                              SelectionUnit="Cell"
-                                              SelectionMode="Single"
-                                              SelectedCellsChanged="SchedulingTimetableDataGrid_SelectedCellsChanged"
-                                              MinHeight="640"/>
+                                    <DataGrid x:Name="SchedulingTimetableDataGrid" Grid.Row="1" Style="{StaticResource DashboardManagementDataGridStyle}" ColumnHeaderStyle="{StaticResource SchedulingCenteredDataGridHeaderStyle}" CellStyle="{StaticResource SchedulingCenteredDataGridCellStyle}" RowStyle="{StaticResource DashboardManagementDataGridRowStyle}" BorderThickness="0" ColumnWidth="*" local:RoundedClipHelper.CornerRadius="10" ClipToBounds="True" CanUserSortColumns="False" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionUnit="Cell" SelectionMode="Single" SelectedCellsChanged="SchedulingTimetableDataGrid_SelectedCellsChanged" MinHeight="0"/>
                                 </Grid>
                             </Border>
                         </Grid>

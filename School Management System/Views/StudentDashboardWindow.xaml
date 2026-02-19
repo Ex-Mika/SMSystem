@@ -201,7 +201,7 @@
                                     <TextBlock x:Name="ClassScheduleNavText"
                                                Grid.Column="1"
                                                Style="{StaticResource DashboardSidebarNavTextStyle}"
-                                               Text="Class Schedule"/>
+                                               Text="Enrollment"/>
                                 </Grid>
                             </Button>
 

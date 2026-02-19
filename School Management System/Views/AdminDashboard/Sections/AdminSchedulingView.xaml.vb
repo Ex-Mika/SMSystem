@@ -4,6 +4,7 @@ Imports System.Globalization
 Imports System.IO
 Imports System.Text.Json
 Imports System.Windows.Data
+Imports System.Windows.Input
 Imports System.Windows.Media
 
 Class AdminSchedulingView
@@ -119,7 +120,7 @@ Class AdminSchedulingView
         InitializeComponent()
 
         InitializeDayOptions()
-        InitializeSessionTimeOptions()
+        InitializeSessionInputBoxes()
         InitializeLookupFilterControls()
         LoadScheduleRecords()
         LoadLookupData()
@@ -140,24 +141,23 @@ Class AdminSchedulingView
         End If
     End Sub
 
-    Private Sub InitializeSessionTimeOptions()
-        Dim clockTimes As List(Of String) = BuildClockTimes()
-        SessionStartComboBox.ItemsSource = clockTimes
-        SessionEndComboBox.ItemsSource = clockTimes
+    Private Sub InitializeSessionInputBoxes()
+        If SessionStartHourTextBox IsNot Nothing Then
+            SessionStartHourTextBox.Text = "00"
+        End If
+
+        If SessionStartMinuteTextBox IsNot Nothing Then
+            SessionStartMinuteTextBox.Text = "00"
+        End If
+
+        If SessionEndHourTextBox IsNot Nothing Then
+            SessionEndHourTextBox.Text = "00"
+        End If
+
+        If SessionEndMinuteTextBox IsNot Nothing Then
+            SessionEndMinuteTextBox.Text = "00"
+        End If
     End Sub
-
-    Private Function BuildClockTimes() As List(Of String)
-        Dim values As New List(Of String)()
-        For hour As Integer = 0 To 23
-            For minute As Integer = 0 To 30 Step 30
-                values.Add(hour.ToString("00", CultureInfo.InvariantCulture) &
-                           ":" &
-                           minute.ToString("00", CultureInfo.InvariantCulture))
-            Next
-        Next
-
-        Return values
-    End Function
 
     Private Sub InitializeLookupFilterControls()
         _isApplyingLookupFilters = True
@@ -248,34 +248,23 @@ Class AdminSchedulingView
         Dim selectedDepartmentFilter As String = NormalizeDepartmentFilterValue(TryCast(ProfessorDepartmentFilterComboBox.SelectedItem, String))
         Dim selectedScheduleFilter As String = NormalizeText(TryCast(ProfessorScheduleFilterComboBox.SelectedItem, String))
         Dim professorFilter As String = NormalizeText(If(ProfessorFilterTextBox Is Nothing, String.Empty, ProfessorFilterTextBox.Text))
-        Dim subjectFilter As String = NormalizeText(If(SubjectFilterTextBox Is Nothing, String.Empty, SubjectFilterTextBox.Text))
 
         _filteredTeacherOptions = BuildFilteredTeacherOptions(selectedDepartmentFilter, selectedScheduleFilter, professorFilter)
-        _filteredSubjectOptions = BuildFilteredSubjectOptions(selectedDepartmentFilter, subjectFilter)
 
         _isApplyingLookupFilters = True
         Try
-            ProfessorComboBox.ItemsSource = _filteredTeacherOptions
-            SubjectComboBox.ItemsSource = _filteredSubjectOptions
-
-            If Not SelectProfessorById(teacherIdToKeep) AndAlso _filteredTeacherOptions.Count > 0 Then
-                ProfessorComboBox.SelectedIndex = 0
-            End If
-
-            If Not SelectSubjectByCode(subjectCodeToKeep) AndAlso _filteredSubjectOptions.Count > 0 Then
-                SubjectComboBox.SelectedIndex = 0
+            ProfessorListDataGrid.ItemsSource = _filteredTeacherOptions
+            If Not SelectProfessorById(teacherIdToKeep) Then
+                ProfessorListDataGrid.SelectedItem = Nothing
             End If
         Finally
             _isApplyingLookupFilters = False
         End Try
 
-        ProfessorComboBox.IsEnabled = _filteredTeacherOptions.Count > 0
-        SubjectComboBox.IsEnabled = _filteredSubjectOptions.Count > 0
-
         UpdateLookupCounts()
         UpdateProfessorScheduleBreakdown()
         UpdateScheduleBuilderSubtitle()
-        RefreshProfessorContext()
+        RefreshProfessorContext(subjectCodeToKeep)
     End Sub
 
     Private Function BuildFilteredTeacherOptions(departmentFilter As String,
@@ -369,12 +358,20 @@ Class AdminSchedulingView
     End Function
 
     Private Function GetSelectedProfessorId() As String
-        Dim selectedTeacher As TeacherOption = TryCast(ProfessorComboBox.SelectedItem, TeacherOption)
+        Dim selectedTeacher As TeacherOption = GetSelectedTeacherOption()
         If selectedTeacher Is Nothing Then
             Return String.Empty
         End If
 
         Return NormalizeText(selectedTeacher.TeacherId)
+    End Function
+
+    Private Function GetSelectedTeacherOption() As TeacherOption
+        If ProfessorListDataGrid Is Nothing Then
+            Return Nothing
+        End If
+
+        Return TryCast(ProfessorListDataGrid.SelectedItem, TeacherOption)
     End Function
 
     Private Sub LoadScheduleRecords()
@@ -648,20 +645,45 @@ Class AdminSchedulingView
         ApplyLookupFilters()
     End Sub
 
-    Private Sub SubjectFilterTextBox_TextChanged(sender As Object, e As TextChangedEventArgs)
-        If _isApplyingLookupFilters Then
-            Return
-        End If
-
-        ApplyLookupFilters()
-    End Sub
-
-    Private Sub ProfessorComboBox_SelectionChanged(sender As Object, e As SelectionChangedEventArgs)
+    Private Sub ProfessorListDataGrid_SelectionChanged(sender As Object, e As SelectionChangedEventArgs)
         If _isApplyingLookupFilters Then
             Return
         End If
 
         RefreshProfessorContext()
+    End Sub
+
+    Private Sub BackToProfessorListButton_Click(sender As Object, e As RoutedEventArgs)
+        If ProfessorListDataGrid Is Nothing Then
+            Return
+        End If
+
+        _isApplyingLookupFilters = True
+        Try
+            ProfessorListDataGrid.SelectedItem = Nothing
+        Finally
+            _isApplyingLookupFilters = False
+        End Try
+
+        RefreshProfessorContext()
+    End Sub
+
+    Private Sub SessionTimeTextBox_PreviewTextInput(sender As Object, e As TextCompositionEventArgs)
+        For Each typedCharacter As Char In e.Text
+            If Not Char.IsDigit(typedCharacter) Then
+                e.Handled = True
+                Exit For
+            End If
+        Next
+    End Sub
+
+    Private Sub SessionTimeTextBox_LostFocus(sender As Object, e As RoutedEventArgs)
+        Dim inputBox As System.Windows.Controls.TextBox = TryCast(sender, System.Windows.Controls.TextBox)
+        If inputBox Is Nothing Then
+            Return
+        End If
+
+        NormalizeSessionTextBox(inputBox)
     End Sub
 
     Private Sub RefreshSchedulingDataButton_Click(sender As Object, e As RoutedEventArgs)
@@ -671,7 +693,7 @@ Class AdminSchedulingView
     End Sub
 
     Private Sub SaveScheduleSlotButton_Click(sender As Object, e As RoutedEventArgs)
-        Dim selectedTeacher As TeacherOption = TryCast(ProfessorComboBox.SelectedItem, TeacherOption)
+        Dim selectedTeacher As TeacherOption = GetSelectedTeacherOption()
         If selectedTeacher Is Nothing Then
             SetActionStatus("Select a professor first.", True)
             Return
@@ -727,7 +749,7 @@ Class AdminSchedulingView
     End Sub
 
     Private Sub RemoveScheduleSlotButton_Click(sender As Object, e As RoutedEventArgs)
-        Dim selectedTeacher As TeacherOption = TryCast(ProfessorComboBox.SelectedItem, TeacherOption)
+        Dim selectedTeacher As TeacherOption = GetSelectedTeacherOption()
         If selectedTeacher Is Nothing Then
             SetActionStatus("Select a professor first.", True)
             Return
@@ -768,8 +790,7 @@ Class AdminSchedulingView
             SubjectComboBox.SelectedIndex = 0
         End If
 
-        SessionStartComboBox.SelectedIndex = -1
-        SessionEndComboBox.SelectedIndex = -1
+        InitializeSessionInputBoxes()
         RoomTextBox.Text = String.Empty
         SectionTextBox.Text = String.Empty
         SetActionStatus("Form cleared.")
@@ -788,10 +809,9 @@ Class AdminSchedulingView
 
         Dim sessionValue As String = NormalizeSession(ReadRowValue(selectedRowView.Row, "Session"))
         If Not String.IsNullOrWhiteSpace(sessionValue) AndAlso Not String.Equals(sessionValue, "--", StringComparison.OrdinalIgnoreCase) Then
-            SetSessionSelectorsFromSession(sessionValue)
+            SetSessionInputsFromSession(sessionValue)
         Else
-            SessionStartComboBox.SelectedIndex = -1
-            SessionEndComboBox.SelectedIndex = -1
+            InitializeSessionInputBoxes()
         End If
 
         Dim selectedHeader As String = String.Empty
@@ -826,20 +846,52 @@ Class AdminSchedulingView
         End If
     End Sub
 
-    Private Sub RefreshProfessorContext()
-        Dim selectedTeacher As TeacherOption = TryCast(ProfessorComboBox.SelectedItem, TeacherOption)
+    Private Sub RefreshProfessorContext(Optional preferredSubjectCode As String = Nothing)
+        Dim selectedTeacher As TeacherOption = GetSelectedTeacherOption()
         If selectedTeacher Is Nothing Then
             _selectedTeacherId = String.Empty
-            SelectedProfessorTextBlock.Text = "--"
-            TimetableSubtitleTextBlock.Text = "Select a professor to load timetable."
+            If TimetableSubtitleTextBlock IsNot Nothing Then
+                TimetableSubtitleTextBlock.Text = "Select a professor to load timetable."
+            End If
+            _filteredSubjectOptions = New List(Of SubjectOption)()
+            If SubjectComboBox IsNot Nothing Then
+                SubjectComboBox.ItemsSource = _filteredSubjectOptions
+            End If
         Else
             _selectedTeacherId = NormalizeText(selectedTeacher.TeacherId)
-            SelectedProfessorTextBlock.Text = selectedTeacher.DisplayName
-            TimetableSubtitleTextBlock.Text = "Schedule for " & selectedTeacher.DisplayName
+            If TimetableSubtitleTextBlock IsNot Nothing Then
+                TimetableSubtitleTextBlock.Text = "Schedule for " & selectedTeacher.DisplayName
+            End If
+            ApplySubjectOptionsForTeacher(selectedTeacher, preferredSubjectCode)
         End If
 
+        UpdateScheduleBuilderSubtitle()
         UpdateActionButtonState()
         RefreshTimetableForSelectedProfessor()
+    End Sub
+
+    Private Sub ApplySubjectOptionsForTeacher(selectedTeacher As TeacherOption,
+                                              Optional preferredSubjectCode As String = Nothing)
+        Dim teacherDepartment As String = NormalizeText(If(selectedTeacher Is Nothing, String.Empty, selectedTeacher.Department))
+        Dim subjectCodeToKeep As String = NormalizeText(preferredSubjectCode)
+        If String.IsNullOrWhiteSpace(subjectCodeToKeep) Then
+            subjectCodeToKeep = GetSelectedSubjectCode()
+        End If
+
+        _filteredSubjectOptions = BuildFilteredSubjectOptions(teacherDepartment, String.Empty)
+        If _filteredSubjectOptions.Count = 0 AndAlso Not String.IsNullOrWhiteSpace(teacherDepartment) Then
+            _filteredSubjectOptions = BuildFilteredSubjectOptions(String.Empty, String.Empty)
+        End If
+
+        _isApplyingLookupFilters = True
+        Try
+            SubjectComboBox.ItemsSource = _filteredSubjectOptions
+            If Not SelectSubjectByCode(subjectCodeToKeep) AndAlso _filteredSubjectOptions.Count > 0 Then
+                SubjectComboBox.SelectedIndex = 0
+            End If
+        Finally
+            _isApplyingLookupFilters = False
+        End Try
     End Sub
 
     Private Sub RefreshTimetableForSelectedProfessor()
@@ -964,13 +1016,13 @@ Class AdminSchedulingView
     End Function
 
     Private Function CompareSessions(left As String, right As String) As Integer
-        Dim leftStart As DateTime
-        Dim rightStart As DateTime
+        Dim leftStart As Integer
+        Dim rightStart As Integer
         Dim leftHasTime As Boolean = TryParseSessionStart(left, leftStart)
         Dim rightHasTime As Boolean = TryParseSessionStart(right, rightStart)
 
         If leftHasTime AndAlso rightHasTime Then
-            Return DateTime.Compare(leftStart, rightStart)
+            Return leftStart.CompareTo(rightStart)
         End If
 
         If leftHasTime Then
@@ -984,8 +1036,8 @@ Class AdminSchedulingView
         Return String.Compare(left, right, StringComparison.OrdinalIgnoreCase)
     End Function
 
-    Private Function TryParseSessionStart(sessionValue As String, ByRef parsedStart As DateTime) As Boolean
-        Dim parsedEnd As DateTime
+    Private Function TryParseSessionStart(sessionValue As String, ByRef parsedStart As Integer) As Boolean
+        Dim parsedEnd As Integer
         If TryParseSessionRange(sessionValue, parsedStart, parsedEnd) Then
             Return True
         End If
@@ -1000,13 +1052,19 @@ Class AdminSchedulingView
 
         SchedulingTimetableDataGrid.Columns.Clear()
 
+        Dim centeredTextStyle As New Style(GetType(TextBlock))
+        centeredTextStyle.Setters.Add(New Setter(TextBlock.TextAlignmentProperty, TextAlignment.Center))
+        centeredTextStyle.Setters.Add(New Setter(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center))
+        centeredTextStyle.Setters.Add(New Setter(TextBlock.TextWrappingProperty, TextWrapping.Wrap))
+
         Dim sessionColumn As New DataGridTextColumn() With {
             .Header = "Session",
             .Binding = New Binding(BuildDataTableBindingPath("Session")),
             .IsReadOnly = True,
             .CanUserSort = False,
-            .MinWidth = 170,
-            .Width = New DataGridLength(1.2, DataGridLengthUnitType.Star)
+            .MinWidth = 120,
+            .Width = New DataGridLength(1.2, DataGridLengthUnitType.Star),
+            .ElementStyle = centeredTextStyle
         }
         SchedulingTimetableDataGrid.Columns.Add(sessionColumn)
 
@@ -1020,7 +1078,8 @@ Class AdminSchedulingView
                 .Binding = New Binding(BuildDataTableBindingPath(dayHeader)),
                 .IsReadOnly = True,
                 .CanUserSort = False,
-                .Width = New DataGridLength(1, DataGridLengthUnitType.Star)
+                .Width = New DataGridLength(1, DataGridLengthUnitType.Star),
+                .ElementStyle = centeredTextStyle
             }
             SchedulingTimetableDataGrid.Columns.Add(dayColumn)
         Next
@@ -1111,22 +1170,22 @@ Class AdminSchedulingView
             Return
         End If
 
-        If _subjectOptions.Count = 0 Then
-            ScheduleBuilderSubtitleTextBlock.Text = "No subjects found. Add subjects first."
+        If _filteredTeacherOptions.Count = 0 Then
+            ScheduleBuilderSubtitleTextBlock.Text = "No professors match the current list filters."
             Return
         End If
 
-        If _filteredTeacherOptions.Count = 0 Then
-            ScheduleBuilderSubtitleTextBlock.Text = "No professors match the current filters."
+        If String.IsNullOrWhiteSpace(_selectedTeacherId) Then
+            ScheduleBuilderSubtitleTextBlock.Text = "Select a professor from the list to start building."
             Return
         End If
 
         If _filteredSubjectOptions.Count = 0 Then
-            ScheduleBuilderSubtitleTextBlock.Text = "No subjects match the current filters."
+            ScheduleBuilderSubtitleTextBlock.Text = "No subjects available for the selected professor."
             Return
         End If
 
-        ScheduleBuilderSubtitleTextBlock.Text = "Choose a professor and assign subjects, session, section, and room."
+        ScheduleBuilderSubtitleTextBlock.Text = "Assign subject, day, session, section, and room for the selected professor."
     End Sub
 
     Private Sub UpdateActionButtonState()
@@ -1136,10 +1195,38 @@ Class AdminSchedulingView
         SaveScheduleSlotButton.IsEnabled = hasTeacher AndAlso hasSubjects
         RemoveScheduleSlotButton.IsEnabled = hasTeacher
         DayComboBox.IsEnabled = hasTeacher
-        SessionStartComboBox.IsEnabled = hasTeacher
-        SessionEndComboBox.IsEnabled = hasTeacher
+        SessionStartHourTextBox.IsEnabled = hasTeacher
+        SessionStartMinuteTextBox.IsEnabled = hasTeacher
+        SessionEndHourTextBox.IsEnabled = hasTeacher
+        SessionEndMinuteTextBox.IsEnabled = hasTeacher
         SectionTextBox.IsEnabled = hasTeacher
         RoomTextBox.IsEnabled = hasTeacher
+        SubjectComboBox.IsEnabled = hasTeacher AndAlso hasSubjects
+
+        ScheduleBuilderEditorPanel.Visibility = If(hasTeacher, System.Windows.Visibility.Visible, System.Windows.Visibility.Collapsed)
+        ScheduleBuilderEmptyStatePanel.Visibility = If(hasTeacher, System.Windows.Visibility.Collapsed, System.Windows.Visibility.Visible)
+
+        If hasTeacher Then
+            ProfessorListPanelRow.Height = New System.Windows.GridLength(0)
+            ListBuilderSpacerRow.Height = New System.Windows.GridLength(0)
+            ScheduleBuilderPanelRow.Height = New System.Windows.GridLength(1, System.Windows.GridUnitType.Star)
+            ProfessorListPanelBorder.Visibility = System.Windows.Visibility.Collapsed
+            ScheduleBuilderPanelBorder.Visibility = System.Windows.Visibility.Visible
+            ScheduleLeftColumn.Width = New System.Windows.GridLength(0.8, System.Windows.GridUnitType.Star)
+            ScheduleMiddleColumn.Width = New System.Windows.GridLength(10)
+            ScheduleRightColumn.Width = New System.Windows.GridLength(1.2, System.Windows.GridUnitType.Star)
+            ProfessorTimetableBorder.Visibility = System.Windows.Visibility.Visible
+        Else
+            ProfessorListPanelRow.Height = New System.Windows.GridLength(1, System.Windows.GridUnitType.Star)
+            ListBuilderSpacerRow.Height = New System.Windows.GridLength(0)
+            ScheduleBuilderPanelRow.Height = New System.Windows.GridLength(0)
+            ProfessorListPanelBorder.Visibility = System.Windows.Visibility.Visible
+            ScheduleBuilderPanelBorder.Visibility = System.Windows.Visibility.Collapsed
+            ScheduleLeftColumn.Width = New System.Windows.GridLength(1, System.Windows.GridUnitType.Star)
+            ScheduleMiddleColumn.Width = New System.Windows.GridLength(0)
+            ScheduleRightColumn.Width = New System.Windows.GridLength(0)
+            ProfessorTimetableBorder.Visibility = System.Windows.Visibility.Collapsed
+        End If
     End Sub
 
     Private Function GetSchedulesForTeacher(teacherId As String) As List(Of ScheduleStorageRecord)
@@ -1246,69 +1333,113 @@ Class AdminSchedulingView
     End Function
 
     Private Function NormalizeSession(sessionValue As String) As String
-        Dim startTime As DateTime
-        Dim endTime As DateTime
-        If TryParseSessionRange(sessionValue, startTime, endTime) Then
-            Return FormatSessionRange(startTime, endTime)
+        Dim startMinutes As Integer
+        Dim endMinutes As Integer
+        If TryParseSessionRange(sessionValue, startMinutes, endMinutes) Then
+            Return FormatSessionRange(startMinutes, endMinutes)
         End If
 
         Return NormalizeText(sessionValue)
     End Function
 
+    Private Sub NormalizeSessionTextBox(inputBox As System.Windows.Controls.TextBox)
+        If inputBox Is Nothing Then
+            Return
+        End If
+
+        Dim isHourBox As Boolean =
+            inputBox.Name.IndexOf("Hour", StringComparison.OrdinalIgnoreCase) >= 0
+        Dim maxValue As Integer = If(isHourBox, 24, 59)
+
+        Dim numericValue As Integer
+        If Not Integer.TryParse(NormalizeText(inputBox.Text), NumberStyles.Integer, CultureInfo.InvariantCulture, numericValue) Then
+            numericValue = 0
+        End If
+
+        numericValue = Math.Max(0, Math.Min(maxValue, numericValue))
+        inputBox.Text = numericValue.ToString("00", CultureInfo.InvariantCulture)
+    End Sub
+
     Private Function TryGetSessionRangeFromInputs(ByRef sessionValue As String) As Boolean
         sessionValue = String.Empty
 
-        Dim selectedStart As String = NormalizeText(TryCast(SessionStartComboBox.SelectedItem, String))
-        Dim selectedEnd As String = NormalizeText(TryCast(SessionEndComboBox.SelectedItem, String))
-        If String.IsNullOrWhiteSpace(selectedStart) OrElse String.IsNullOrWhiteSpace(selectedEnd) Then
+        NormalizeSessionTextBox(SessionStartHourTextBox)
+        NormalizeSessionTextBox(SessionStartMinuteTextBox)
+        NormalizeSessionTextBox(SessionEndHourTextBox)
+        NormalizeSessionTextBox(SessionEndMinuteTextBox)
+
+        Dim startMinutes As Integer
+        Dim endMinutes As Integer
+        If Not TryParseSessionInput(SessionStartHourTextBox.Text, SessionStartMinuteTextBox.Text, startMinutes) Then
             Return False
         End If
 
-        Dim startTime As DateTime
-        Dim endTime As DateTime
-        If Not TryParseClockTime(selectedStart, startTime) OrElse Not TryParseClockTime(selectedEnd, endTime) Then
+        If Not TryParseSessionInput(SessionEndHourTextBox.Text, SessionEndMinuteTextBox.Text, endMinutes) Then
             Return False
         End If
 
-        If endTime <= startTime Then
+        If endMinutes <= startMinutes Then
             Return False
         End If
 
-        sessionValue = FormatSessionRange(startTime, endTime)
+        sessionValue = FormatSessionRange(startMinutes, endMinutes)
         Return True
     End Function
 
-    Private Sub SetSessionSelectorsFromSession(sessionValue As String)
-        Dim startTime As DateTime
-        Dim endTime As DateTime
-        If Not TryParseSessionRange(sessionValue, startTime, endTime) Then
-            SessionStartComboBox.SelectedIndex = -1
-            SessionEndComboBox.SelectedIndex = -1
+    Private Sub SetSessionInputsFromSession(sessionValue As String)
+        Dim startMinutes As Integer
+        Dim endMinutes As Integer
+        If Not TryParseSessionRange(sessionValue, startMinutes, endMinutes) Then
+            InitializeSessionInputBoxes()
             Return
         End If
 
-        SelectSessionComboValue(SessionStartComboBox, startTime.ToString("HH:mm", CultureInfo.InvariantCulture))
-        SelectSessionComboValue(SessionEndComboBox, endTime.ToString("HH:mm", CultureInfo.InvariantCulture))
+        SessionStartHourTextBox.Text = (startMinutes \ 60).ToString("00", CultureInfo.InvariantCulture)
+        SessionStartMinuteTextBox.Text = (startMinutes Mod 60).ToString("00", CultureInfo.InvariantCulture)
+        SessionEndHourTextBox.Text = (endMinutes \ 60).ToString("00", CultureInfo.InvariantCulture)
+        SessionEndMinuteTextBox.Text = (endMinutes Mod 60).ToString("00", CultureInfo.InvariantCulture)
     End Sub
 
-    Private Sub SelectSessionComboValue(combo As System.Windows.Controls.ComboBox, value As String)
-        If combo Is Nothing Then
-            Return
+    Private Function TryParseSessionInput(hourValue As String,
+                                          minuteValue As String,
+                                          ByRef totalMinutes As Integer) As Boolean
+        totalMinutes = 0
+
+        Dim normalizedHour As String = NormalizeText(hourValue)
+        Dim normalizedMinute As String = NormalizeText(minuteValue)
+        If String.IsNullOrWhiteSpace(normalizedHour) Then
+            normalizedHour = "00"
+        End If
+        If String.IsNullOrWhiteSpace(normalizedMinute) Then
+            normalizedMinute = "00"
         End If
 
-        Dim normalizedValue As String = NormalizeText(value)
-        For Each item As Object In combo.Items
-            Dim candidate As String = NormalizeText(TryCast(item, String))
-            If String.Equals(candidate, normalizedValue, StringComparison.OrdinalIgnoreCase) Then
-                combo.SelectedItem = item
-                Return
-            End If
-        Next
+        Dim parsedHour As Integer
+        Dim parsedMinute As Integer
+        If Not Integer.TryParse(normalizedHour, NumberStyles.Integer, CultureInfo.InvariantCulture, parsedHour) OrElse
+           Not Integer.TryParse(normalizedMinute, NumberStyles.Integer, CultureInfo.InvariantCulture, parsedMinute) Then
+            Return False
+        End If
 
-        combo.SelectedIndex = -1
-    End Sub
+        If parsedHour < 0 OrElse parsedHour > 24 Then
+            Return False
+        End If
 
-    Private Function TryParseSessionRange(sessionValue As String, ByRef parsedStart As DateTime, ByRef parsedEnd As DateTime) As Boolean
+        If parsedMinute < 0 OrElse parsedMinute > 59 Then
+            Return False
+        End If
+
+        If parsedHour = 24 AndAlso parsedMinute <> 0 Then
+            Return False
+        End If
+
+        totalMinutes = (parsedHour * 60) + parsedMinute
+        Return totalMinutes >= 0 AndAlso totalMinutes <= 1440
+    End Function
+
+    Private Function TryParseSessionRange(sessionValue As String,
+                                          ByRef parsedStartMinutes As Integer,
+                                          ByRef parsedEndMinutes As Integer) As Boolean
         Dim normalizedSession As String = NormalizeText(sessionValue)
         If String.IsNullOrWhiteSpace(normalizedSession) Then
             Return False
@@ -1320,11 +1451,12 @@ Class AdminSchedulingView
             Return False
         End If
 
-        If Not TryParseClockTime(startToken, parsedStart) OrElse Not TryParseClockTime(endToken, parsedEnd) Then
+        If Not TryParseClockToken(startToken, parsedStartMinutes) OrElse
+           Not TryParseClockToken(endToken, parsedEndMinutes) Then
             Return False
         End If
 
-        If parsedEnd <= parsedStart Then
+        If parsedEndMinutes <= parsedStartMinutes Then
             Return False
         End If
 
@@ -1360,10 +1492,26 @@ Class AdminSchedulingView
         Return True
     End Function
 
-    Private Function TryParseClockTime(value As String, ByRef parsedTime As DateTime) As Boolean
+    Private Function TryParseClockToken(value As String, ByRef parsedMinutes As Integer) As Boolean
+        parsedMinutes = 0
         Dim normalized As String = NormalizeText(value)
         If String.IsNullOrWhiteSpace(normalized) Then
             Return False
+        End If
+
+        Dim splitTokens As String() = normalized.Split(":"c)
+        If splitTokens.Length = 2 Then
+            Dim parsedHour As Integer
+            Dim parsedMinute As Integer
+            If Integer.TryParse(NormalizeText(splitTokens(0)), NumberStyles.Integer, CultureInfo.InvariantCulture, parsedHour) AndAlso
+               Integer.TryParse(NormalizeText(splitTokens(1)), NumberStyles.Integer, CultureInfo.InvariantCulture, parsedMinute) Then
+                If parsedHour >= 0 AndAlso parsedHour <= 24 AndAlso
+                   parsedMinute >= 0 AndAlso parsedMinute <= 59 AndAlso
+                   (parsedHour < 24 OrElse parsedMinute = 0) Then
+                    parsedMinutes = (parsedHour * 60) + parsedMinute
+                    Return True
+                End If
+            End If
         End If
 
         Dim supportedFormats As String() = New String() {
@@ -1375,25 +1523,42 @@ Class AdminSchedulingView
             "h:mmtt"
         }
 
+        Dim parsedTime As DateTime
         If DateTime.TryParseExact(normalized,
                                   supportedFormats,
                                   CultureInfo.InvariantCulture,
                                   DateTimeStyles.AllowWhiteSpaces,
                                   parsedTime) Then
+            parsedMinutes = (parsedTime.Hour * 60) + parsedTime.Minute
             Return True
         End If
 
         If DateTime.TryParse(normalized, CultureInfo.CurrentCulture, DateTimeStyles.NoCurrentDateDefault, parsedTime) Then
+            parsedMinutes = (parsedTime.Hour * 60) + parsedTime.Minute
             Return True
         End If
 
-        Return DateTime.TryParse(normalized, CultureInfo.InvariantCulture, DateTimeStyles.NoCurrentDateDefault, parsedTime)
+        If DateTime.TryParse(normalized, CultureInfo.InvariantCulture, DateTimeStyles.NoCurrentDateDefault, parsedTime) Then
+            parsedMinutes = (parsedTime.Hour * 60) + parsedTime.Minute
+            Return True
+        End If
+
+        Return False
     End Function
 
-    Private Function FormatSessionRange(startTime As DateTime, endTime As DateTime) As String
-        Return startTime.ToString("HH:mm", CultureInfo.InvariantCulture) &
+    Private Function FormatSessionRange(startMinutes As Integer, endMinutes As Integer) As String
+        Return FormatClockMinutes(startMinutes) &
                " - " &
-               endTime.ToString("HH:mm", CultureInfo.InvariantCulture)
+               FormatClockMinutes(endMinutes)
+    End Function
+
+    Private Function FormatClockMinutes(totalMinutes As Integer) As String
+        Dim normalizedTotal As Integer = Math.Max(0, Math.Min(1440, totalMinutes))
+        Dim hourValue As Integer = normalizedTotal \ 60
+        Dim minuteValue As Integer = normalizedTotal Mod 60
+        Return hourValue.ToString("00", CultureInfo.InvariantCulture) &
+               ":" &
+               minuteValue.ToString("00", CultureInfo.InvariantCulture)
     End Function
 
     Private Function BuildTimetableCellDisplay(record As ScheduleStorageRecord) As String
@@ -1522,18 +1687,23 @@ Class AdminSchedulingView
     End Sub
 
     Private Function SelectProfessorById(teacherId As String) As Boolean
+        If ProfessorListDataGrid Is Nothing Then
+            Return False
+        End If
+
         Dim normalizedTeacherId As String = NormalizeText(teacherId)
         If String.IsNullOrWhiteSpace(normalizedTeacherId) Then
             Return False
         End If
 
-        For Each optionEntry As TeacherOption In _teacherOptions
+        For Each optionEntry As TeacherOption In _filteredTeacherOptions
             If optionEntry Is Nothing Then
                 Continue For
             End If
 
             If String.Equals(NormalizeText(optionEntry.TeacherId), normalizedTeacherId, StringComparison.OrdinalIgnoreCase) Then
-                ProfessorComboBox.SelectedItem = optionEntry
+                ProfessorListDataGrid.SelectedItem = optionEntry
+                ProfessorListDataGrid.ScrollIntoView(optionEntry)
                 Return True
             End If
         Next
@@ -1547,7 +1717,12 @@ Class AdminSchedulingView
             Return False
         End If
 
-        For Each optionEntry As SubjectOption In _subjectOptions
+        Dim source As IEnumerable(Of SubjectOption) = _filteredSubjectOptions
+        If source Is Nothing OrElse _filteredSubjectOptions.Count = 0 Then
+            source = _subjectOptions
+        End If
+
+        For Each optionEntry As SubjectOption In source
             If optionEntry Is Nothing Then
                 Continue For
             End If
@@ -1567,7 +1742,12 @@ Class AdminSchedulingView
             Return False
         End If
 
-        For Each optionEntry As SubjectOption In _subjectOptions
+        Dim source As IEnumerable(Of SubjectOption) = _filteredSubjectOptions
+        If source Is Nothing OrElse _filteredSubjectOptions.Count = 0 Then
+            source = _subjectOptions
+        End If
+
+        For Each optionEntry As SubjectOption In source
             If optionEntry Is Nothing Then
                 Continue For
             End If

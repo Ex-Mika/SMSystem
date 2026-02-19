@@ -1,60 +1,358 @@
-<UserControl x:Class="AdminAdministratorsView"
+﻿<UserControl x:Class="AdminAdministratorsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:School_Management_System"
              mc:Ignorable="d">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="20,18,20,22">
-            <Border Style="{StaticResource DashboardCardBorderStyle}">
-                <StackPanel Margin="18">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
-                                   Text="Administrators"
-                                   FontSize="22"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                        <TextBlock x:Name="AdministratorsCountTextBlock"
-                                   Grid.Column="1"
-                                   VerticalAlignment="Center"
+    <UserControl.Resources>
+        <Style x:Key="AdministratorFormLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,12,0,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+        </Style>
+
+        <Style x:Key="AdministratorFormTextInputStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="AdministratorDetailsValueBorderStyle" TargetType="Border">
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+
+        <Style x:Key="AdministratorDetailsValueTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+            <Setter Property="Text" Value="--"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20,18,20,22">
+                <Border Style="{StaticResource DashboardCardBorderStyle}">
+                    <StackPanel Margin="18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Administrators"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <TextBlock x:Name="AdministratorsCountTextBlock"
+                                       Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Text="0 administrators"/>
+                        </Grid>
+
+                        <TextBlock Margin="0,6,0,0"
                                    FontSize="12"
-                                   FontWeight="SemiBold"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"
-                                   Text="0 administrators"/>
-                    </Grid>
+                                   Text="Select a row to view administrator details on the left. Use New, Edit, or Delete to manage records."/>
 
-                    <TextBlock Margin="0,6,0,0"
-                               FontSize="12"
-                               Foreground="{StaticResource DashboardTextMutedBrush}"
-                               Text="Review and manage system administrator accounts."/>
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="460"/>
+                                <ColumnDefinition Width="14"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                    <Border Margin="0,14,0,0"
-                            BorderBrush="{StaticResource DashboardBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                        <DataGrid x:Name="AdministratorsDataGrid"
-                                  Style="{StaticResource DashboardManagementDataGridStyle}"
-                                  ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
-                                  CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
-                                  RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
-                                  MinHeight="560"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  IsReadOnly="True">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Administrator ID" Binding="{Binding [Administrator ID]}" Width="1.1*"/>
-                                <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" Width="1.4*"/>
-                                <DataGridTextColumn Header="Role" Binding="{Binding [Role]}" Width="1*"/>
-                                <DataGridTextColumn Header="Email" Binding="{Binding [Email]}" Width="1.6*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Border>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+                            <Border Grid.Column="0"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Background="White">
+                                <Grid>
+                                    <Grid x:Name="AdministratorDetailsPanel">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock Text="Administrator Details"
+                                                           FontSize="20"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="AdministratorDetailsSubtitleTextBlock"
+                                                           Margin="0,3,0,0"
+                                                           Text="Select a administrator from the table."
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}"
+                                                           Margin="0,0,0,0"
+                                                           Text="Photo"/>
+                                                <Border Style="{StaticResource AdministratorDetailsValueBorderStyle}"
+                                                        Padding="0"
+                                                        Width="160"
+                                                        Height="160"
+                                                        HorizontalAlignment="Left">
+                                                    <Image x:Name="AdministratorDetailsPhotoImage"
+                                                           Stretch="UniformToFill"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}"
+                                                           Text="Administrator ID"/>
+                                                <Border Style="{StaticResource AdministratorDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="AdministratorDetailsAdministratorIdTextBlock" Style="{StaticResource AdministratorDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Text="Full Name"/>
+                                                <Border Style="{StaticResource AdministratorDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="AdministratorDetailsFullNameTextBlock" Style="{StaticResource AdministratorDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Text="Role"/>
+                                                <Border Style="{StaticResource AdministratorDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="AdministratorDetailsRoleTextBlock" Style="{StaticResource AdministratorDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Text="Email"/>
+                                                <Border Style="{StaticResource AdministratorDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="AdministratorDetailsEmailTextBlock" Style="{StaticResource AdministratorDetailsValueTextStyle}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Border Grid.Row="2"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Background="#FCFDFE">
+                                            <UniformGrid Columns="3">
+                                                <Button Height="38"
+                                                        Margin="0,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#137FEC"
+                                                        Foreground="White"
+                                                        Click="OpenAddAdministratorButton_Click"
+                                                        Content="New"/>
+                                                <Button x:Name="EditSelectedAdministratorButton"
+                                                        Height="38"
+                                                        Margin="6,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#EAF4FF"
+                                                        Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                        Click="EditSelectedAdministratorButton_Click"
+                                                        Content="Edit"/>
+                                                <Button x:Name="DeleteSelectedAdministratorButton"
+                                                        Height="38"
+                                                        Margin="6,0,0,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#FFECEE"
+                                                        Foreground="#D64545"
+                                                        Click="DeleteSelectedAdministratorButton_Click"
+                                                        Content="Delete"/>
+                                            </UniformGrid>
+                                        </Border>
+                                    </Grid>
+
+                                    <Grid x:Name="AdministratorFormPanel" Visibility="Collapsed">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock x:Name="AdministratorFormTitleTextBlock"
+                                                           Text="Add Administrator"
+                                                           FontSize="20"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="AdministratorFormSubtitleTextBlock"
+                                                           Margin="0,3,0,0"
+                                                           Text="Create a new administrator record."
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}"
+                                                           Margin="0,0,0,0"
+                                                           Text="Administrator ID"/>
+                                                <TextBox x:Name="AdministratorFormAdministratorIdTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
+
+                                                <Grid Margin="0,12,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="12"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Margin="0" Text="First Name"/>
+                                                        <TextBox x:Name="AdministratorFormFirstNameTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Margin="0" Text="Last Name"/>
+                                                        <TextBox x:Name="AdministratorFormLastNameTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Text="Middle Name"/>
+                                                <TextBox x:Name="AdministratorFormMiddleNameTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
+
+                                                <Grid Margin="0,12,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="12"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Margin="0" Text="Role"/>
+                                                        <TextBox x:Name="AdministratorFormRoleTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Margin="0" Text="Email"/>
+                                                        <TextBox x:Name="AdministratorFormEmailTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Text="Photo"/>
+                                                <Grid Margin="0,6,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="8"/>
+                                                        <ColumnDefinition Width="100"/>
+                                                        <ColumnDefinition Width="8"/>
+                                                        <ColumnDefinition Width="72"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBox x:Name="AdministratorFormPhotoPathTextBox"
+                                                             Grid.Column="0"
+                                                             Style="{StaticResource AdministratorFormTextInputStyle}"
+                                                             Margin="0"
+                                                             TextChanged="AdministratorFormPhotoPathTextBox_TextChanged"/>
+                                                    <Button Grid.Column="2"
+                                                            Height="36"
+                                                            Margin="0"
+                                                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                            Background="#EAF4FF"
+                                                            Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                            Click="BrowseAdministratorPhotoButton_Click"
+                                                            Content="Browse"/>
+                                                    <Button Grid.Column="4"
+                                                            Height="36"
+                                                            Margin="0"
+                                                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                            Background="#F3F6FA"
+                                                            Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                            Click="ClearAdministratorPhotoButton_Click"
+                                                            Content="Clear"/>
+                                                </Grid>
+
+                                                <Border Margin="0,8,0,0"
+                                                        Width="140"
+                                                        Height="140"
+                                                        HorizontalAlignment="Left"
+                                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="8"
+                                                        Background="#F8FBFF">
+                                                    <Image x:Name="AdministratorFormPhotoPreviewImage"
+                                                           Stretch="UniformToFill"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Border Grid.Row="2"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Background="#FCFDFE">
+                                            <UniformGrid Columns="2">
+                                                <Button x:Name="SaveAdministratorFormButton"
+                                                        Height="38"
+                                                        Margin="0,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#137FEC"
+                                                        Foreground="White"
+                                                        Click="SaveAdministratorFormButton_Click"
+                                                        Content="Add Administrator"/>
+                                                <Button Height="38"
+                                                        Margin="6,0,0,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#F3F6FA"
+                                                        Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                        Click="CancelAdministratorFormButton_Click"
+                                                        Content="Cancel"/>
+                                            </UniformGrid>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="2"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Background="White"
+                                    local:RoundedClipHelper.CornerRadius="10"
+                                    ClipToBounds="True"
+                                    SnapsToDevicePixels="True">
+                                <DataGrid x:Name="AdministratorsDataGrid"
+                                          Style="{StaticResource DashboardManagementDataGridStyle}"
+                                          ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                          CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                          RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                          BorderThickness="0"
+                                          ColumnWidth="*"
+                                          local:RoundedClipHelper.CornerRadius="10"
+                                          ClipToBounds="True"
+                                          CanUserSortColumns="True"
+                                          SelectionChanged="AdministratorsDataGrid_SelectionChanged"
+                                          MinHeight="640">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Administrator ID" Binding="{Binding [Administrator ID]}" SortMemberPath="Administrator ID" Width="*"/>
+                                        <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" SortMemberPath="Full Name" Width="*"/>
+                                        <DataGridTextColumn Header="Role" Binding="{Binding [Role]}" SortMemberPath="Role" Width="*"/>
+                                        <DataGridTextColumn Header="Email" Binding="{Binding [Email]}" SortMemberPath="Email" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>
+
+

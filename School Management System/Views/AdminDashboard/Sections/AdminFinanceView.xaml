@@ -1,4 +1,4 @@
-<UserControl x:Class="AdminFinanceView"
+﻿<UserControl x:Class="AdminFinanceView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -27,11 +27,11 @@
                                   RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
                                   MinHeight="560">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Department ID" Binding="{Binding [Department ID]}" Width="1.2*"/>
-                                <DataGridTextColumn Header="Department Name" Binding="{Binding [Department Name]}" Width="1.6*"/>
-                                <DataGridTextColumn Header="Head" Binding="{Binding [Head]}" Width="1.4*"/>
-                                <DataGridTextColumn Header="Courses" Binding="{Binding [Courses]}" Width="1*"/>
-                                <DataGridTextColumn Header="Faculty Count" Binding="{Binding [Faculty Count]}" Width="1*"/>
+                                <DataGridTextColumn Header="Department ID" Binding="{Binding [Department ID]}" SortMemberPath="Department ID" Width="1.2*"/>
+                                <DataGridTextColumn Header="Department Name" Binding="{Binding [Department Name]}" SortMemberPath="Department Name" Width="1.6*"/>
+                                <DataGridTextColumn Header="Head" Binding="{Binding [Head]}" SortMemberPath="Head" Width="1.4*"/>
+                                <DataGridTextColumn Header="Courses" Binding="{Binding [Courses]}" SortMemberPath="Courses" Width="1*"/>
+                                <DataGridTextColumn Header="Faculty Count" Binding="{Binding [Faculty Count]}" SortMemberPath="Faculty Count" Width="1*"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>
@@ -40,5 +40,6 @@
         </StackPanel>
     </ScrollViewer>
 </UserControl>
+
 
 

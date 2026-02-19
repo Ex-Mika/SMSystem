@@ -1,42 +1,282 @@
-<UserControl x:Class="AdminSubjectsView"
+﻿<UserControl x:Class="AdminSubjectsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:School_Management_System"
              mc:Ignorable="d">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="20,18,20,22">
-            <Border Style="{StaticResource DashboardCardBorderStyle}">
-                <StackPanel Margin="18">
-                    <TextBlock Text="Subject Management"
-                               FontSize="22"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                    <TextBlock Margin="0,4,0,0"
-                               FontSize="12"
-                               Foreground="{StaticResource DashboardTextMutedBrush}"
-                               Text="Review and maintain available subjects per program and year level."/>
-                    <Border Margin="0,14,0,0"
-                            BorderBrush="{StaticResource DashboardBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8">
-                        <DataGrid x:Name="SubjectsDataGrid"
-                                  Style="{StaticResource DashboardManagementDataGridStyle}"
-                                  ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
-                                  CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
-                                  RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
-                                  MinHeight="560">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Subject Code" Binding="{Binding [Subject Code]}" Width="1.2*"/>
-                                <DataGridTextColumn Header="Subject Name" Binding="{Binding [Subject Name]}" Width="1.8*"/>
-                                <DataGridTextColumn Header="Units" Binding="{Binding [Units]}" Width="0.8*"/>
-                                <DataGridTextColumn Header="Course" Binding="{Binding [Course]}" Width="1.2*"/>
-                                <DataGridTextColumn Header="Year Level" Binding="{Binding [Year Level]}" Width="1*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Border>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+    <UserControl.Resources>
+        <Style x:Key="SubjectFormLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,12,0,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
+        </Style>
+
+        <Style x:Key="SubjectFormTextInputStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="SubjectDetailsValueBorderStyle" TargetType="Border">
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+
+        <Style x:Key="SubjectDetailsValueTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
+            <Setter Property="Text" Value="--"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20,18,20,22">
+                <Border Style="{StaticResource DashboardCardBorderStyle}">
+                    <StackPanel Margin="18">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="Subjects"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                            <TextBlock x:Name="SubjectsCountTextBlock"
+                                       Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       Text="0 subjects"/>
+                        </Grid>
+
+                        <TextBlock Margin="0,6,0,0"
+                                   FontSize="12"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   Text="Manage available subjects. Select a row to view details on the left."/>
+
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="460"/>
+                                <ColumnDefinition Width="14"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Background="White">
+                                <Grid>
+                                    <Grid x:Name="SubjectDetailsPanel">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock Text="Subject Details"
+                                                           FontSize="20"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="SubjectDetailsSubtitleTextBlock"
+                                                           Margin="0,3,0,0"
+                                                           Text="Select a subject from the table."
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Margin="0,0,0,0" Text="Subject Code"/>
+                                                <Border Style="{StaticResource SubjectDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="SubjectDetailsCodeTextBlock" Style="{StaticResource SubjectDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Text="Subject Name"/>
+                                                <Border Style="{StaticResource SubjectDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="SubjectDetailsNameTextBlock" Style="{StaticResource SubjectDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Text="Course"/>
+                                                <Border Style="{StaticResource SubjectDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="SubjectDetailsCourseTextBlock" Style="{StaticResource SubjectDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Text="Year Level"/>
+                                                <Border Style="{StaticResource SubjectDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="SubjectDetailsYearLevelTextBlock" Style="{StaticResource SubjectDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Text="Units"/>
+                                                <Border Style="{StaticResource SubjectDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="SubjectDetailsUnitsTextBlock" Style="{StaticResource SubjectDetailsValueTextStyle}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Border Grid.Row="2"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Background="#FCFDFE">
+                                            <UniformGrid Columns="3">
+                                                <Button Height="38"
+                                                        Margin="0,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#137FEC"
+                                                        Foreground="White"
+                                                        Click="OpenAddSubjectButton_Click"
+                                                        Content="New"/>
+                                                <Button x:Name="EditSelectedSubjectButton"
+                                                        Height="38"
+                                                        Margin="6,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#EAF4FF"
+                                                        Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                        Click="EditSelectedSubjectButton_Click"
+                                                        Content="Edit"/>
+                                                <Button x:Name="DeleteSelectedSubjectButton"
+                                                        Height="38"
+                                                        Margin="6,0,0,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#FFECEE"
+                                                        Foreground="#D64545"
+                                                        Click="DeleteSelectedSubjectButton_Click"
+                                                        Content="Delete"/>
+                                            </UniformGrid>
+                                        </Border>
+                                    </Grid>
+
+                                    <Grid x:Name="SubjectFormPanel" Visibility="Collapsed">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Border Grid.Row="0"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Background="#FCFDFE">
+                                            <StackPanel>
+                                                <TextBlock x:Name="SubjectFormTitleTextBlock"
+                                                           Text="Add Subject"
+                                                           FontSize="20"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock x:Name="SubjectFormSubtitleTextBlock"
+                                                           Margin="0,3,0,0"
+                                                           Text="Create a new subject record."
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Margin="0,0,0,0" Text="Subject Code"/>
+                                                <TextBox x:Name="SubjectFormCodeTextBox" Style="{StaticResource SubjectFormTextInputStyle}"/>
+
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Text="Subject Name"/>
+                                                <TextBox x:Name="SubjectFormNameTextBox" Style="{StaticResource SubjectFormTextInputStyle}"/>
+
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Text="Course"/>
+                                                <TextBox x:Name="SubjectFormCourseTextBox" Style="{StaticResource SubjectFormTextInputStyle}"/>
+
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Text="Year Level"/>
+                                                <TextBox x:Name="SubjectFormYearLevelTextBox" Style="{StaticResource SubjectFormTextInputStyle}"/>
+
+                                                <TextBlock Style="{StaticResource SubjectFormLabelStyle}" Text="Units"/>
+                                                <TextBox x:Name="SubjectFormUnitsTextBox" Style="{StaticResource SubjectFormTextInputStyle}"/>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Border Grid.Row="2"
+                                                Padding="18,14"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                Background="#FCFDFE">
+                                            <UniformGrid Columns="2">
+                                                <Button x:Name="SaveSubjectFormButton"
+                                                        Height="38"
+                                                        Margin="0,0,6,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#137FEC"
+                                                        Foreground="White"
+                                                        Click="SaveSubjectFormButton_Click"
+                                                        Content="Add Subject"/>
+                                                <Button Height="38"
+                                                        Margin="6,0,0,0"
+                                                        Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                        Background="#F3F6FA"
+                                                        Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                        Click="CancelSubjectFormButton_Click"
+                                                        Content="Cancel"/>
+                                            </UniformGrid>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="2"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Background="White"
+                                    local:RoundedClipHelper.CornerRadius="10"
+                                    ClipToBounds="True"
+                                    SnapsToDevicePixels="True">
+                                <DataGrid x:Name="SubjectsDataGrid"
+                                          Style="{StaticResource DashboardManagementDataGridStyle}"
+                                          ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                          CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                          RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                          BorderThickness="0"
+                                          ColumnWidth="*"
+                                          local:RoundedClipHelper.CornerRadius="10"
+                                          ClipToBounds="True"
+                                          CanUserSortColumns="True"
+                                          SelectionChanged="SubjectsDataGrid_SelectionChanged"
+                                          MinHeight="640">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Subject Code" Binding="{Binding [Subject Code]}" SortMemberPath="Subject Code" Width="*"/>
+                                        <DataGridTextColumn Header="Subject Name" Binding="{Binding [Subject Name]}" SortMemberPath="Subject Name" Width="*"/>
+                                        <DataGridTextColumn Header="Course" Binding="{Binding [Course]}" SortMemberPath="Course" Width="*"/>
+                                        <DataGridTextColumn Header="Year Level" Binding="{Binding [Year Level]}" SortMemberPath="Year Level" Width="*"/>
+                                        <DataGridTextColumn Header="Units" Binding="{Binding [Units]}" SortMemberPath="Units" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>
+
+

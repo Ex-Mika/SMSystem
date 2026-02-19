@@ -5,71 +5,146 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:School_Management_System"
              mc:Ignorable="d">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="20,18,20,22">
             <Border Style="{StaticResource DashboardCardBorderStyle}">
-                <Grid Margin="18">
+                <Grid Margin="22">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel>
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="0"
+                                Margin="0,0,18,0">
+                        <TextBlock Text="My Subjects"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
                         <TextBlock x:Name="SubjectsHeaderNameTextBlock"
                                    Text="Student"
-                                   FontSize="24"
+                                   Margin="0,4,0,0"
+                                   FontSize="32"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock Text="Manage your enrolled, completed, and planned courses in one place."
+                                   Margin="0,6,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
                         <TextBlock x:Name="SubjectsHeaderIdTextBlock"
                                    Text=""
-                                   Margin="0,4,0,0"
-                                   FontSize="13"
+                                   Margin="0,8,0,0"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Border Margin="0,0,8,0"
-                                Padding="12,8"
-                                CornerRadius="8"
-                                Background="#F4F8FD"
-                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top">
+                        <Border Width="76"
+                                Height="76"
+                                CornerRadius="38"
+                                Background="#E4F0FF"
+                                BorderBrush="#C9DDF7"
                                 BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock Text="Enrolled" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                <TextBlock Text="0" FontSize="17" FontWeight="Bold"/>
-                            </StackPanel>
+                            <TextBlock Text="&#xE7BE;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="28"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource DashboardPrimaryBrush}"/>
                         </Border>
-                        <Border Padding="12,8"
-                                CornerRadius="8"
-                                Background="#F4F8FD"
-                                BorderBrush="{StaticResource DashboardBorderBrush}"
-                                BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock Text="Units" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                <TextBlock Text="0" FontSize="17" FontWeight="Bold"/>
-                            </StackPanel>
-                        </Border>
+                        <WrapPanel Margin="0,12,0,0"
+                                   HorizontalAlignment="Right">
+                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
+                                <TextBlock Text="Enrollment Open"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                            </Border>
+                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
+                                <TextBlock Text="Adviser Ready"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                            </Border>
+                        </WrapPanel>
                     </StackPanel>
+
+                    <UniformGrid Grid.Row="1"
+                                 Grid.ColumnSpan="2"
+                                 Margin="0,20,0,0"
+                                 Columns="3">
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Current Subjects"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Total Units"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Completed Subjects"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
                 </Grid>
             </Border>
 
             <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,18,0,0">
-                <TabControl Margin="18"
-                            Background="Transparent"
-                            BorderThickness="0">
-                    <TabItem Header="Current">
-                        <local:StudentCurrentSubjectsTab x:Name="CurrentSubjectsTabView"
-                                                         Margin="0,14,0,0"/>
-                    </TabItem>
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                    <TabItem Header="Completed">
-                        <local:StudentCompletedSubjectsTab Margin="0,14,0,0"/>
-                    </TabItem>
+                    <StackPanel>
+                        <TextBlock Text="Subject Tracker"
+                                   Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                        <TextBlock Text="Switch between current load, completed classes, and next-term plans."
+                                   Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                    </StackPanel>
 
-                    <TabItem Header="Planned">
-                        <local:StudentPlannedSubjectsTab Margin="0,14,0,0"/>
-                    </TabItem>
-                </TabControl>
+                    <TabControl Grid.Row="1"
+                                Margin="0,16,0,0"
+                                Style="{StaticResource DashboardProfileTabControlStyle}"
+                                ItemContainerStyle="{StaticResource DashboardProfileTabItemStyle}">
+                        <TabItem Header="Current Load">
+                            <local:StudentCurrentSubjectsTab x:Name="CurrentSubjectsTabView"/>
+                        </TabItem>
+
+                        <TabItem Header="Completed">
+                            <local:StudentCompletedSubjectsTab/>
+                        </TabItem>
+
+                        <TabItem Header="Planned">
+                            <local:StudentPlannedSubjectsTab/>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
             </Border>
         </StackPanel>
     </ScrollViewer>

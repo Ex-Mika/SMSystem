@@ -6,84 +6,96 @@
              mc:Ignorable="d">
     <StackPanel>
         <TextBlock Text="Planned Subjects"
-                   FontSize="22"
-                   FontWeight="Bold"/>
-        <TextBlock Text="Queue for next enrollment cycle"
-                   Margin="0,4,0,0"
-                   FontSize="13"
-                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                   Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+        <TextBlock Text="Queue subjects for your next enrollment cycle."
+                   Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
-        <Grid Margin="0,14,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Border Margin="0,0,8,0"
-                    Padding="12,10"
-                    CornerRadius="8"
-                    Background="#F4F8FD"
-                    BorderBrush="{StaticResource DashboardBorderBrush}"
-                    BorderThickness="1">
+        <UniformGrid Margin="0,14,0,0"
+                     Columns="2">
+            <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
                 <StackPanel>
-                    <TextBlock Text="Planned Count" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                    <TextBlock Text="0" FontSize="20" FontWeight="Bold"/>
+                    <TextBlock Text="Planned Count"
+                               Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                    <TextBlock Text="0"
+                               Margin="0,4,0,0"
+                               Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="1"
-                    Margin="8,0,0,0"
-                    Padding="12,10"
-                    CornerRadius="8"
-                    Background="#F4F8FD"
-                    BorderBrush="{StaticResource DashboardBorderBrush}"
-                    BorderThickness="1">
+            <Border Style="{StaticResource DashboardProfileStatCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="Planned Units" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                    <TextBlock Text="0" FontSize="20" FontWeight="Bold"/>
+                    <TextBlock Text="Planned Units"
+                               Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                    <TextBlock Text="0"
+                               Margin="0,4,0,0"
+                               Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
             </Border>
-        </Grid>
+        </UniformGrid>
 
         <Border Margin="0,14,0,0"
-                BorderBrush="{StaticResource DashboardBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="12">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
+                Style="{StaticResource DashboardProfileSectionCardStyle}">
+            <StackPanel>
+                <TextBlock Text="Next-Term Queue"
+                           Style="{StaticResource DashboardProfileSectionTitleStyle}"
+                           FontSize="16"/>
+                <TextBlock Text="Subjects listed here can be finalized during enrollment."
+                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
-                <TextBlock Text="Subject"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                <TextBlock Grid.Column="1"
-                           Text="Code"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                <TextBlock Grid.Column="2"
-                           Text="Units"
-                           FontWeight="SemiBold"
-                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                <Grid Margin="0,14,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <Rectangle Grid.Row="1"
-                           Grid.ColumnSpan="3"
-                           Height="1"
-                           Fill="{StaticResource DashboardBorderBrush}"
-                           Margin="0,10,0,10"/>
+                    <Border Grid.Row="0"
+                            Background="#F5F9FF"
+                            BorderBrush="#DCE8F8"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1.2*"/>
+                                <ColumnDefinition Width="0.9*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Subject"
+                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="Code"
+                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                            <TextBlock Grid.Column="2"
+                                       Text="Units"
+                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        </Grid>
+                    </Border>
 
-                <TextBlock Grid.Row="2" Text=" "/>
-                <TextBlock Grid.Row="2" Grid.Column="1" Text=" "/>
-                <TextBlock Grid.Row="2" Grid.Column="2" Text="0"/>
-            </Grid>
+                    <Border Grid.Row="1"
+                            Margin="0,8,0,0"
+                            Background="White"
+                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12,11">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="1.2*"/>
+                                <ColumnDefinition Width="0.9*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="No planned subjects yet."
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="--"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            <TextBlock Grid.Column="2"
+                                       Text="0"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </StackPanel>
         </Border>
     </StackPanel>
 </UserControl>

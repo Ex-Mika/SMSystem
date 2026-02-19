@@ -2,6 +2,8 @@ Imports System.Data
 Imports System.Collections.Generic
 Imports System.IO
 Imports System.Text.Json
+Imports System.Windows.Media.Imaging
+Imports Microsoft.Win32
 
 Class AdminStudentsView
     Private Enum StudentFormMode
@@ -15,6 +17,7 @@ Class AdminStudentsView
         Public YearLevel As String
         Public Course As String
         Public Section As String
+        Public PhotoPath As String
     End Structure
 
     Private Class StudentStorageRecord
@@ -23,6 +26,7 @@ Class AdminStudentsView
         Public Property YearLevel As String
         Public Property Course As String
         Public Property Section As String
+        Public Property PhotoPath As String
     End Class
 
     Private _studentsTable As DataTable
@@ -72,13 +76,13 @@ Class AdminStudentsView
         Dim yearLevelColumn As DataColumn = EnsureStudentsColumn(table, "Year Level", "YearLevel", "Year")
         Dim courseColumn As DataColumn = EnsureStudentsColumn(table, "Course", "Program", "Course Name", "Degree")
         Dim sectionColumn As DataColumn = EnsureStudentsColumn(table, "Section", "Class", "Block")
+        Dim photoPathColumn As DataColumn = EnsureStudentsColumn(table, "Photo Path", "PhotoPath", "Photo", "Image", "ImagePath", "Avatar")
 
         RemoveStudentsColumns(table,
                               "Status",
                               "Enrollment Status",
                               "State",
                               "Photo",
-                              "Photo Path",
                               "Image",
                               "ImagePath",
                               "Avatar")
@@ -88,6 +92,7 @@ Class AdminStudentsView
         yearLevelColumn.SetOrdinal(2)
         courseColumn.SetOrdinal(3)
         sectionColumn.SetOrdinal(4)
+        photoPathColumn.SetOrdinal(5)
 
         For Each row As DataRow In table.Rows
             If row.IsNull("Student ID") Then
@@ -118,6 +123,12 @@ Class AdminStudentsView
                 row("Section") = String.Empty
             Else
                 row("Section") = row("Section").ToString().Trim()
+            End If
+
+            If row.IsNull("Photo Path") Then
+                row("Photo Path") = String.Empty
+            Else
+                row("Photo Path") = row("Photo Path").ToString().Trim()
             End If
         Next
 
@@ -185,6 +196,7 @@ Class AdminStudentsView
         table.Columns.Add("Year Level", GetType(String))
         table.Columns.Add("Course", GetType(String))
         table.Columns.Add("Section", GetType(String))
+        table.Columns.Add("Photo Path", GetType(String))
         Return table
     End Function
 
@@ -213,6 +225,7 @@ Class AdminStudentsView
                 row("Year Level") = If(record.YearLevel, String.Empty).Trim()
                 row("Course") = If(record.Course, String.Empty).Trim()
                 row("Section") = If(record.Section, String.Empty).Trim()
+                row("Photo Path") = If(record.PhotoPath, String.Empty).Trim()
                 table.Rows.Add(row)
             Next
         Catch ex As Exception
@@ -247,7 +260,8 @@ Class AdminStudentsView
                     .FullName = ReadRowValue(row, "Full Name"),
                     .YearLevel = ReadRowValue(row, "Year Level"),
                     .Course = ReadRowValue(row, "Course"),
-                    .Section = ReadRowValue(row, "Section")
+                    .Section = ReadRowValue(row, "Section"),
+                    .PhotoPath = ReadRowValue(row, "Photo Path")
                 })
             Next
 
@@ -341,6 +355,27 @@ Class AdminStudentsView
 
     Private Sub StudentsDataGrid_SelectionChanged(sender As Object, e As SelectionChangedEventArgs)
         RefreshStudentDetailsPanel()
+    End Sub
+
+    Private Sub BrowseStudentPhotoButton_Click(sender As Object, e As RoutedEventArgs)
+        Dim dialog As New OpenFileDialog() With {
+            .Title = "Select Student Photo",
+            .Filter = "Image Files|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp|All Files|*.*",
+            .CheckFileExists = True,
+            .CheckPathExists = True
+        }
+
+        If dialog.ShowDialog() = True Then
+            StudentFormPhotoPathTextBox.Text = If(dialog.FileName, String.Empty).Trim()
+        End If
+    End Sub
+
+    Private Sub ClearStudentPhotoButton_Click(sender As Object, e As RoutedEventArgs)
+        StudentFormPhotoPathTextBox.Text = String.Empty
+    End Sub
+
+    Private Sub StudentFormPhotoPathTextBox_TextChanged(sender As Object, e As TextChangedEventArgs)
+        UpdateImageControlSource(StudentFormPhotoPreviewImage, If(StudentFormPhotoPathTextBox.Text, String.Empty))
     End Sub
 
     Private Sub BeginAddStudent()
@@ -448,6 +483,7 @@ Class AdminStudentsView
         row("Year Level") = values.YearLevel
         row("Course") = values.Course
         row("Section") = values.Section
+        row("Photo Path") = values.PhotoPath
     End Sub
 
     Private Sub CancelStudentFormButton_Click(sender As Object, e As RoutedEventArgs)
@@ -539,6 +575,7 @@ Class AdminStudentsView
             SetDetailsValue(StudentDetailsYearLevelTextBlock, String.Empty)
             SetDetailsValue(StudentDetailsCourseTextBlock, String.Empty)
             SetDetailsValue(StudentDetailsSectionTextBlock, String.Empty)
+            UpdateImageControlSource(StudentDetailsPhotoImage, String.Empty)
             Return
         End If
 
@@ -551,6 +588,7 @@ Class AdminStudentsView
         SetDetailsValue(StudentDetailsYearLevelTextBlock, ReadRowValue(selectedRow, "Year Level"))
         SetDetailsValue(StudentDetailsCourseTextBlock, ReadRowValue(selectedRow, "Course"))
         SetDetailsValue(StudentDetailsSectionTextBlock, ReadRowValue(selectedRow, "Section"))
+        UpdateImageControlSource(StudentDetailsPhotoImage, ReadRowValue(selectedRow, "Photo Path"))
     End Sub
 
     Private Sub SetDetailsValue(target As TextBlock, value As String)
@@ -608,6 +646,8 @@ Class AdminStudentsView
         SetComboBoxValue(StudentFormYearLevelComboBox, ReadRowValue(row, "Year Level"))
         StudentFormCourseTextBox.Text = ReadRowValue(row, "Course")
         StudentFormSectionTextBox.Text = ReadRowValue(row, "Section")
+        StudentFormPhotoPathTextBox.Text = ReadRowValue(row, "Photo Path")
+        UpdateImageControlSource(StudentFormPhotoPreviewImage, StudentFormPhotoPathTextBox.Text)
     End Sub
 
     Private Sub ClearStudentFormInputs()
@@ -618,6 +658,8 @@ Class AdminStudentsView
         StudentFormYearLevelComboBox.SelectedIndex = -1
         StudentFormCourseTextBox.Text = String.Empty
         StudentFormSectionTextBox.Text = String.Empty
+        StudentFormPhotoPathTextBox.Text = String.Empty
+        UpdateImageControlSource(StudentFormPhotoPreviewImage, String.Empty)
     End Sub
 
     Private Function TryReadStudentForm(ByRef values As StudentFormValues) As Boolean
@@ -631,6 +673,7 @@ Class AdminStudentsView
         values.YearLevel = ReadComboBoxValue(StudentFormYearLevelComboBox)
         values.Course = If(StudentFormCourseTextBox.Text, String.Empty).Trim()
         values.Section = If(StudentFormSectionTextBox.Text, String.Empty).Trim()
+        values.PhotoPath = If(StudentFormPhotoPathTextBox.Text, String.Empty).Trim()
 
         If String.IsNullOrWhiteSpace(values.StudentId) Then
             MessageBox.Show("Student ID is required.", "Student Form", MessageBoxButton.OK, MessageBoxImage.Information)
@@ -814,4 +857,28 @@ Class AdminStudentsView
 
         Return row(columnName).ToString().Trim()
     End Function
+
+    Private Sub UpdateImageControlSource(targetImage As System.Windows.Controls.Image, imagePath As String)
+        If targetImage Is Nothing Then
+            Return
+        End If
+
+        Dim normalizedPath As String = If(imagePath, String.Empty).Trim()
+        If String.IsNullOrWhiteSpace(normalizedPath) OrElse Not File.Exists(normalizedPath) Then
+            targetImage.Source = Nothing
+            Return
+        End If
+
+        Try
+            Dim bitmap As New BitmapImage()
+            bitmap.BeginInit()
+            bitmap.CacheOption = BitmapCacheOption.OnLoad
+            bitmap.UriSource = New Uri(normalizedPath, UriKind.Absolute)
+            bitmap.EndInit()
+            bitmap.Freeze()
+            targetImage.Source = bitmap
+        Catch
+            targetImage.Source = Nothing
+        End Try
+    End Sub
 End Class

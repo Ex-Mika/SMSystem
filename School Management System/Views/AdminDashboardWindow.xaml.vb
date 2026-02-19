@@ -123,6 +123,8 @@
             AdministratorsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
         ElseIf section = AdminDashboardSection.Courses Then
             CoursesContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf section = AdminDashboardSection.Subjects Then
+            SubjectsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
         ElseIf section = AdminDashboardSection.Reports Then
             ReportsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
         ElseIf section = AdminDashboardSection.Scheduling Then
@@ -139,6 +141,8 @@
             AdministratorsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
         ElseIf _activeSection = AdminDashboardSection.Courses Then
             CoursesContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        ElseIf _activeSection = AdminDashboardSection.Subjects Then
+            SubjectsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
         ElseIf _activeSection = AdminDashboardSection.Reports Then
             ReportsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
         ElseIf _activeSection = AdminDashboardSection.Scheduling Then

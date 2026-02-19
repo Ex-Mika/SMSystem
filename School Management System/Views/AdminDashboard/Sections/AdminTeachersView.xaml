@@ -1,4 +1,4 @@
-<UserControl x:Class="AdminTeachersView"
+﻿<UserControl x:Class="AdminTeachersView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -112,6 +112,17 @@
                                             <StackPanel Margin="18,12,18,14">
                                                 <TextBlock Style="{StaticResource TeacherFormLabelStyle}"
                                                            Margin="0,0,0,0"
+                                                           Text="Photo"/>
+                                                <Border Style="{StaticResource TeacherDetailsValueBorderStyle}"
+                                                        Padding="0"
+                                                        Width="160"
+                                                        Height="160"
+                                                        HorizontalAlignment="Left">
+                                                    <Image x:Name="TeacherDetailsPhotoImage"
+                                                           Stretch="UniformToFill"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}"
                                                            Text="Teacher ID"/>
                                                 <Border Style="{StaticResource TeacherDetailsValueBorderStyle}">
                                                     <TextBlock x:Name="TeacherDetailsTeacherIdTextBlock" Style="{StaticResource TeacherDetailsValueTextStyle}"/>
@@ -234,6 +245,50 @@
                                                         <TextBox x:Name="TeacherFormAdvisoryTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
                                                     </StackPanel>
                                                 </Grid>
+
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Photo"/>
+                                                <Grid Margin="0,6,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="8"/>
+                                                        <ColumnDefinition Width="100"/>
+                                                        <ColumnDefinition Width="8"/>
+                                                        <ColumnDefinition Width="72"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBox x:Name="TeacherFormPhotoPathTextBox"
+                                                             Grid.Column="0"
+                                                             Style="{StaticResource TeacherFormTextInputStyle}"
+                                                             Margin="0"
+                                                             TextChanged="TeacherFormPhotoPathTextBox_TextChanged"/>
+                                                    <Button Grid.Column="2"
+                                                            Height="36"
+                                                            Margin="0"
+                                                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                            Background="#EAF4FF"
+                                                            Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                            Click="BrowseTeacherPhotoButton_Click"
+                                                            Content="Browse"/>
+                                                    <Button Grid.Column="4"
+                                                            Height="36"
+                                                            Margin="0"
+                                                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                            Background="#F3F6FA"
+                                                            Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                            Click="ClearTeacherPhotoButton_Click"
+                                                            Content="Clear"/>
+                                                </Grid>
+
+                                                <Border Margin="0,8,0,0"
+                                                        Width="140"
+                                                        Height="140"
+                                                        HorizontalAlignment="Left"
+                                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="8"
+                                                        Background="#F8FBFF">
+                                                    <Image x:Name="TeacherFormPhotoPreviewImage"
+                                                           Stretch="UniformToFill"/>
+                                                </Border>
                                             </StackPanel>
                                         </ScrollViewer>
 
@@ -285,10 +340,10 @@
                                           SelectionChanged="TeachersDataGrid_SelectionChanged"
                                           MinHeight="640">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Teacher ID" Binding="{Binding [Teacher ID]}" Width="*"/>
-                                        <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" Width="*"/>
-                                        <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" Width="*"/>
-                                        <DataGridTextColumn Header="Advisory" Binding="{Binding [Advisory]}" Width="*"/>
+                                        <DataGridTextColumn Header="Teacher ID" Binding="{Binding [Teacher ID]}" SortMemberPath="Teacher ID" Width="*"/>
+                                        <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" SortMemberPath="Full Name" Width="*"/>
+                                        <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" SortMemberPath="Department" Width="*"/>
+                                        <DataGridTextColumn Header="Advisory" Binding="{Binding [Advisory]}" SortMemberPath="Advisory" Width="*"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Border>
@@ -299,3 +354,4 @@
         </ScrollViewer>
     </Grid>
 </UserControl>
+

@@ -1,4 +1,4 @@
-<UserControl x:Class="AdminCoursesView"
+﻿<UserControl x:Class="AdminCoursesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -255,10 +255,10 @@
                                           SelectionChanged="CoursesDataGrid_SelectionChanged"
                                           MinHeight="640">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Course Code" Binding="{Binding [Course Code]}" Width="*"/>
-                                        <DataGridTextColumn Header="Course Title" Binding="{Binding [Course Title]}" Width="*"/>
-                                        <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" Width="*"/>
-                                        <DataGridTextColumn Header="Units" Binding="{Binding [Units]}" Width="*"/>
+                                        <DataGridTextColumn Header="Course Code" Binding="{Binding [Course Code]}" SortMemberPath="Course Code" Width="*"/>
+                                        <DataGridTextColumn Header="Course Title" Binding="{Binding [Course Title]}" SortMemberPath="Course Title" Width="*"/>
+                                        <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" SortMemberPath="Department" Width="*"/>
+                                        <DataGridTextColumn Header="Units" Binding="{Binding [Units]}" SortMemberPath="Units" Width="*"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Border>
@@ -269,3 +269,4 @@
         </ScrollViewer>
     </Grid>
 </UserControl>
+
