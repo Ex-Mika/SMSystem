@@ -4,6 +4,8 @@ Imports School_Management_System.Backend.Repositories
 
 Namespace Backend.Services
     Public Class AuthenticationService
+        Public Const InvalidCredentialsMessage As String = "Invalid login credentials. Please try again."
+
         Private ReadOnly _userRepository As UserRepository
 
         Public Sub New()
@@ -30,16 +32,16 @@ Namespace Backend.Services
             Dim user As UserAccount = _userRepository.GetByLoginIdentifier(request.Role,
                                                                            request.Identifier)
             If user Is Nothing Then
-                Return ServiceResult(Of UserAccount).Failure("User account was not found.")
+                Return ServiceResult(Of UserAccount).Failure(InvalidCredentialsMessage)
             End If
 
             If Not user.IsActive Then
-                Return ServiceResult(Of UserAccount).Failure("User account is inactive.")
+                Return ServiceResult(Of UserAccount).Failure(InvalidCredentialsMessage)
             End If
 
             If Not Database.DatabaseModule.VerifyPassword(request.Password,
                                                           user.PasswordHash) Then
-                Return ServiceResult(Of UserAccount).Failure("Invalid password.")
+                Return ServiceResult(Of UserAccount).Failure(InvalidCredentialsMessage)
             End If
 
             Return ServiceResult(Of UserAccount).Success(user, "Login successful.")

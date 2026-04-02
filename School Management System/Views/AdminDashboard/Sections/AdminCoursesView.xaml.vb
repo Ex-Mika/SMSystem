@@ -1,7 +1,7 @@
-Imports System.Data
 Imports System.Collections.Generic
-Imports System.IO
-Imports System.Text.Json
+Imports System.Data
+Imports School_Management_System.Backend.Models
+Imports School_Management_System.Backend.Services
 
 Class AdminCoursesView
     Private Enum CourseFormMode
@@ -16,22 +16,11 @@ Class AdminCoursesView
         Public Units As String
     End Structure
 
-    Private Class CourseStorageRecord
-        Public Property CourseCode As String
-        Public Property CourseTitle As String
-        Public Property Department As String
-        Public Property Units As String
-    End Class
-
     Private _coursesTable As DataTable
     Private _searchTerm As String = String.Empty
     Private _activeFormMode As CourseFormMode = CourseFormMode.Add
     Private _editingCourseOriginalCode As String = String.Empty
-    Private ReadOnly _coursesStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "courses.json")
-    Private ReadOnly _courseStorageJsonOptions As New JsonSerializerOptions() With {
-        .WriteIndented = True
-    }
+    Private ReadOnly _courseManagementService As New CourseManagementService()
 
     Public Sub New()
         InitializeComponent()
@@ -49,7 +38,7 @@ Class AdminCoursesView
     End Sub
 
     Public Sub SetCoursesTable(table As DataTable)
-        _coursesTable = NormalizeCoursesTable(table)
+        _coursesTable = If(table, CreateEmptyCoursesTable())
         CoursesDataGrid.ItemsSource = _coursesTable.DefaultView
         ApplyCoursesFilter()
         UpdateCoursesCount()
@@ -58,123 +47,41 @@ Class AdminCoursesView
     End Sub
 
     Private Sub LoadCoursesTable(Optional courseCodeToSelect As String = "")
-        Dim coursesTable As DataTable = FetchCoursesTable()
-        SetCoursesTable(coursesTable)
+        Dim result = _courseManagementService.GetCourses()
+
+        If Not result.IsSuccess Then
+            SetCoursesTable(CreateEmptyCoursesTable())
+            MessageBox.Show(result.Message,
+                            "Courses",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            Return
+        End If
+
+        SetCoursesTable(BuildCoursesTable(result.Data))
 
         If Not String.IsNullOrWhiteSpace(courseCodeToSelect) Then
             SelectCourseByCode(courseCodeToSelect)
         End If
     End Sub
 
-    Private Function FetchCoursesTable() As DataTable
-        Return ReadCoursesFromStorage()
-    End Function
+    Private Function BuildCoursesTable(records As IEnumerable(Of CourseRecord)) As DataTable
+        Dim table As DataTable = CreateEmptyCoursesTable()
 
-    Private Function NormalizeCoursesTable(source As DataTable) As DataTable
-        Dim table As DataTable = If(source Is Nothing, CreateEmptyCoursesTable(), source.Copy())
+        If records Is Nothing Then
+            Return table
+        End If
 
-        Dim courseCodeColumn As DataColumn = EnsureCoursesColumn(table, "Course Code", "CourseCode", "Code", "Course_ID")
-        Dim courseTitleColumn As DataColumn = EnsureCoursesColumn(table, "Course Title", "CourseTitle", "Title", "Course Name")
-        Dim departmentColumn As DataColumn = EnsureCoursesColumn(table, "Department", "Program", "Department Name", "College")
-        Dim unitsColumn As DataColumn = EnsureCoursesColumn(table, "Units", "Unit", "Credits", "Credit")
-
-        RemoveCoursesColumns(table,
-                             "Year Level",
-                             "Section",
-                             "Instructor",
-                             "Status",
-                             "Photo",
-                             "Photo Path",
-                             "Image",
-                             "ImagePath",
-                             "Avatar")
-
-        courseCodeColumn.SetOrdinal(0)
-        courseTitleColumn.SetOrdinal(1)
-        departmentColumn.SetOrdinal(2)
-        unitsColumn.SetOrdinal(3)
-
-        For Each row As DataRow In table.Rows
-            If row.IsNull("Course Code") Then
-                row("Course Code") = String.Empty
-            Else
-                row("Course Code") = row("Course Code").ToString().Trim()
-            End If
-
-            If row.IsNull("Course Title") Then
-                row("Course Title") = String.Empty
-            Else
-                row("Course Title") = row("Course Title").ToString().Trim()
-            End If
-
-            If row.IsNull("Department") Then
-                row("Department") = String.Empty
-            Else
-                row("Department") = row("Department").ToString().Trim()
-            End If
-
-            If row.IsNull("Units") Then
-                row("Units") = String.Empty
-            Else
-                row("Units") = row("Units").ToString().Trim()
-            End If
+        For Each record As CourseRecord In records
+            Dim row As DataRow = table.NewRow()
+            row("Course Code") = record.CourseCode
+            row("Course Title") = record.CourseName
+            row("Department") = record.DepartmentDisplayName
+            row("Units") = record.Units
+            table.Rows.Add(row)
         Next
 
         Return table
-    End Function
-
-    Private Sub RemoveCoursesColumns(table As DataTable, ParamArray columnNames() As String)
-        If table Is Nothing OrElse columnNames Is Nothing Then
-            Return
-        End If
-
-        For columnIndex As Integer = table.Columns.Count - 1 To 0 Step -1
-            Dim candidateColumn As DataColumn = table.Columns(columnIndex)
-            For Each requestedName As String In columnNames
-                If String.Equals(candidateColumn.ColumnName, requestedName, StringComparison.OrdinalIgnoreCase) Then
-                    table.Columns.Remove(candidateColumn)
-                    Exit For
-                End If
-            Next
-        Next
-    End Sub
-
-    Private Function EnsureCoursesColumn(table As DataTable, targetColumnName As String, ParamArray aliases() As String) As DataColumn
-        Dim existingColumn As DataColumn = FindTableColumn(table, targetColumnName)
-        If existingColumn Is Nothing Then
-            existingColumn = FindTableColumn(table, aliases)
-            If existingColumn IsNot Nothing Then
-                existingColumn.ColumnName = targetColumnName
-            End If
-        End If
-
-        If existingColumn Is Nothing Then
-            existingColumn = New DataColumn(targetColumnName, GetType(String))
-            table.Columns.Add(existingColumn)
-        End If
-
-        Return existingColumn
-    End Function
-
-    Private Function FindTableColumn(table As DataTable, ParamArray columnNames() As String) As DataColumn
-        If table Is Nothing OrElse columnNames Is Nothing Then
-            Return Nothing
-        End If
-
-        For Each requestedName As String In columnNames
-            Dim normalizedRequestedName As String = If(requestedName, String.Empty).Trim()
-            If String.IsNullOrWhiteSpace(normalizedRequestedName) Then
-                Continue For
-            End If
-
-            For Each candidateColumn As DataColumn In table.Columns
-                If String.Equals(candidateColumn.ColumnName, normalizedRequestedName, StringComparison.OrdinalIgnoreCase) Then
-                    Return candidateColumn
-                End If
-            Next
-        Next
-
-        Return Nothing
     End Function
 
     Private Function CreateEmptyCoursesTable() As DataTable
@@ -184,79 +91,6 @@ Class AdminCoursesView
         table.Columns.Add("Department", GetType(String))
         table.Columns.Add("Units", GetType(String))
         Return table
-    End Function
-
-    Private Function ReadCoursesFromStorage() As DataTable
-        Dim table As DataTable = CreateEmptyCoursesTable()
-        If Not File.Exists(_coursesStoragePath) Then
-            Return table
-        End If
-
-        Try
-            Dim json As String = File.ReadAllText(_coursesStoragePath)
-            If String.IsNullOrWhiteSpace(json) Then
-                Return table
-            End If
-
-            Dim records As List(Of CourseStorageRecord) =
-                JsonSerializer.Deserialize(Of List(Of CourseStorageRecord))(json, _courseStorageJsonOptions)
-            If records Is Nothing Then
-                Return table
-            End If
-
-            For Each record As CourseStorageRecord In records
-                Dim row As DataRow = table.NewRow()
-                row("Course Code") = If(record.CourseCode, String.Empty).Trim()
-                row("Course Title") = If(record.CourseTitle, String.Empty).Trim()
-                row("Department") = If(record.Department, String.Empty).Trim()
-                row("Units") = If(record.Units, String.Empty).Trim()
-                table.Rows.Add(row)
-            Next
-        Catch ex As Exception
-            MessageBox.Show("Unable to load saved courses data." & Environment.NewLine & ex.Message,
-                            "Courses",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning)
-        End Try
-
-        Return table
-    End Function
-
-    Private Function PersistCoursesToStorage() As Boolean
-        If _coursesTable Is Nothing Then
-            Return True
-        End If
-
-        Try
-            Dim storageDirectory As String = Path.GetDirectoryName(_coursesStoragePath)
-            If Not String.IsNullOrWhiteSpace(storageDirectory) Then
-                Directory.CreateDirectory(storageDirectory)
-            End If
-
-            Dim records As New List(Of CourseStorageRecord)()
-            For Each row As DataRow In _coursesTable.Rows
-                If row.RowState = DataRowState.Deleted Then
-                    Continue For
-                End If
-
-                records.Add(New CourseStorageRecord With {
-                    .CourseCode = ReadRowValue(row, "Course Code"),
-                    .CourseTitle = ReadRowValue(row, "Course Title"),
-                    .Department = ReadRowValue(row, "Department"),
-                    .Units = ReadRowValue(row, "Units")
-                })
-            Next
-
-            Dim json As String = JsonSerializer.Serialize(records, _courseStorageJsonOptions)
-            File.WriteAllText(_coursesStoragePath, json)
-            Return True
-        Catch ex As Exception
-            MessageBox.Show("Unable to save courses data." & Environment.NewLine & ex.Message,
-                            "Courses",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error)
-            Return False
-        End Try
     End Function
 
     Private Sub ApplyCoursesFilter()
@@ -358,24 +192,29 @@ Class AdminCoursesView
             Return
         End If
 
-        EnsureCoursesTableLoaded()
-        Dim targetRow As DataRow = ResolveTargetRowForSave(formValues.CourseCode)
-        If targetRow Is Nothing Then
+        Dim request As New CourseSaveRequest() With {
+            .OriginalCourseCode = _editingCourseOriginalCode,
+            .CourseCode = formValues.CourseCode,
+            .CourseName = formValues.CourseTitle,
+            .DepartmentText = formValues.Department,
+            .Units = formValues.Units
+        }
+
+        Dim isAddMode As Boolean = _activeFormMode = CourseFormMode.Add
+        Dim result =
+            If(isAddMode,
+               _courseManagementService.CreateCourse(request),
+               _courseManagementService.UpdateCourse(request))
+
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Courses",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information)
             Return
         End If
 
-        WriteCourseValues(targetRow, formValues)
-        If _activeFormMode = CourseFormMode.Add Then
-            _coursesTable.Rows.Add(targetRow)
-        End If
-
-        _coursesTable.AcceptChanges()
-        If Not PersistCoursesToStorage() Then
-            Return
-        End If
-
-        ApplyCoursesFilter()
-        SelectCourseByCode(formValues.CourseCode)
+        LoadCoursesTable(result.Data.CourseCode)
         HideCourseForm()
     End Sub
 
@@ -401,49 +240,6 @@ Class AdminCoursesView
         ShowCourseForm()
     End Sub
 
-    Private Sub EnsureCoursesTableLoaded()
-        If _coursesTable Is Nothing Then
-            SetCoursesTable(Nothing)
-        End If
-    End Sub
-
-    Private Function ResolveTargetRowForSave(courseCode As String) As DataRow
-        Select Case _activeFormMode
-            Case CourseFormMode.Add
-                If FindCourseRowByCode(courseCode) IsNot Nothing Then
-                    MessageBox.Show("Course Code already exists.", "Duplicate Course Code", MessageBoxButton.OK, MessageBoxImage.Information)
-                    Return Nothing
-                End If
-
-                Return _coursesTable.NewRow()
-
-            Case CourseFormMode.Edit
-                Dim targetRow As DataRow = FindCourseRowByCode(_editingCourseOriginalCode)
-                If targetRow Is Nothing Then
-                    MessageBox.Show("The selected course no longer exists.", "Edit Course", MessageBoxButton.OK, MessageBoxImage.Information)
-                    HideCourseForm()
-                    Return Nothing
-                End If
-
-                If Not String.Equals(_editingCourseOriginalCode, courseCode, StringComparison.OrdinalIgnoreCase) AndAlso
-                   FindCourseRowByCode(courseCode) IsNot Nothing Then
-                    MessageBox.Show("Course Code already exists.", "Duplicate Course Code", MessageBoxButton.OK, MessageBoxImage.Information)
-                    Return Nothing
-                End If
-
-                Return targetRow
-        End Select
-
-        Return Nothing
-    End Function
-
-    Private Sub WriteCourseValues(row As DataRow, values As CourseFormValues)
-        row("Course Code") = values.CourseCode
-        row("Course Title") = values.CourseTitle
-        row("Department") = values.Department
-        row("Units") = values.Units
-    End Sub
-
     Private Sub CancelCourseFormButton_Click(sender As Object, e As RoutedEventArgs)
         HideCourseForm()
     End Sub
@@ -457,26 +253,32 @@ Class AdminCoursesView
         Dim courseCode As String = ReadRowValue(row, "Course Code")
         Dim recordLabel As String = If(String.IsNullOrWhiteSpace(courseTitle), courseCode, courseTitle)
 
-        Dim confirmation As MessageBoxResult = MessageBox.Show("Delete " & recordLabel & "?", "Delete Course", MessageBoxButton.YesNo, MessageBoxImage.Question)
+        Dim confirmation As MessageBoxResult =
+            MessageBox.Show("Delete " & recordLabel & "?",
+                            "Delete Course",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question)
         If confirmation <> MessageBoxResult.Yes Then
             Return
         End If
 
-        row.Delete()
-        _coursesTable.AcceptChanges()
-        If Not PersistCoursesToStorage() Then
+        Dim result = _courseManagementService.DeleteCourse(courseCode)
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Courses",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information)
             Return
         End If
 
-        ApplyCoursesFilter()
-
         If _activeFormMode = CourseFormMode.Edit AndAlso
-           String.Equals(_editingCourseOriginalCode, courseCode, StringComparison.OrdinalIgnoreCase) Then
+           String.Equals(_editingCourseOriginalCode,
+                         courseCode,
+                         StringComparison.OrdinalIgnoreCase) Then
             HideCourseForm()
         End If
 
-        EnsureSelectedCourseForDetails()
-        RefreshCourseDetailsPanel()
+        LoadCoursesTable()
     End Sub
 
     Private Sub EnsureSelectedCourseForDetails()
@@ -624,30 +426,6 @@ Class AdminCoursesView
         End If
 
         Return True
-    End Function
-
-    Private Function FindCourseRowByCode(courseCode As String) As DataRow
-        If _coursesTable Is Nothing Then
-            Return Nothing
-        End If
-
-        Dim normalizedCourseCode As String = If(courseCode, String.Empty).Trim()
-        If String.IsNullOrWhiteSpace(normalizedCourseCode) Then
-            Return Nothing
-        End If
-
-        For Each row As DataRow In _coursesTable.Rows
-            If row.RowState = DataRowState.Deleted Then
-                Continue For
-            End If
-
-            Dim candidateCode As String = ReadRowValue(row, "Course Code")
-            If String.Equals(candidateCode, normalizedCourseCode, StringComparison.OrdinalIgnoreCase) Then
-                Return row
-            End If
-        Next
-
-        Return Nothing
     End Function
 
     Private Sub SelectCourseByCode(courseCode As String)

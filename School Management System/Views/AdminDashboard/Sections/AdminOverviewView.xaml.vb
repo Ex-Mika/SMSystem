@@ -52,12 +52,10 @@ Class AdminOverviewView
     Private Sub SetLoadingState()
         TotalStudentsValueTextBlock.Text = "--"
         TotalTeachersValueTextBlock.Text = "--"
-        FeesCollectedValueTextBlock.Text = "--"
         NewApplicationsValueTextBlock.Text = "--"
 
         TotalStudentsStatusTextBlock.Text = "Loading student data..."
         TotalTeachersStatusTextBlock.Text = "Loading teacher data..."
-        FeesCollectedStatusTextBlock.Text = "Finance module pending..."
         NewApplicationsStatusTextBlock.Text = "Loading recent account activity..."
 
         RecentActivityItemsControl.ItemsSource = Nothing
@@ -74,7 +72,6 @@ Class AdminOverviewView
 
         TotalStudentsValueTextBlock.Text = resolvedOverview.TotalStudents.ToString()
         TotalTeachersValueTextBlock.Text = resolvedOverview.TotalTeachers.ToString()
-        FeesCollectedValueTextBlock.Text = resolvedOverview.FeesCollectedDisplay
         NewApplicationsValueTextBlock.Text = resolvedOverview.NewApplications.ToString()
 
         TotalStudentsStatusTextBlock.Text = BuildCountSummary(resolvedOverview.TotalStudents,
@@ -83,7 +80,6 @@ Class AdminOverviewView
         TotalTeachersStatusTextBlock.Text = BuildCountSummary(resolvedOverview.TotalTeachers,
                                                               "active teacher profile",
                                                               "active teacher profiles")
-        FeesCollectedStatusTextBlock.Text = resolvedOverview.FeesSummary
         NewApplicationsStatusTextBlock.Text = "User accounts created in the last 30 days"
 
         RecentActivityItemsControl.ItemsSource = resolvedOverview.RecentActivities
@@ -106,12 +102,10 @@ Class AdminOverviewView
     Private Sub ApplyErrorState(message As String)
         TotalStudentsValueTextBlock.Text = "--"
         TotalTeachersValueTextBlock.Text = "--"
-        FeesCollectedValueTextBlock.Text = "--"
         NewApplicationsValueTextBlock.Text = "--"
 
         TotalStudentsStatusTextBlock.Text = message
         TotalTeachersStatusTextBlock.Text = message
-        FeesCollectedStatusTextBlock.Text = "Finance module not connected yet."
         NewApplicationsStatusTextBlock.Text = message
 
         RecentActivityItemsControl.ItemsSource = Nothing

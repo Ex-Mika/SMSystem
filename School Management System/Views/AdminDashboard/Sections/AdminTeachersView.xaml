@@ -171,6 +171,11 @@
                                                     <TextBlock x:Name="TeacherDetailsDepartmentTextBlock" Style="{StaticResource TeacherDetailsValueTextStyle}"/>
                                                 </Border>
 
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Position"/>
+                                                <Border Style="{StaticResource TeacherDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="TeacherDetailsPositionTextBlock" Style="{StaticResource TeacherDetailsValueTextStyle}"/>
+                                                </Border>
+
                                                 <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Advisory"/>
                                                 <Border Style="{StaticResource TeacherDetailsValueBorderStyle}">
                                                     <TextBlock x:Name="TeacherDetailsAdvisoryTextBlock" Style="{StaticResource TeacherDetailsValueTextStyle}"/>
@@ -277,10 +282,21 @@
                                                         <TextBox x:Name="TeacherFormDepartmentTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
                                                     </StackPanel>
                                                     <StackPanel Grid.Column="2">
-                                                        <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Margin="0" Text="Advisory"/>
-                                                        <TextBox x:Name="TeacherFormAdvisoryTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+                                                        <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Margin="0" Text="Position"/>
+                                                        <TextBox x:Name="TeacherFormPositionTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
                                                     </StackPanel>
                                                 </Grid>
+
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Advisory"/>
+                                                <TextBox x:Name="TeacherFormAdvisoryTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+
+                                                <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Password"/>
+                                                <TextBox x:Name="TeacherFormPasswordTextBox" Style="{StaticResource TeacherFormTextInputStyle}"/>
+                                                <TextBlock Margin="0,4,0,0"
+                                                           FontSize="11"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                           Text="Leave blank to use the default password when creating, or keep the current password while editing."
+                                                           TextWrapping="Wrap"/>
 
                                                 <TextBlock Style="{StaticResource TeacherFormLabelStyle}" Text="Photo"/>
                                                 <Grid Margin="0,6,0,0">
@@ -363,7 +379,7 @@
                                     local:RoundedClipHelper.CornerRadius="10"
                                     ClipToBounds="True"
                                     SnapsToDevicePixels="True">
-                                <DataGrid x:Name="TeachersDataGrid"
+                                    <DataGrid x:Name="TeachersDataGrid"
                                           Style="{StaticResource DashboardManagementDataGridStyle}"
                                           ColumnHeaderStyle="{StaticResource TeacherDataGridHeaderStyle}"
                                           CellStyle="{StaticResource TeacherDataGridCellStyle}"
@@ -380,6 +396,7 @@
                                         <DataGridTextColumn Header="Teacher ID" Binding="{Binding [Teacher ID]}" SortMemberPath="Teacher ID" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
                                         <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" SortMemberPath="Full Name" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
                                         <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" SortMemberPath="Department" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
+                                        <DataGridTextColumn Header="Position" Binding="{Binding [Position]}" SortMemberPath="Position" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
                                         <DataGridTextColumn Header="Advisory" Binding="{Binding [Advisory]}" SortMemberPath="Advisory" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
                                     </DataGrid.Columns>
                                 </DataGrid>

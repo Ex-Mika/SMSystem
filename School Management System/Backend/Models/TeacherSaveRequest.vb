@@ -6,6 +6,7 @@ Namespace Backend.Models
         Public Property MiddleName As String = String.Empty
         Public Property LastName As String = String.Empty
         Public Property DepartmentText As String = String.Empty
+        Public Property PositionTitle As String = String.Empty
         Public Property AdvisorySection As String = String.Empty
         Public Property PhotoPath As String = String.Empty
         Public Property Password As String = String.Empty

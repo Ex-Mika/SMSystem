@@ -1,7 +1,7 @@
-﻿Imports System.Data
 Imports System.Collections.Generic
-Imports System.IO
-Imports System.Text.Json
+Imports System.Data
+Imports School_Management_System.Backend.Models
+Imports School_Management_System.Backend.Services
 
 Class AdminSubjectsView
     Private Enum SubjectFormMode
@@ -17,23 +17,11 @@ Class AdminSubjectsView
         Public Units As String
     End Structure
 
-    Private Class SubjectStorageRecord
-        Public Property SubjectCode As String
-        Public Property SubjectName As String
-        Public Property Course As String
-        Public Property YearLevel As String
-        Public Property Units As String
-    End Class
-
     Private _subjectsTable As DataTable
     Private _searchTerm As String = String.Empty
     Private _activeFormMode As SubjectFormMode = SubjectFormMode.Add
     Private _editingSubjectOriginalCode As String = String.Empty
-    Private ReadOnly _subjectsStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "subjects.json")
-    Private ReadOnly _subjectStorageJsonOptions As New JsonSerializerOptions() With {
-        .WriteIndented = True
-    }
+    Private ReadOnly _subjectManagementService As New SubjectManagementService()
 
     Public Sub New()
         InitializeComponent()
@@ -51,7 +39,7 @@ Class AdminSubjectsView
     End Sub
 
     Public Sub SetSubjectsTable(table As DataTable)
-        _subjectsTable = NormalizeSubjectsTable(table)
+        _subjectsTable = If(table, CreateEmptySubjectsTable())
         SubjectsDataGrid.ItemsSource = _subjectsTable.DefaultView
         ApplySubjectsFilter()
         UpdateSubjectsCount()
@@ -60,130 +48,42 @@ Class AdminSubjectsView
     End Sub
 
     Private Sub LoadSubjectsTable(Optional subjectCodeToSelect As String = "")
-        Dim subjectsTable As DataTable = FetchSubjectsTable()
-        SetSubjectsTable(subjectsTable)
+        Dim result = _subjectManagementService.GetSubjects()
+
+        If Not result.IsSuccess Then
+            SetSubjectsTable(CreateEmptySubjectsTable())
+            MessageBox.Show(result.Message,
+                            "Subjects",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            Return
+        End If
+
+        SetSubjectsTable(BuildSubjectsTable(result.Data))
 
         If Not String.IsNullOrWhiteSpace(subjectCodeToSelect) Then
             SelectSubjectByCode(subjectCodeToSelect)
         End If
     End Sub
 
-    Private Function FetchSubjectsTable() As DataTable
-        Return ReadSubjectsFromStorage()
-    End Function
+    Private Function BuildSubjectsTable(records As IEnumerable(Of SubjectRecord)) As DataTable
+        Dim table As DataTable = CreateEmptySubjectsTable()
 
-    Private Function NormalizeSubjectsTable(source As DataTable) As DataTable
-        Dim table As DataTable = If(source Is Nothing, CreateEmptySubjectsTable(), source.Copy())
+        If records Is Nothing Then
+            Return table
+        End If
 
-        Dim subjectCodeColumn As DataColumn = EnsureSubjectsColumn(table, "Subject Code", "SubjectCode", "Code", "Subject_ID")
-        Dim subjectNameColumn As DataColumn = EnsureSubjectsColumn(table, "Subject Name", "SubjectName", "Name", "Subject Name")
-        Dim courseColumn As DataColumn = EnsureSubjectsColumn(table, "Course", "Program", "Course Name", "College")
-        Dim yearLevelColumn As DataColumn = EnsureSubjectsColumn(table, "Year Level", "YearLevel", "Year")
-        Dim unitsColumn As DataColumn = EnsureSubjectsColumn(table, "Units", "Unit", "Credits", "Credit")
-
-        RemoveSubjectsColumns(table,
-                             "Section",
-                             "Instructor",
-                             "Status",
-                             "Photo",
-                             "Photo Path",
-                             "Image",
-                             "ImagePath",
-                             "Avatar")
-
-        subjectCodeColumn.SetOrdinal(0)
-        subjectNameColumn.SetOrdinal(1)
-        courseColumn.SetOrdinal(2)
-        yearLevelColumn.SetOrdinal(3)
-        unitsColumn.SetOrdinal(4)
-
-        For Each row As DataRow In table.Rows
-            If row.IsNull("Subject Code") Then
-                row("Subject Code") = String.Empty
-            Else
-                row("Subject Code") = row("Subject Code").ToString().Trim()
-            End If
-
-            If row.IsNull("Subject Name") Then
-                row("Subject Name") = String.Empty
-            Else
-                row("Subject Name") = row("Subject Name").ToString().Trim()
-            End If
-
-            If row.IsNull("Course") Then
-                row("Course") = String.Empty
-            Else
-                row("Course") = row("Course").ToString().Trim()
-            End If
-
-            If row.IsNull("Year Level") Then
-                row("Year Level") = String.Empty
-            Else
-                row("Year Level") = row("Year Level").ToString().Trim()
-            End If
-
-            If row.IsNull("Units") Then
-                row("Units") = String.Empty
-            Else
-                row("Units") = row("Units").ToString().Trim()
-            End If
+        For Each record As SubjectRecord In records
+            Dim row As DataRow = table.NewRow()
+            row("Subject Code") = record.SubjectCode
+            row("Subject Name") = record.SubjectName
+            row("Course") = record.CourseDisplayName
+            row("Year Level") = record.YearLevel
+            row("Units") = record.Units
+            table.Rows.Add(row)
         Next
 
         Return table
-    End Function
-
-    Private Sub RemoveSubjectsColumns(table As DataTable, ParamArray columnNames() As String)
-        If table Is Nothing OrElse columnNames Is Nothing Then
-            Return
-        End If
-
-        For columnIndex As Integer = table.Columns.Count - 1 To 0 Step -1
-            Dim candidateColumn As DataColumn = table.Columns(columnIndex)
-            For Each requestedName As String In columnNames
-                If String.Equals(candidateColumn.ColumnName, requestedName, StringComparison.OrdinalIgnoreCase) Then
-                    table.Columns.Remove(candidateColumn)
-                    Exit For
-                End If
-            Next
-        Next
-    End Sub
-
-    Private Function EnsureSubjectsColumn(table As DataTable, targetColumnName As String, ParamArray aliases() As String) As DataColumn
-        Dim existingColumn As DataColumn = FindTableColumn(table, targetColumnName)
-        If existingColumn Is Nothing Then
-            existingColumn = FindTableColumn(table, aliases)
-            If existingColumn IsNot Nothing Then
-                existingColumn.ColumnName = targetColumnName
-            End If
-        End If
-
-        If existingColumn Is Nothing Then
-            existingColumn = New DataColumn(targetColumnName, GetType(String))
-            table.Columns.Add(existingColumn)
-        End If
-
-        Return existingColumn
-    End Function
-
-    Private Function FindTableColumn(table As DataTable, ParamArray columnNames() As String) As DataColumn
-        If table Is Nothing OrElse columnNames Is Nothing Then
-            Return Nothing
-        End If
-
-        For Each requestedName As String In columnNames
-            Dim normalizedRequestedName As String = If(requestedName, String.Empty).Trim()
-            If String.IsNullOrWhiteSpace(normalizedRequestedName) Then
-                Continue For
-            End If
-
-            For Each candidateColumn As DataColumn In table.Columns
-                If String.Equals(candidateColumn.ColumnName, normalizedRequestedName, StringComparison.OrdinalIgnoreCase) Then
-                    Return candidateColumn
-                End If
-            Next
-        Next
-
-        Return Nothing
     End Function
 
     Private Function CreateEmptySubjectsTable() As DataTable
@@ -194,81 +94,6 @@ Class AdminSubjectsView
         table.Columns.Add("Year Level", GetType(String))
         table.Columns.Add("Units", GetType(String))
         Return table
-    End Function
-
-    Private Function ReadSubjectsFromStorage() As DataTable
-        Dim table As DataTable = CreateEmptySubjectsTable()
-        If Not File.Exists(_subjectsStoragePath) Then
-            Return table
-        End If
-
-        Try
-            Dim json As String = File.ReadAllText(_subjectsStoragePath)
-            If String.IsNullOrWhiteSpace(json) Then
-                Return table
-            End If
-
-            Dim records As List(Of SubjectStorageRecord) =
-                JsonSerializer.Deserialize(Of List(Of SubjectStorageRecord))(json, _subjectStorageJsonOptions)
-            If records Is Nothing Then
-                Return table
-            End If
-
-            For Each record As SubjectStorageRecord In records
-                Dim row As DataRow = table.NewRow()
-                row("Subject Code") = If(record.SubjectCode, String.Empty).Trim()
-                row("Subject Name") = If(record.SubjectName, String.Empty).Trim()
-                row("Course") = If(record.Course, String.Empty).Trim()
-                row("Year Level") = If(record.YearLevel, String.Empty).Trim()
-                row("Units") = If(record.Units, String.Empty).Trim()
-                table.Rows.Add(row)
-            Next
-        Catch ex As Exception
-            MessageBox.Show("Unable to load saved subjects data." & Environment.NewLine & ex.Message,
-                            "Subjects",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning)
-        End Try
-
-        Return table
-    End Function
-
-    Private Function PersistSubjectsToStorage() As Boolean
-        If _subjectsTable Is Nothing Then
-            Return True
-        End If
-
-        Try
-            Dim storageDirectory As String = Path.GetDirectoryName(_subjectsStoragePath)
-            If Not String.IsNullOrWhiteSpace(storageDirectory) Then
-                Directory.CreateDirectory(storageDirectory)
-            End If
-
-            Dim records As New List(Of SubjectStorageRecord)()
-            For Each row As DataRow In _subjectsTable.Rows
-                If row.RowState = DataRowState.Deleted Then
-                    Continue For
-                End If
-
-                records.Add(New SubjectStorageRecord With {
-                    .SubjectCode = ReadRowValue(row, "Subject Code"),
-                    .SubjectName = ReadRowValue(row, "Subject Name"),
-                    .Course = ReadRowValue(row, "Course"),
-                    .YearLevel = ReadRowValue(row, "Year Level"),
-                    .Units = ReadRowValue(row, "Units")
-                })
-            Next
-
-            Dim json As String = JsonSerializer.Serialize(records, _subjectStorageJsonOptions)
-            File.WriteAllText(_subjectsStoragePath, json)
-            Return True
-        Catch ex As Exception
-            MessageBox.Show("Unable to save subjects data." & Environment.NewLine & ex.Message,
-                            "Subjects",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error)
-            Return False
-        End Try
     End Function
 
     Private Sub ApplySubjectsFilter()
@@ -371,24 +196,30 @@ Class AdminSubjectsView
             Return
         End If
 
-        EnsureSubjectsTableLoaded()
-        Dim targetRow As DataRow = ResolveTargetRowForSave(formValues.SubjectCode)
-        If targetRow Is Nothing Then
+        Dim request As New SubjectSaveRequest() With {
+            .OriginalSubjectCode = _editingSubjectOriginalCode,
+            .SubjectCode = formValues.SubjectCode,
+            .SubjectName = formValues.SubjectName,
+            .CourseText = formValues.Course,
+            .YearLevel = formValues.YearLevel,
+            .Units = formValues.Units
+        }
+
+        Dim isAddMode As Boolean = _activeFormMode = SubjectFormMode.Add
+        Dim result =
+            If(isAddMode,
+               _subjectManagementService.CreateSubject(request),
+               _subjectManagementService.UpdateSubject(request))
+
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Subjects",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information)
             Return
         End If
 
-        WriteSubjectValues(targetRow, formValues)
-        If _activeFormMode = SubjectFormMode.Add Then
-            _subjectsTable.Rows.Add(targetRow)
-        End If
-
-        _subjectsTable.AcceptChanges()
-        If Not PersistSubjectsToStorage() Then
-            Return
-        End If
-
-        ApplySubjectsFilter()
-        SelectSubjectByCode(formValues.SubjectCode)
+        LoadSubjectsTable(result.Data.SubjectCode)
         HideSubjectForm()
     End Sub
 
@@ -414,50 +245,6 @@ Class AdminSubjectsView
         ShowSubjectForm()
     End Sub
 
-    Private Sub EnsureSubjectsTableLoaded()
-        If _subjectsTable Is Nothing Then
-            SetSubjectsTable(Nothing)
-        End If
-    End Sub
-
-    Private Function ResolveTargetRowForSave(subjectCode As String) As DataRow
-        Select Case _activeFormMode
-            Case SubjectFormMode.Add
-                If FindSubjectRowByCode(subjectCode) IsNot Nothing Then
-                    MessageBox.Show("Subject Code already exists.", "Duplicate Subject Code", MessageBoxButton.OK, MessageBoxImage.Information)
-                    Return Nothing
-                End If
-
-                Return _subjectsTable.NewRow()
-
-            Case SubjectFormMode.Edit
-                Dim targetRow As DataRow = FindSubjectRowByCode(_editingSubjectOriginalCode)
-                If targetRow Is Nothing Then
-                    MessageBox.Show("The selected subject no longer exists.", "Edit Subject", MessageBoxButton.OK, MessageBoxImage.Information)
-                    HideSubjectForm()
-                    Return Nothing
-                End If
-
-                If Not String.Equals(_editingSubjectOriginalCode, subjectCode, StringComparison.OrdinalIgnoreCase) AndAlso
-                   FindSubjectRowByCode(subjectCode) IsNot Nothing Then
-                    MessageBox.Show("Subject Code already exists.", "Duplicate Subject Code", MessageBoxButton.OK, MessageBoxImage.Information)
-                    Return Nothing
-                End If
-
-                Return targetRow
-        End Select
-
-        Return Nothing
-    End Function
-
-    Private Sub WriteSubjectValues(row As DataRow, values As SubjectFormValues)
-        row("Subject Code") = values.SubjectCode
-        row("Subject Name") = values.SubjectName
-        row("Course") = values.Course
-        row("Year Level") = values.YearLevel
-        row("Units") = values.Units
-    End Sub
-
     Private Sub CancelSubjectFormButton_Click(sender As Object, e As RoutedEventArgs)
         HideSubjectForm()
     End Sub
@@ -471,26 +258,32 @@ Class AdminSubjectsView
         Dim subjectCode As String = ReadRowValue(row, "Subject Code")
         Dim recordLabel As String = If(String.IsNullOrWhiteSpace(subjectName), subjectCode, subjectName)
 
-        Dim confirmation As MessageBoxResult = MessageBox.Show("Delete " & recordLabel & "?", "Delete Subject", MessageBoxButton.YesNo, MessageBoxImage.Question)
+        Dim confirmation As MessageBoxResult =
+            MessageBox.Show("Delete " & recordLabel & "?",
+                            "Delete Subject",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question)
         If confirmation <> MessageBoxResult.Yes Then
             Return
         End If
 
-        row.Delete()
-        _subjectsTable.AcceptChanges()
-        If Not PersistSubjectsToStorage() Then
+        Dim result = _subjectManagementService.DeleteSubject(subjectCode)
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Subjects",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information)
             Return
         End If
 
-        ApplySubjectsFilter()
-
         If _activeFormMode = SubjectFormMode.Edit AndAlso
-           String.Equals(_editingSubjectOriginalCode, subjectCode, StringComparison.OrdinalIgnoreCase) Then
+           String.Equals(_editingSubjectOriginalCode,
+                         subjectCode,
+                         StringComparison.OrdinalIgnoreCase) Then
             HideSubjectForm()
         End If
 
-        EnsureSelectedSubjectForDetails()
-        RefreshSubjectDetailsPanel()
+        LoadSubjectsTable()
     End Sub
 
     Private Sub EnsureSelectedSubjectForDetails()
@@ -645,30 +438,6 @@ Class AdminSubjectsView
         Return True
     End Function
 
-    Private Function FindSubjectRowByCode(subjectCode As String) As DataRow
-        If _subjectsTable Is Nothing Then
-            Return Nothing
-        End If
-
-        Dim normalizedSubjectCode As String = If(subjectCode, String.Empty).Trim()
-        If String.IsNullOrWhiteSpace(normalizedSubjectCode) Then
-            Return Nothing
-        End If
-
-        For Each row As DataRow In _subjectsTable.Rows
-            If row.RowState = DataRowState.Deleted Then
-                Continue For
-            End If
-
-            Dim candidateCode As String = ReadRowValue(row, "Subject Code")
-            If String.Equals(candidateCode, normalizedSubjectCode, StringComparison.OrdinalIgnoreCase) Then
-                Return row
-            End If
-        Next
-
-        Return Nothing
-    End Function
-
     Private Sub SelectSubjectByCode(subjectCode As String)
         If _subjectsTable Is Nothing Then
             Return
@@ -704,4 +473,3 @@ Class AdminSubjectsView
         Return row(columnName).ToString().Trim()
     End Function
 End Class
-

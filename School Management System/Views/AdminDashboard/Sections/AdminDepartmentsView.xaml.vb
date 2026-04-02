@@ -1,7 +1,7 @@
 Imports System.Collections.Generic
 Imports System.Data
-Imports System.IO
-Imports System.Text.Json
+Imports School_Management_System.Backend.Models
+Imports School_Management_System.Backend.Services
 
 Class AdminDepartmentsView
     Private Enum DepartmentFormMode
@@ -15,21 +15,11 @@ Class AdminDepartmentsView
         Public Head As String
     End Structure
 
-    Private Class DepartmentStorageRecord
-        Public Property DepartmentId As String
-        Public Property DepartmentName As String
-        Public Property Head As String
-    End Class
-
     Private _departmentsTable As DataTable
     Private _searchTerm As String = String.Empty
     Private _activeFormMode As DepartmentFormMode = DepartmentFormMode.Add
     Private _editingDepartmentOriginalId As String = String.Empty
-    Private ReadOnly _departmentsStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "departments.json")
-    Private ReadOnly _departmentStorageJsonOptions As New JsonSerializerOptions() With {
-        .WriteIndented = True
-    }
+    Private ReadOnly _departmentManagementService As New DepartmentManagementService()
 
     Public Sub New()
         InitializeComponent()
@@ -47,7 +37,7 @@ Class AdminDepartmentsView
     End Sub
 
     Public Sub SetDepartmentsTable(table As DataTable)
-        _departmentsTable = NormalizeDepartmentsTable(table)
+        _departmentsTable = If(table, CreateEmptyDepartmentsTable())
         DepartmentsDataGrid.ItemsSource = _departmentsTable.DefaultView
         ApplyDepartmentsFilter()
         UpdateDepartmentsCount()
@@ -56,113 +46,40 @@ Class AdminDepartmentsView
     End Sub
 
     Private Sub LoadDepartmentsTable(Optional departmentIdToSelect As String = "")
-        Dim departmentsTable As DataTable = FetchDepartmentsTable()
-        SetDepartmentsTable(departmentsTable)
+        Dim result = _departmentManagementService.GetDepartments()
+
+        If Not result.IsSuccess Then
+            SetDepartmentsTable(CreateEmptyDepartmentsTable())
+            MessageBox.Show(result.Message,
+                            "Departments",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            Return
+        End If
+
+        SetDepartmentsTable(BuildDepartmentsTable(result.Data))
 
         If Not String.IsNullOrWhiteSpace(departmentIdToSelect) Then
             SelectDepartmentById(departmentIdToSelect)
         End If
     End Sub
 
-    Private Function FetchDepartmentsTable() As DataTable
-        Return ReadDepartmentsFromStorage()
-    End Function
+    Private Function BuildDepartmentsTable(records As IEnumerable(Of DepartmentRecord)) As DataTable
+        Dim table As DataTable = CreateEmptyDepartmentsTable()
 
-    Private Function NormalizeDepartmentsTable(source As DataTable) As DataTable
-        Dim table As DataTable = If(source Is Nothing, CreateEmptyDepartmentsTable(), source.Copy())
+        If records Is Nothing Then
+            Return table
+        End If
 
-        Dim departmentIdColumn As DataColumn = EnsureDepartmentsColumn(table, "Department ID", "DepartmentId", "ID", "Department Code")
-        Dim departmentNameColumn As DataColumn = EnsureDepartmentsColumn(table, "Department Name", "DepartmentName", "Name", "Program")
-        Dim headColumn As DataColumn = EnsureDepartmentsColumn(table, "Head", "HeadName", "Chair", "Chairman", "Coordinator")
-
-        RemoveDepartmentsColumns(table,
-                                 "Status",
-                                 "State",
-                                 "Photo",
-                                 "Photo Path",
-                                 "Image",
-                                 "ImagePath",
-                                 "Avatar")
-
-        departmentIdColumn.SetOrdinal(0)
-        departmentNameColumn.SetOrdinal(1)
-        headColumn.SetOrdinal(2)
-
-        For Each row As DataRow In table.Rows
-            If row.IsNull("Department ID") Then
-                row("Department ID") = String.Empty
-            Else
-                row("Department ID") = row("Department ID").ToString().Trim()
-            End If
-
-            If row.IsNull("Department Name") Then
-                row("Department Name") = String.Empty
-            Else
-                row("Department Name") = row("Department Name").ToString().Trim()
-            End If
-
-            If row.IsNull("Head") Then
-                row("Head") = String.Empty
-            Else
-                row("Head") = row("Head").ToString().Trim()
-            End If
+        For Each record As DepartmentRecord In records
+            Dim row As DataRow = table.NewRow()
+            row("Department ID") = record.DepartmentCode
+            row("Department Name") = record.DepartmentName
+            row("Head") = record.HeadName
+            table.Rows.Add(row)
         Next
 
         Return table
-    End Function
-
-    Private Sub RemoveDepartmentsColumns(table As DataTable, ParamArray columnNames() As String)
-        If table Is Nothing OrElse columnNames Is Nothing Then
-            Return
-        End If
-
-        For columnIndex As Integer = table.Columns.Count - 1 To 0 Step -1
-            Dim candidateColumn As DataColumn = table.Columns(columnIndex)
-            For Each requestedName As String In columnNames
-                If String.Equals(candidateColumn.ColumnName, requestedName, StringComparison.OrdinalIgnoreCase) Then
-                    table.Columns.Remove(candidateColumn)
-                    Exit For
-                End If
-            Next
-        Next
-    End Sub
-
-    Private Function EnsureDepartmentsColumn(table As DataTable, targetColumnName As String, ParamArray aliases() As String) As DataColumn
-        Dim existingColumn As DataColumn = FindTableColumn(table, targetColumnName)
-        If existingColumn Is Nothing Then
-            existingColumn = FindTableColumn(table, aliases)
-            If existingColumn IsNot Nothing Then
-                existingColumn.ColumnName = targetColumnName
-            End If
-        End If
-
-        If existingColumn Is Nothing Then
-            existingColumn = New DataColumn(targetColumnName, GetType(String))
-            table.Columns.Add(existingColumn)
-        End If
-
-        Return existingColumn
-    End Function
-
-    Private Function FindTableColumn(table As DataTable, ParamArray columnNames() As String) As DataColumn
-        If table Is Nothing OrElse columnNames Is Nothing Then
-            Return Nothing
-        End If
-
-        For Each requestedName As String In columnNames
-            Dim normalizedRequestedName As String = If(requestedName, String.Empty).Trim()
-            If String.IsNullOrWhiteSpace(normalizedRequestedName) Then
-                Continue For
-            End If
-
-            For Each candidateColumn As DataColumn In table.Columns
-                If String.Equals(candidateColumn.ColumnName, normalizedRequestedName, StringComparison.OrdinalIgnoreCase) Then
-                    Return candidateColumn
-                End If
-            Next
-        Next
-
-        Return Nothing
     End Function
 
     Private Function CreateEmptyDepartmentsTable() As DataTable
@@ -171,77 +88,6 @@ Class AdminDepartmentsView
         table.Columns.Add("Department Name", GetType(String))
         table.Columns.Add("Head", GetType(String))
         Return table
-    End Function
-
-    Private Function ReadDepartmentsFromStorage() As DataTable
-        Dim table As DataTable = CreateEmptyDepartmentsTable()
-        If Not File.Exists(_departmentsStoragePath) Then
-            Return table
-        End If
-
-        Try
-            Dim json As String = File.ReadAllText(_departmentsStoragePath)
-            If String.IsNullOrWhiteSpace(json) Then
-                Return table
-            End If
-
-            Dim records As List(Of DepartmentStorageRecord) =
-                JsonSerializer.Deserialize(Of List(Of DepartmentStorageRecord))(json, _departmentStorageJsonOptions)
-            If records Is Nothing Then
-                Return table
-            End If
-
-            For Each record As DepartmentStorageRecord In records
-                Dim row As DataRow = table.NewRow()
-                row("Department ID") = If(record.DepartmentId, String.Empty).Trim()
-                row("Department Name") = If(record.DepartmentName, String.Empty).Trim()
-                row("Head") = If(record.Head, String.Empty).Trim()
-                table.Rows.Add(row)
-            Next
-        Catch ex As Exception
-            MessageBox.Show("Unable to load saved departments data." & Environment.NewLine & ex.Message,
-                            "Departments",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning)
-        End Try
-
-        Return table
-    End Function
-
-    Private Function PersistDepartmentsToStorage() As Boolean
-        If _departmentsTable Is Nothing Then
-            Return True
-        End If
-
-        Try
-            Dim storageDirectory As String = Path.GetDirectoryName(_departmentsStoragePath)
-            If Not String.IsNullOrWhiteSpace(storageDirectory) Then
-                Directory.CreateDirectory(storageDirectory)
-            End If
-
-            Dim records As New List(Of DepartmentStorageRecord)()
-            For Each row As DataRow In _departmentsTable.Rows
-                If row.RowState = DataRowState.Deleted Then
-                    Continue For
-                End If
-
-                records.Add(New DepartmentStorageRecord With {
-                    .DepartmentId = ReadRowValue(row, "Department ID"),
-                    .DepartmentName = ReadRowValue(row, "Department Name"),
-                    .Head = ReadRowValue(row, "Head")
-                })
-            Next
-
-            Dim json As String = JsonSerializer.Serialize(records, _departmentStorageJsonOptions)
-            File.WriteAllText(_departmentsStoragePath, json)
-            Return True
-        Catch ex As Exception
-            MessageBox.Show("Unable to save departments data." & Environment.NewLine & ex.Message,
-                            "Departments",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error)
-            Return False
-        End Try
     End Function
 
     Private Sub ApplyDepartmentsFilter()
@@ -290,7 +136,8 @@ Class AdminDepartmentsView
         Dim hasSearch As Boolean = Not String.IsNullOrWhiteSpace(_searchTerm)
 
         If hasSearch AndAlso visibleCount <> totalCount Then
-            DepartmentsCountTextBlock.Text = visibleCount.ToString() & " of " & totalCount.ToString() & " departments"
+            DepartmentsCountTextBlock.Text =
+                visibleCount.ToString() & " of " & totalCount.ToString() & " departments"
         Else
             DepartmentsCountTextBlock.Text = totalCount.ToString() & " departments"
         End If
@@ -323,7 +170,11 @@ Class AdminDepartmentsView
     End Sub
 
     Private Sub BeginAddDepartment()
-        OpenDepartmentForm(DepartmentFormMode.Add, "Add Department", "Create a new department record.", "Add Department", Nothing)
+        OpenDepartmentForm(DepartmentFormMode.Add,
+                           "Add Department",
+                           "Create a new department record.",
+                           "Add Department",
+                           Nothing)
         DepartmentFormIdTextBox.Focus()
     End Sub
 
@@ -332,7 +183,11 @@ Class AdminDepartmentsView
             Return
         End If
 
-        OpenDepartmentForm(DepartmentFormMode.Edit, "Edit Department", "Update department details.", "Save Changes", row)
+        OpenDepartmentForm(DepartmentFormMode.Edit,
+                           "Edit Department",
+                           "Update department details.",
+                           "Save Changes",
+                           row)
         DepartmentFormNameTextBox.Focus()
     End Sub
 
@@ -342,24 +197,28 @@ Class AdminDepartmentsView
             Return
         End If
 
-        EnsureDepartmentsTableLoaded()
-        Dim targetRow As DataRow = ResolveTargetRowForSave(formValues.DepartmentId)
-        If targetRow Is Nothing Then
+        Dim request As New DepartmentSaveRequest() With {
+            .OriginalDepartmentCode = _editingDepartmentOriginalId,
+            .DepartmentCode = formValues.DepartmentId,
+            .DepartmentName = formValues.DepartmentName,
+            .HeadName = formValues.Head
+        }
+
+        Dim isAddMode As Boolean = _activeFormMode = DepartmentFormMode.Add
+        Dim result =
+            If(isAddMode,
+               _departmentManagementService.CreateDepartment(request),
+               _departmentManagementService.UpdateDepartment(request))
+
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Departments",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information)
             Return
         End If
 
-        WriteDepartmentValues(targetRow, formValues)
-        If _activeFormMode = DepartmentFormMode.Add Then
-            _departmentsTable.Rows.Add(targetRow)
-        End If
-
-        _departmentsTable.AcceptChanges()
-        If Not PersistDepartmentsToStorage() Then
-            Return
-        End If
-
-        ApplyDepartmentsFilter()
-        SelectDepartmentById(formValues.DepartmentId)
+        LoadDepartmentsTable(result.Data.DepartmentCode)
         HideDepartmentForm()
     End Sub
 
@@ -385,48 +244,6 @@ Class AdminDepartmentsView
         ShowDepartmentForm()
     End Sub
 
-    Private Sub EnsureDepartmentsTableLoaded()
-        If _departmentsTable Is Nothing Then
-            SetDepartmentsTable(Nothing)
-        End If
-    End Sub
-
-    Private Function ResolveTargetRowForSave(departmentId As String) As DataRow
-        Select Case _activeFormMode
-            Case DepartmentFormMode.Add
-                If FindDepartmentRowById(departmentId) IsNot Nothing Then
-                    MessageBox.Show("Department ID already exists.", "Duplicate Department ID", MessageBoxButton.OK, MessageBoxImage.Information)
-                    Return Nothing
-                End If
-
-                Return _departmentsTable.NewRow()
-
-            Case DepartmentFormMode.Edit
-                Dim targetRow As DataRow = FindDepartmentRowById(_editingDepartmentOriginalId)
-                If targetRow Is Nothing Then
-                    MessageBox.Show("The selected department no longer exists.", "Edit Department", MessageBoxButton.OK, MessageBoxImage.Information)
-                    HideDepartmentForm()
-                    Return Nothing
-                End If
-
-                If Not String.Equals(_editingDepartmentOriginalId, departmentId, StringComparison.OrdinalIgnoreCase) AndAlso
-                   FindDepartmentRowById(departmentId) IsNot Nothing Then
-                    MessageBox.Show("Department ID already exists.", "Duplicate Department ID", MessageBoxButton.OK, MessageBoxImage.Information)
-                    Return Nothing
-                End If
-
-                Return targetRow
-        End Select
-
-        Return Nothing
-    End Function
-
-    Private Sub WriteDepartmentValues(row As DataRow, values As DepartmentFormValues)
-        row("Department ID") = values.DepartmentId
-        row("Department Name") = values.DepartmentName
-        row("Head") = values.Head
-    End Sub
-
     Private Sub CancelDepartmentFormButton_Click(sender As Object, e As RoutedEventArgs)
         HideDepartmentForm()
     End Sub
@@ -438,28 +255,35 @@ Class AdminDepartmentsView
 
         Dim departmentName As String = ReadRowValue(row, "Department Name")
         Dim departmentId As String = ReadRowValue(row, "Department ID")
-        Dim recordLabel As String = If(String.IsNullOrWhiteSpace(departmentName), departmentId, departmentName)
+        Dim recordLabel As String =
+            If(String.IsNullOrWhiteSpace(departmentName), departmentId, departmentName)
 
-        Dim confirmation As MessageBoxResult = MessageBox.Show("Delete " & recordLabel & "?", "Delete Department", MessageBoxButton.YesNo, MessageBoxImage.Question)
+        Dim confirmation As MessageBoxResult =
+            MessageBox.Show("Delete " & recordLabel & "?",
+                            "Delete Department",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question)
         If confirmation <> MessageBoxResult.Yes Then
             Return
         End If
 
-        row.Delete()
-        _departmentsTable.AcceptChanges()
-        If Not PersistDepartmentsToStorage() Then
+        Dim result = _departmentManagementService.DeleteDepartment(departmentId)
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Departments",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information)
             Return
         End If
 
-        ApplyDepartmentsFilter()
-
         If _activeFormMode = DepartmentFormMode.Edit AndAlso
-           String.Equals(_editingDepartmentOriginalId, departmentId, StringComparison.OrdinalIgnoreCase) Then
+           String.Equals(_editingDepartmentOriginalId,
+                         departmentId,
+                         StringComparison.OrdinalIgnoreCase) Then
             HideDepartmentForm()
         End If
 
-        EnsureSelectedDepartmentForDetails()
-        RefreshDepartmentDetailsPanel()
+        LoadDepartmentsTable()
     End Sub
 
     Private Sub EnsureSelectedDepartmentForDetails()
@@ -592,40 +416,22 @@ Class AdminDepartmentsView
         values.Head = If(DepartmentFormHeadTextBox.Text, String.Empty).Trim()
 
         If String.IsNullOrWhiteSpace(values.DepartmentId) Then
-            MessageBox.Show("Department ID is required.", "Department Form", MessageBoxButton.OK, MessageBoxImage.Information)
+            MessageBox.Show("Department ID is required.",
+                            "Department Form",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information)
             Return False
         End If
 
         If String.IsNullOrWhiteSpace(values.DepartmentName) Then
-            MessageBox.Show("Department Name is required.", "Department Form", MessageBoxButton.OK, MessageBoxImage.Information)
+            MessageBox.Show("Department Name is required.",
+                            "Department Form",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information)
             Return False
         End If
 
         Return True
-    End Function
-
-    Private Function FindDepartmentRowById(departmentId As String) As DataRow
-        If _departmentsTable Is Nothing Then
-            Return Nothing
-        End If
-
-        Dim normalizedDepartmentId As String = If(departmentId, String.Empty).Trim()
-        If String.IsNullOrWhiteSpace(normalizedDepartmentId) Then
-            Return Nothing
-        End If
-
-        For Each row As DataRow In _departmentsTable.Rows
-            If row.RowState = DataRowState.Deleted Then
-                Continue For
-            End If
-
-            Dim candidateId As String = ReadRowValue(row, "Department ID")
-            If String.Equals(candidateId, normalizedDepartmentId, StringComparison.OrdinalIgnoreCase) Then
-                Return row
-            End If
-        Next
-
-        Return Nothing
     End Function
 
     Private Sub SelectDepartmentById(departmentId As String)
@@ -635,6 +441,7 @@ Class AdminDepartmentsView
 
         Dim normalizedDepartmentId As String = If(departmentId, String.Empty).Trim()
         If String.IsNullOrWhiteSpace(normalizedDepartmentId) Then
+            RefreshDepartmentDetailsPanel()
             Return
         End If
 

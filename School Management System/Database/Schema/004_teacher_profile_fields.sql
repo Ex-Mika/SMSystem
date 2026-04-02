@@ -36,6 +36,23 @@ PREPARE department_label_stmt FROM @department_label_sql;
 EXECUTE department_label_stmt;
 DEALLOCATE PREPARE department_label_stmt;
 
+SET @position_title_exists = (
+    SELECT COUNT(*)
+    FROM `information_schema`.`COLUMNS`
+    WHERE `TABLE_SCHEMA` = @schema_name
+      AND `TABLE_NAME` = 'teachers'
+      AND `COLUMN_NAME` = 'position_title'
+);
+
+SET @position_title_sql = IF(
+    @position_title_exists = 0,
+    'ALTER TABLE `teachers` ADD COLUMN `position_title` VARCHAR(100) NULL AFTER `department_label`;',
+    'SELECT 1;'
+);
+PREPARE position_title_stmt FROM @position_title_sql;
+EXECUTE position_title_stmt;
+DEALLOCATE PREPARE position_title_stmt;
+
 SET @advisory_section_exists = (
     SELECT COUNT(*)
     FROM `information_schema`.`COLUMNS`

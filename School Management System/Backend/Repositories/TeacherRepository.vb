@@ -91,10 +91,10 @@ Namespace Backend.Repositories
                     Using teacherCommand As New MySqlCommand(
                         "INSERT INTO teachers (" &
                         "user_id, employee_number, first_name, middle_name, last_name, " &
-                        "department_id, department_label, advisory_section, photo_path" &
+                        "department_id, department_label, position_title, advisory_section, photo_path" &
                         ") VALUES (" &
                         "@userId, @employeeNumber, @firstName, @middleName, @lastName, " &
-                        "@departmentId, @departmentLabel, @advisorySection, @photoPath" &
+                        "@departmentId, @departmentLabel, @positionTitle, @advisorySection, @photoPath" &
                         ");",
                         connection,
                         transaction)
@@ -105,6 +105,7 @@ Namespace Backend.Repositories
                         teacherCommand.Parameters.AddWithValue("@lastName", request.LastName.Trim())
                         teacherCommand.Parameters.AddWithValue("@departmentId", departmentInfo.Item1)
                         teacherCommand.Parameters.AddWithValue("@departmentLabel", departmentInfo.Item2)
+                        teacherCommand.Parameters.AddWithValue("@positionTitle", NormalizeNullableValue(request.PositionTitle))
                         teacherCommand.Parameters.AddWithValue("@advisorySection", NormalizeNullableValue(request.AdvisorySection))
                         teacherCommand.Parameters.AddWithValue("@photoPath", NormalizeNullableValue(request.PhotoPath))
                         teacherCommand.ExecuteNonQuery()
@@ -161,6 +162,7 @@ Namespace Backend.Repositories
                         "last_name = @lastName, " &
                         "department_id = @departmentId, " &
                         "department_label = @departmentLabel, " &
+                        "position_title = @positionTitle, " &
                         "advisory_section = @advisorySection, " &
                         "photo_path = @photoPath " &
                         "WHERE teacher_id = @teacherRecordId;",
@@ -172,6 +174,7 @@ Namespace Backend.Repositories
                         teacherCommand.Parameters.AddWithValue("@lastName", request.LastName.Trim())
                         teacherCommand.Parameters.AddWithValue("@departmentId", departmentInfo.Item1)
                         teacherCommand.Parameters.AddWithValue("@departmentLabel", departmentInfo.Item2)
+                        teacherCommand.Parameters.AddWithValue("@positionTitle", NormalizeNullableValue(request.PositionTitle))
                         teacherCommand.Parameters.AddWithValue("@advisorySection", NormalizeNullableValue(request.AdvisorySection))
                         teacherCommand.Parameters.AddWithValue("@photoPath", NormalizeNullableValue(request.PhotoPath))
                         teacherCommand.Parameters.AddWithValue("@teacherRecordId", existingRecord.TeacherRecordId)

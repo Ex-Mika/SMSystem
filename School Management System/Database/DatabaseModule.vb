@@ -182,6 +182,14 @@ Namespace Database
 
                 ' Keep older local databases compatible with the current repository queries.
                 EnsureOptionalColumns(connection,
+                                      "departments",
+                                      {
+                                          Tuple.Create(
+                                              "head_name",
+                                              "ALTER TABLE `departments` ADD COLUMN `head_name` VARCHAR(150) NULL AFTER `department_name`;")
+                                      })
+
+                EnsureOptionalColumns(connection,
                                       "students",
                                       {
                                           Tuple.Create(
@@ -221,6 +229,9 @@ Namespace Database
                                           Tuple.Create(
                                               "department_label",
                                               "ALTER TABLE `teachers` ADD COLUMN `department_label` VARCHAR(120) NULL AFTER `department_id`;"),
+                                          Tuple.Create(
+                                              "position_title",
+                                              "ALTER TABLE `teachers` ADD COLUMN `position_title` VARCHAR(100) NULL AFTER `department_label`;"),
                                           Tuple.Create(
                                               "advisory_section",
                                               "ALTER TABLE `teachers` ADD COLUMN `advisory_section` VARCHAR(60) NULL AFTER `position_title`;"),

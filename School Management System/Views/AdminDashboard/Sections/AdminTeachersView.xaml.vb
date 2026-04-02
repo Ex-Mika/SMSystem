@@ -18,8 +18,10 @@ Class AdminTeachersView
         Public MiddleName As String
         Public LastName As String
         Public Department As String
+        Public Position As String
         Public Advisory As String
         Public PhotoPath As String
+        Public Password As String
     End Structure
 
     Private _teachersTable As DataTable
@@ -86,6 +88,7 @@ Class AdminTeachersView
             row("Middle Name") = record.MiddleName
             row("Last Name") = record.LastName
             row("Department") = record.DepartmentDisplayName
+            row("Position") = record.PositionTitle
             row("Advisory") = record.AdvisorySection
             row("Photo Path") = record.PhotoPath
             row("Email") = record.Email
@@ -103,6 +106,7 @@ Class AdminTeachersView
         table.Columns.Add("Middle Name", GetType(String))
         table.Columns.Add("Last Name", GetType(String))
         table.Columns.Add("Department", GetType(String))
+        table.Columns.Add("Position", GetType(String))
         table.Columns.Add("Advisory", GetType(String))
         table.Columns.Add("Photo Path", GetType(String))
         table.Columns.Add("Email", GetType(String))
@@ -123,6 +127,7 @@ Class AdminTeachersView
                 "[Teacher ID] LIKE '*" & escapedTerm & "*' OR " &
                 "[Full Name] LIKE '*" & escapedTerm & "*' OR " &
                 "[Department] LIKE '*" & escapedTerm & "*' OR " &
+                "[Position] LIKE '*" & escapedTerm & "*' OR " &
                 "[Advisory] LIKE '*" & escapedTerm & "*'"
         End If
 
@@ -254,8 +259,10 @@ Class AdminTeachersView
             .MiddleName = formValues.MiddleName,
             .LastName = formValues.LastName,
             .DepartmentText = formValues.Department,
+            .PositionTitle = formValues.Position,
             .AdvisorySection = formValues.Advisory,
-            .PhotoPath = formValues.PhotoPath
+            .PhotoPath = formValues.PhotoPath,
+            .Password = formValues.Password
         }
 
         Dim isAddMode As Boolean = _activeFormMode = TeacherFormMode.Add
@@ -458,6 +465,7 @@ Class AdminTeachersView
             SetDetailsValue(TeacherDetailsTeacherIdTextBlock, String.Empty)
             SetDetailsValue(TeacherDetailsFullNameTextBlock, String.Empty)
             SetDetailsValue(TeacherDetailsDepartmentTextBlock, String.Empty)
+            SetDetailsValue(TeacherDetailsPositionTextBlock, String.Empty)
             SetDetailsValue(TeacherDetailsAdvisoryTextBlock, String.Empty)
             UpdateImageControlSource(TeacherDetailsPhotoImage, String.Empty)
             Return
@@ -470,6 +478,7 @@ Class AdminTeachersView
         SetDetailsValue(TeacherDetailsTeacherIdTextBlock, ReadRowValue(selectedRow, "Teacher ID"))
         SetDetailsValue(TeacherDetailsFullNameTextBlock, ReadRowValue(selectedRow, "Full Name"))
         SetDetailsValue(TeacherDetailsDepartmentTextBlock, ReadRowValue(selectedRow, "Department"))
+        SetDetailsValue(TeacherDetailsPositionTextBlock, ReadRowValue(selectedRow, "Position"))
         SetDetailsValue(TeacherDetailsAdvisoryTextBlock, ReadRowValue(selectedRow, "Advisory"))
         UpdateImageControlSource(TeacherDetailsPhotoImage, ReadRowValue(selectedRow, "Photo Path"))
     End Sub
@@ -521,7 +530,9 @@ Class AdminTeachersView
         TeacherFormMiddleNameTextBox.Text = ReadRowValue(row, "Middle Name")
         TeacherFormLastNameTextBox.Text = ReadRowValue(row, "Last Name")
         TeacherFormDepartmentTextBox.Text = ReadRowValue(row, "Department")
+        TeacherFormPositionTextBox.Text = ReadRowValue(row, "Position")
         TeacherFormAdvisoryTextBox.Text = ReadRowValue(row, "Advisory")
+        TeacherFormPasswordTextBox.Text = String.Empty
         TeacherFormPhotoPathTextBox.Text = ReadRowValue(row, "Photo Path")
         UpdateImageControlSource(TeacherFormPhotoPreviewImage, TeacherFormPhotoPathTextBox.Text)
     End Sub
@@ -532,7 +543,9 @@ Class AdminTeachersView
         TeacherFormMiddleNameTextBox.Text = String.Empty
         TeacherFormLastNameTextBox.Text = String.Empty
         TeacherFormDepartmentTextBox.Text = String.Empty
+        TeacherFormPositionTextBox.Text = String.Empty
         TeacherFormAdvisoryTextBox.Text = String.Empty
+        TeacherFormPasswordTextBox.Text = String.Empty
         TeacherFormPhotoPathTextBox.Text = String.Empty
         UpdateImageControlSource(TeacherFormPhotoPreviewImage, String.Empty)
     End Sub
@@ -543,7 +556,9 @@ Class AdminTeachersView
         values.MiddleName = If(TeacherFormMiddleNameTextBox.Text, String.Empty).Trim()
         values.LastName = If(TeacherFormLastNameTextBox.Text, String.Empty).Trim()
         values.Department = If(TeacherFormDepartmentTextBox.Text, String.Empty).Trim()
+        values.Position = If(TeacherFormPositionTextBox.Text, String.Empty).Trim()
         values.Advisory = If(TeacherFormAdvisoryTextBox.Text, String.Empty).Trim()
+        values.Password = If(TeacherFormPasswordTextBox.Text, String.Empty).Trim()
         values.PhotoPath = If(TeacherFormPhotoPathTextBox.Text, String.Empty).Trim()
 
         If String.IsNullOrWhiteSpace(values.TeacherId) Then

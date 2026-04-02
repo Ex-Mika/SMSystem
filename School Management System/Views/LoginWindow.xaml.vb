@@ -216,7 +216,7 @@ Class LoginWindow
         Try
             Dim result = Await Task.Run(Function() _authenticationService.Authenticate(request))
             If result Is Nothing OrElse Not result.IsSuccess OrElse result.Data Is Nothing Then
-                ShowLoginStatus(If(result?.Message, "Unable to sign in."))
+                ShowLoginStatus(AuthenticationService.InvalidCredentialsMessage)
                 Return
             End If
 

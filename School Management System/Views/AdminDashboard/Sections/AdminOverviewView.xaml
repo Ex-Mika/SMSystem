@@ -7,7 +7,7 @@
              mc:Ignorable="d">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="20,18,20,22">
-            <UniformGrid Columns="4">
+            <UniformGrid Columns="3">
                 <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,8,0">
                     <StackPanel Margin="16,14,16,12">
                         <Grid>
@@ -46,22 +46,6 @@
                                    FontSize="12"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"
                                    Text="Loading teacher data..."/>
-                    </StackPanel>
-                </Border>
-                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0">
-                    <StackPanel Margin="16,14,16,12">
-                        <TextBlock Text="Fees Collected"
-                                   FontSize="13"
-                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                        <TextBlock x:Name="FeesCollectedValueTextBlock"
-                                   Text="--"
-                                   FontSize="34"
-                                   FontWeight="Bold"/>
-                        <TextBlock x:Name="FeesCollectedStatusTextBlock"
-                                   Margin="0,12,0,0"
-                                   FontSize="12"
-                                   Foreground="{StaticResource DashboardTextMutedBrush}"
-                                   Text="Finance module pending..."/>
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0,0,0">

@@ -1,5 +1,4 @@
 Imports System.Data
-Imports System.Collections.Generic
 Imports System.IO
 Imports System.Windows.Input
 Imports System.Windows.Media
@@ -174,24 +173,11 @@ Class AdminStudentsView
 
         If hasSearch AndAlso visibleCount <> totalCount Then
             StudentsCountTextBlock.Text =
-                visibleCount.ToString() & " of " & totalCount.ToString() & " students"
-            If StudentsSearchStateTextBlock IsNot Nothing Then
-                StudentsSearchStateTextBlock.Text = "Search: " & _searchTerm
-            End If
+                visibleCount.ToString() & " of " & totalCount.ToString()
         Else
-            StudentsCountTextBlock.Text = totalCount.ToString() & " students"
-            If StudentsSearchStateTextBlock IsNot Nothing Then
-                StudentsSearchStateTextBlock.Text = "All records"
-            End If
+            StudentsCountTextBlock.Text = totalCount.ToString()
         End If
 
-        SetDetailsValue(StudentsVisibleCountTextBlock, visibleCount.ToString(), "0")
-        SetDetailsValue(StudentsCourseCountTextBlock,
-                        CountDistinctVisibleValues("Course").ToString(),
-                        "0")
-        SetDetailsValue(StudentsSectionCountTextBlock,
-                        CountDistinctVisibleValues("Section").ToString(),
-                        "0")
     End Sub
 
     Private Sub OpenAddStudentButton_Click(sender As Object, e As RoutedEventArgs)
@@ -693,23 +679,6 @@ Class AdminStudentsView
         End If
 
         Return row(columnName).ToString().Trim()
-    End Function
-
-    Private Function CountDistinctVisibleValues(columnName As String) As Integer
-        If _studentsTable Is Nothing OrElse Not _studentsTable.Columns.Contains(columnName) Then
-            Return 0
-        End If
-
-        Dim distinctValues As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
-
-        For Each rowView As DataRowView In _studentsTable.DefaultView
-            Dim candidate As String = If(rowView(columnName), String.Empty).ToString().Trim()
-            If Not String.IsNullOrWhiteSpace(candidate) Then
-                distinctValues.Add(candidate)
-            End If
-        Next
-
-        Return distinctValues.Count
     End Function
 
     Private Sub UpdateImageControlSource(targetImage As System.Windows.Controls.Image,

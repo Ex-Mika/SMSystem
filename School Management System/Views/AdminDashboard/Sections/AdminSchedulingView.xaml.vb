@@ -1,8 +1,6 @@
 Imports System.Collections.Generic
 Imports System.Data
 Imports System.Globalization
-Imports System.IO
-Imports System.Text.Json
 Imports System.Windows.Data
 Imports System.Windows.Input
 Imports System.Windows.Media
@@ -11,22 +9,12 @@ Imports School_Management_System.Backend.Services
 
 Class AdminSchedulingView
     Private ReadOnly _dayHeaders As String() = New String() {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"}
-    Private ReadOnly _subjectsStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "subjects.json")
-    Private ReadOnly _coursesStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "courses.json")
-    Private ReadOnly _schedulesStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "professor-schedules.json")
-    Private ReadOnly _jsonOptions As New JsonSerializerOptions() With {
-        .WriteIndented = True,
-        .PropertyNameCaseInsensitive = True
-    }
 
     Private _teacherOptions As New List(Of TeacherOption)()
     Private _subjectOptions As New List(Of SubjectOption)()
     Private _filteredTeacherOptions As New List(Of TeacherOption)()
     Private _filteredSubjectOptions As New List(Of SubjectOption)()
-    Private _scheduleRecords As New List(Of ScheduleStorageRecord)()
+    Private _scheduleRecords As New List(Of TeacherScheduleRecord)()
     Private _timetableTable As DataTable
     Private _selectedTeacherId As String = String.Empty
     Private _searchTerm As String = String.Empty
@@ -36,6 +24,8 @@ Class AdminSchedulingView
     Private ReadOnly _allProfessorsFilterLabel As String = "All professors"
     Private ReadOnly _withSchedulesFilterLabel As String = "With schedules"
     Private ReadOnly _withoutSchedulesFilterLabel As String = "Without schedules"
+    Private ReadOnly _subjectManagementService As New SubjectManagementService()
+    Private ReadOnly _teacherScheduleManagementService As New TeacherScheduleManagementService()
     Private ReadOnly _teacherManagementService As New TeacherManagementService()
 
     Private Class TeacherOption
@@ -98,17 +88,6 @@ Class AdminSchedulingView
         Public Overrides Function ToString() As String
             Return DisplayName
         End Function
-    End Class
-
-    Private Class ScheduleStorageRecord
-        Public Property TeacherId As String
-        Public Property TeacherName As String
-        Public Property Day As String
-        Public Property Session As String
-        Public Property Section As String
-        Public Property SubjectCode As String
-        Public Property SubjectName As String
-        Public Property Room As String
     End Class
 
     Public Sub New()
@@ -375,11 +354,19 @@ Class AdminSchedulingView
     End Function
 
     Private Sub LoadScheduleRecords()
-        Dim loadedRecords As List(Of ScheduleStorageRecord) = ReadSchedulesFromStorage()
-        Dim normalizedRecords As New List(Of ScheduleStorageRecord)()
+        Dim result = _teacherScheduleManagementService.GetSchedules()
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Scheduling",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            _scheduleRecords = New List(Of TeacherScheduleRecord)()
+            Return
+        End If
 
-        For Each record As ScheduleStorageRecord In loadedRecords
-            Dim normalized As ScheduleStorageRecord = NormalizeScheduleRecord(record)
+        Dim normalizedRecords As New List(Of TeacherScheduleRecord)()
+        For Each record As TeacherScheduleRecord In result.Data
+            Dim normalized As TeacherScheduleRecord = NormalizeScheduleRecord(record)
             If normalized IsNot Nothing Then
                 normalizedRecords.Add(normalized)
             End If
@@ -421,84 +408,40 @@ Class AdminSchedulingView
     End Function
 
     Private Function ReadSubjectOptions() As List(Of SubjectOption)
-        Dim options As List(Of SubjectOption) =
-            ReadSubjectOptionsFromJsonFile(
-                _subjectsStoragePath,
-                New String() {"SubjectCode", "Subject Code", "Code", "CourseCode", "Course Code"},
-                New String() {"SubjectName", "Subject Name", "Name", "Title", "CourseTitle", "Course Title"},
-                New String() {"Department", "Dept", "Program", "Course", "Course Code", "CourseCode"},
-                "subjects")
-
-        If options.Count = 0 Then
-            options = ReadSubjectOptionsFromJsonFile(
-                _coursesStoragePath,
-                New String() {"CourseCode", "Course Code", "Code", "SubjectCode", "Subject Code"},
-                New String() {"CourseTitle", "Course Title", "Title", "Name", "SubjectName", "Subject Name"},
-                New String() {"Department", "Dept", "Program", "Department Name", "College"},
-                "courses")
-        End If
-
-        options = DeduplicateSubjectOptions(options)
-        options.Sort(Function(left, right) String.Compare(left.DisplayName, right.DisplayName, StringComparison.OrdinalIgnoreCase))
-        Return options
-    End Function
-
-    Private Function ReadSubjectOptionsFromJsonFile(storagePath As String,
-                                                    codeAliases As String(),
-                                                    nameAliases As String(),
-                                                    departmentAliases As String(),
-                                                    sourceLabel As String) As List(Of SubjectOption)
         Dim options As New List(Of SubjectOption)()
-        If Not File.Exists(storagePath) Then
-            Return options
-        End If
+        Dim result = _subjectManagementService.GetSubjects()
 
-        Try
-            Dim json As String = File.ReadAllText(storagePath)
-            If String.IsNullOrWhiteSpace(json) Then
-                Return options
-            End If
-
-            Using document As JsonDocument = JsonDocument.Parse(json)
-                If document.RootElement.ValueKind <> JsonValueKind.Array Then
-                    Return options
-                End If
-
-                For Each item As JsonElement In document.RootElement.EnumerateArray()
-                    If item.ValueKind <> JsonValueKind.Object Then
-                        Continue For
-                    End If
-
-                    Dim code As String = NormalizeText(ExtractJsonValue(item, codeAliases))
-                    Dim name As String = NormalizeText(ExtractJsonValue(item, nameAliases))
-                    Dim department As String = NormalizeText(ExtractJsonValue(item, departmentAliases))
-
-                    If String.IsNullOrWhiteSpace(code) AndAlso String.IsNullOrWhiteSpace(name) Then
-                        Continue For
-                    End If
-
-                    If String.IsNullOrWhiteSpace(code) Then
-                        code = name
-                    End If
-
-                    If String.IsNullOrWhiteSpace(name) Then
-                        name = code
-                    End If
-
-                    options.Add(New SubjectOption With {
-                        .SubjectCode = code,
-                        .SubjectName = name,
-                        .Department = department
-                    })
-                Next
-            End Using
-        Catch ex As Exception
-            MessageBox.Show("Unable to load " & sourceLabel & " for scheduling." & Environment.NewLine & ex.Message,
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
                             "Scheduling",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning)
-        End Try
+            Return options
+        End If
 
+        For Each record As SubjectRecord In result.Data
+            Dim subjectCode As String = NormalizeText(record.SubjectCode)
+            Dim subjectName As String = NormalizeText(record.SubjectName)
+
+            If String.IsNullOrWhiteSpace(subjectCode) AndAlso
+               String.IsNullOrWhiteSpace(subjectName) Then
+                Continue For
+            End If
+
+            Dim department As String = NormalizeText(record.DepartmentDisplayName)
+            If String.IsNullOrWhiteSpace(department) Then
+                department = NormalizeText(record.CourseDisplayName)
+            End If
+
+            options.Add(New SubjectOption With {
+                .SubjectCode = subjectCode,
+                .SubjectName = subjectName,
+                .Department = department
+            })
+        Next
+
+        options = DeduplicateSubjectOptions(options)
+        options.Sort(Function(left, right) String.Compare(left.DisplayName, right.DisplayName, StringComparison.OrdinalIgnoreCase))
         Return options
     End Function
 
@@ -531,82 +474,6 @@ Class AdminSchedulingView
         Next
 
         Return deduped
-    End Function
-
-    Private Function ExtractJsonValue(element As JsonElement, propertyAliases As IEnumerable(Of String)) As String
-        If element.ValueKind <> JsonValueKind.Object OrElse propertyAliases Is Nothing Then
-            Return String.Empty
-        End If
-
-        For Each aliasName As String In propertyAliases
-            Dim normalizedAlias As String = NormalizeText(aliasName)
-            If String.IsNullOrWhiteSpace(normalizedAlias) Then
-                Continue For
-            End If
-
-            For Each propertyEntry As JsonProperty In element.EnumerateObject()
-                If Not String.Equals(propertyEntry.Name, normalizedAlias, StringComparison.OrdinalIgnoreCase) Then
-                    Continue For
-                End If
-
-                Select Case propertyEntry.Value.ValueKind
-                    Case JsonValueKind.String
-                        Return NormalizeText(propertyEntry.Value.GetString())
-                    Case JsonValueKind.Number, JsonValueKind.True, JsonValueKind.False
-                        Return NormalizeText(propertyEntry.Value.ToString())
-                End Select
-            Next
-        Next
-
-        Return String.Empty
-    End Function
-
-    Private Function ReadSchedulesFromStorage() As List(Of ScheduleStorageRecord)
-        Dim schedules As New List(Of ScheduleStorageRecord)()
-        If Not File.Exists(_schedulesStoragePath) Then
-            Return schedules
-        End If
-
-        Try
-            Dim json As String = File.ReadAllText(_schedulesStoragePath)
-            If String.IsNullOrWhiteSpace(json) Then
-                Return schedules
-            End If
-
-            Dim records As List(Of ScheduleStorageRecord) =
-                JsonSerializer.Deserialize(Of List(Of ScheduleStorageRecord))(json, _jsonOptions)
-            If records Is Nothing Then
-                Return schedules
-            End If
-
-            schedules.AddRange(records)
-        Catch ex As Exception
-            MessageBox.Show("Unable to load saved schedule records." & Environment.NewLine & ex.Message,
-                            "Scheduling",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning)
-        End Try
-
-        Return schedules
-    End Function
-
-    Private Function PersistSchedulesToStorage() As Boolean
-        Try
-            Dim storageDirectory As String = Path.GetDirectoryName(_schedulesStoragePath)
-            If Not String.IsNullOrWhiteSpace(storageDirectory) Then
-                Directory.CreateDirectory(storageDirectory)
-            End If
-
-            Dim json As String = JsonSerializer.Serialize(_scheduleRecords, _jsonOptions)
-            File.WriteAllText(_schedulesStoragePath, json)
-            Return True
-        Catch ex As Exception
-            MessageBox.Show("Unable to save schedule records." & Environment.NewLine & ex.Message,
-                            "Scheduling",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error)
-            Return False
-        End Try
     End Function
 
     Private Sub ProfessorDepartmentFilterComboBox_SelectionChanged(sender As Object, e As SelectionChangedEventArgs)
@@ -708,27 +575,24 @@ Class AdminSchedulingView
         Dim roomValue As String = NormalizeText(RoomTextBox.Text)
         Dim sectionValue As String = NormalizeText(SectionTextBox.Text)
         Dim normalizedTeacherId As String = NormalizeText(selectedTeacher.TeacherId)
-        Dim normalizedTeacherName As String = NormalizeText(selectedTeacher.FullName)
         Dim normalizedSubjectCode As String = NormalizeText(selectedSubject.SubjectCode)
         Dim normalizedSubjectName As String = NormalizeText(selectedSubject.SubjectName)
-
-        RemoveSchedulesBySlot(normalizedTeacherId, selectedDay, sessionValue)
-
-        _scheduleRecords.Add(New ScheduleStorageRecord With {
-            .TeacherId = normalizedTeacherId,
-            .TeacherName = normalizedTeacherName,
-            .Day = selectedDay,
-            .Session = sessionValue,
-            .Section = sectionValue,
-            .SubjectCode = normalizedSubjectCode,
-            .SubjectName = normalizedSubjectName,
-            .Room = roomValue
-        })
-
-        If Not PersistSchedulesToStorage() Then
+        Dim saveResult =
+            _teacherScheduleManagementService.SaveSchedule(New TeacherScheduleSaveRequest() With {
+                .TeacherId = normalizedTeacherId,
+                .Day = selectedDay,
+                .Session = sessionValue,
+                .Section = sectionValue,
+                .SubjectCode = normalizedSubjectCode,
+                .SubjectName = normalizedSubjectName,
+                .Room = roomValue
+            })
+        If Not saveResult.IsSuccess Then
+            SetActionStatus(saveResult.Message, True)
             Return
         End If
 
+        LoadScheduleRecords()
         ApplyLookupFilters(normalizedTeacherId, normalizedSubjectCode)
         If String.Equals(NormalizeText(_selectedTeacherId), normalizedTeacherId, StringComparison.OrdinalIgnoreCase) Then
             SelectTimetableCell(sessionValue, selectedDay)
@@ -755,16 +619,16 @@ Class AdminSchedulingView
             Return
         End If
 
-        Dim removedCount As Integer = RemoveSchedulesBySlot(NormalizeText(selectedTeacher.TeacherId), selectedDay, sessionValue)
-        If removedCount = 0 Then
-            SetActionStatus("No matching slot found for this professor.", True)
+        Dim deleteResult =
+            _teacherScheduleManagementService.DeleteSchedule(NormalizeText(selectedTeacher.TeacherId),
+                                                            selectedDay,
+                                                            sessionValue)
+        If Not deleteResult.IsSuccess Then
+            SetActionStatus(deleteResult.Message, True)
             Return
         End If
 
-        If Not PersistSchedulesToStorage() Then
-            Return
-        End If
-
+        LoadScheduleRecords()
         ApplyLookupFilters(NormalizeText(selectedTeacher.TeacherId), GetSelectedSubjectCode())
         SetActionStatus("Removed " & selectedDay & " " & sessionValue & ".")
     End Sub
@@ -894,7 +758,7 @@ Class AdminSchedulingView
         ApplyTimetableFilter()
     End Sub
 
-    Private Function CreateTimetableFromSchedules(schedules As IEnumerable(Of ScheduleStorageRecord)) As DataTable
+    Private Function CreateTimetableFromSchedules(schedules As IEnumerable(Of TeacherScheduleRecord)) As DataTable
         Dim table As DataTable = CreateTimetableStructure()
         If schedules Is Nothing Then
             AddPlaceholderTimetableRow(table)
@@ -916,7 +780,7 @@ Class AdminSchedulingView
             table.Rows.Add(row)
         Next
 
-        For Each schedule As ScheduleStorageRecord In schedules
+        For Each schedule As TeacherScheduleRecord In schedules
             Dim normalizedDay As String = NormalizeDayLabel(schedule.Day)
             Dim normalizedSession As String = NormalizeSession(schedule.Session)
             If String.IsNullOrWhiteSpace(normalizedDay) OrElse String.IsNullOrWhiteSpace(normalizedSession) Then
@@ -982,13 +846,13 @@ Class AdminSchedulingView
         Return Nothing
     End Function
 
-    Private Function GetOrderedSessions(schedules As IEnumerable(Of ScheduleStorageRecord)) As List(Of String)
+    Private Function GetOrderedSessions(schedules As IEnumerable(Of TeacherScheduleRecord)) As List(Of String)
         Dim orderedSessions As New List(Of String)()
         If schedules Is Nothing Then
             Return orderedSessions
         End If
 
-        For Each schedule As ScheduleStorageRecord In schedules
+        For Each schedule As TeacherScheduleRecord In schedules
             Dim normalizedSession As String = NormalizeSession(schedule.Session)
             If String.IsNullOrWhiteSpace(normalizedSession) Then
                 Continue For
@@ -1217,14 +1081,14 @@ Class AdminSchedulingView
         End If
     End Sub
 
-    Private Function GetSchedulesForTeacher(teacherId As String) As List(Of ScheduleStorageRecord)
-        Dim matches As New List(Of ScheduleStorageRecord)()
+    Private Function GetSchedulesForTeacher(teacherId As String) As List(Of TeacherScheduleRecord)
+        Dim matches As New List(Of TeacherScheduleRecord)()
         Dim normalizedTeacherId As String = NormalizeText(teacherId)
         If String.IsNullOrWhiteSpace(normalizedTeacherId) Then
             Return matches
         End If
 
-        For Each record As ScheduleStorageRecord In _scheduleRecords
+        For Each record As TeacherScheduleRecord In _scheduleRecords
             If record Is Nothing Then
                 Continue For
             End If
@@ -1241,30 +1105,7 @@ Class AdminSchedulingView
         Return GetSchedulesForTeacher(teacherId).Count
     End Function
 
-    Private Function RemoveSchedulesBySlot(teacherId As String, dayValue As String, sessionValue As String) As Integer
-        Dim normalizedTeacherId As String = NormalizeText(teacherId)
-        Dim normalizedDay As String = NormalizeDayLabel(dayValue)
-        Dim normalizedSession As String = NormalizeSession(sessionValue)
-        Dim removedCount As Integer = 0
-
-        For index As Integer = _scheduleRecords.Count - 1 To 0 Step -1
-            Dim candidate As ScheduleStorageRecord = _scheduleRecords(index)
-            If candidate Is Nothing Then
-                Continue For
-            End If
-
-            If String.Equals(NormalizeText(candidate.TeacherId), normalizedTeacherId, StringComparison.OrdinalIgnoreCase) AndAlso
-               String.Equals(NormalizeDayLabel(candidate.Day), normalizedDay, StringComparison.OrdinalIgnoreCase) AndAlso
-               String.Equals(NormalizeSession(candidate.Session), normalizedSession, StringComparison.OrdinalIgnoreCase) Then
-                _scheduleRecords.RemoveAt(index)
-                removedCount += 1
-            End If
-        Next
-
-        Return removedCount
-    End Function
-
-    Private Function NormalizeScheduleRecord(record As ScheduleStorageRecord) As ScheduleStorageRecord
+    Private Function NormalizeScheduleRecord(record As TeacherScheduleRecord) As TeacherScheduleRecord
         If record Is Nothing Then
             Return Nothing
         End If
@@ -1286,7 +1127,9 @@ Class AdminSchedulingView
             Return Nothing
         End If
 
-        Return New ScheduleStorageRecord With {
+        Return New TeacherScheduleRecord With {
+            .ScheduleId = record.ScheduleId,
+            .TeacherRecordId = record.TeacherRecordId,
             .TeacherId = normalizedTeacherId,
             .TeacherName = NormalizeText(record.TeacherName),
             .Day = normalizedDay,
@@ -1549,7 +1392,7 @@ Class AdminSchedulingView
                minuteValue.ToString("00", CultureInfo.InvariantCulture)
     End Function
 
-    Private Function BuildTimetableCellDisplay(record As ScheduleStorageRecord) As String
+    Private Function BuildTimetableCellDisplay(record As TeacherScheduleRecord) As String
         If record Is Nothing Then
             Return "--"
         End If

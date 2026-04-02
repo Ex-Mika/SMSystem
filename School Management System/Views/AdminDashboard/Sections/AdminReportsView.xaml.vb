@@ -24,52 +24,17 @@ Class AdminReportsView
         Public Property Section As String
     End Class
 
-    Private Class CourseStorageRecord
-        Public Property CourseCode As String
-        Public Property CourseTitle As String
-        Public Property Department As String
-        Public Property Units As String
-    End Class
-
-    Private Class DepartmentStorageRecord
-        Public Property DepartmentId As String
-        Public Property DepartmentName As String
-        Public Property Head As String
-    End Class
-
-    Private Class SubjectStorageRecord
-        Public Property SubjectCode As String
-        Public Property SubjectName As String
-        Public Property Units As String
-        Public Property Course As String
-        Public Property YearLevel As String
-    End Class
-
-    Private Class ScheduleStorageRecord
-        Public Property TeacherId As String
-        Public Property TeacherName As String
-        Public Property Day As String
-        Public Property Session As String
-        Public Property SubjectCode As String
-        Public Property SubjectName As String
-        Public Property Room As String
-    End Class
-
     Private Const TotalReportOptions As Integer = 6
 
     Private _searchTerm As String = String.Empty
+    Private ReadOnly _courseManagementService As New CourseManagementService()
+    Private ReadOnly _departmentManagementService As New DepartmentManagementService()
+    Private ReadOnly _subjectManagementService As New SubjectManagementService()
+    Private ReadOnly _teacherScheduleManagementService As New TeacherScheduleManagementService()
     Private ReadOnly _teacherManagementService As New TeacherManagementService()
 
     Private ReadOnly _studentsStoragePath As String =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "students.json")
-    Private ReadOnly _coursesStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "courses.json")
-    Private ReadOnly _departmentsStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "departments.json")
-    Private ReadOnly _subjectsStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "subjects.json")
-    Private ReadOnly _schedulesStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "professor-schedules.json")
     Private ReadOnly _jsonOptions As New JsonSerializerOptions() With {
         .WriteIndented = True
     }
@@ -267,14 +232,23 @@ Class AdminReportsView
     End Function
 
     Private Function GetCoursesReportRows() As List(Of String())
-        Dim records As List(Of CourseStorageRecord) = ReadRecordsFromStorage(Of CourseStorageRecord)(_coursesStoragePath, "courses")
-
         Dim rows As New List(Of String())()
-        For Each record As CourseStorageRecord In records
+        Dim result = _courseManagementService.GetCourses()
+
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Reports",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            UpdateStatusMessage("Unable to load courses data for printing.", StatusTone.Error)
+            Return rows
+        End If
+
+        For Each record As CourseRecord In result.Data
             rows.Add(New String() {
                 NormalizeValue(record.CourseCode),
-                NormalizeValue(record.CourseTitle),
-                NormalizeValue(record.Department),
+                NormalizeValue(record.CourseName),
+                NormalizeValue(record.DepartmentDisplayName),
                 NormalizeValue(record.Units)
             })
         Next
@@ -283,14 +257,23 @@ Class AdminReportsView
     End Function
 
     Private Function GetDepartmentsReportRows() As List(Of String())
-        Dim records As List(Of DepartmentStorageRecord) = ReadRecordsFromStorage(Of DepartmentStorageRecord)(_departmentsStoragePath, "departments")
-
         Dim rows As New List(Of String())()
-        For Each record As DepartmentStorageRecord In records
+        Dim result = _departmentManagementService.GetDepartments()
+
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Reports",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            UpdateStatusMessage("Unable to load departments data for printing.", StatusTone.Error)
+            Return rows
+        End If
+
+        For Each record As DepartmentRecord In result.Data
             rows.Add(New String() {
-                NormalizeValue(record.DepartmentId),
+                NormalizeValue(record.DepartmentCode),
                 NormalizeValue(record.DepartmentName),
-                NormalizeValue(record.Head)
+                NormalizeValue(record.HeadName)
             })
         Next
 
@@ -298,15 +281,24 @@ Class AdminReportsView
     End Function
 
     Private Function GetSubjectsReportRows() As List(Of String())
-        Dim records As List(Of SubjectStorageRecord) = ReadRecordsFromStorage(Of SubjectStorageRecord)(_subjectsStoragePath, "subjects")
-
         Dim rows As New List(Of String())()
-        For Each record As SubjectStorageRecord In records
+        Dim result = _subjectManagementService.GetSubjects()
+
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Reports",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            UpdateStatusMessage("Unable to load subjects data for printing.", StatusTone.Error)
+            Return rows
+        End If
+
+        For Each record As SubjectRecord In result.Data
             rows.Add(New String() {
                 NormalizeValue(record.SubjectCode),
                 NormalizeValue(record.SubjectName),
                 NormalizeValue(record.Units),
-                NormalizeValue(record.Course),
+                NormalizeValue(record.CourseDisplayName),
                 NormalizeValue(record.YearLevel)
             })
         Next
@@ -315,10 +307,19 @@ Class AdminReportsView
     End Function
 
     Private Function GetSchedulingReportRows() As List(Of String())
-        Dim records As List(Of ScheduleStorageRecord) = ReadRecordsFromStorage(Of ScheduleStorageRecord)(_schedulesStoragePath, "schedules")
-
         Dim rows As New List(Of String())()
-        For Each record As ScheduleStorageRecord In records
+        Dim result = _teacherScheduleManagementService.GetSchedules()
+
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Reports",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            UpdateStatusMessage("Unable to load schedules data for printing.", StatusTone.Error)
+            Return rows
+        End If
+
+        For Each record As TeacherScheduleRecord In result.Data
             rows.Add(New String() {
                 NormalizeValue(record.TeacherId),
                 NormalizeValue(record.TeacherName),
@@ -719,7 +720,7 @@ Class AdminReportsView
         Return document
     End Function
 
-    Private Function BuildSchedulingSubjectText(record As ScheduleStorageRecord) As String
+    Private Function BuildSchedulingSubjectText(record As TeacherScheduleRecord) As String
         If record Is Nothing Then
             Return "--"
         End If
