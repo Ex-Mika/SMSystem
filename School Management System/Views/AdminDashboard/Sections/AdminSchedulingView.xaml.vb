@@ -6,11 +6,11 @@ Imports System.Text.Json
 Imports System.Windows.Data
 Imports System.Windows.Input
 Imports System.Windows.Media
+Imports School_Management_System.Backend.Models
+Imports School_Management_System.Backend.Services
 
 Class AdminSchedulingView
     Private ReadOnly _dayHeaders As String() = New String() {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"}
-    Private ReadOnly _teachersStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "teachers.json")
     Private ReadOnly _subjectsStoragePath As String =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "subjects.json")
     Private ReadOnly _coursesStoragePath As String =
@@ -36,12 +36,7 @@ Class AdminSchedulingView
     Private ReadOnly _allProfessorsFilterLabel As String = "All professors"
     Private ReadOnly _withSchedulesFilterLabel As String = "With schedules"
     Private ReadOnly _withoutSchedulesFilterLabel As String = "Without schedules"
-
-    Private Class TeacherStorageRecord
-        Public Property TeacherId As String
-        Public Property FullName As String
-        Public Property Department As String
-    End Class
+    Private ReadOnly _teacherManagementService As New TeacherManagementService()
 
     Private Class TeacherOption
         Public Property TeacherId As String
@@ -132,6 +127,11 @@ Class AdminSchedulingView
     Public Sub ApplySearchFilter(searchTerm As String)
         _searchTerm = NormalizeText(searchTerm)
         ApplyTimetableFilter()
+    End Sub
+
+    Public Sub RefreshData()
+        LoadScheduleRecords()
+        LoadLookupData()
     End Sub
 
     Private Sub InitializeDayOptions()
@@ -390,43 +390,31 @@ Class AdminSchedulingView
 
     Private Function ReadTeacherOptions() As List(Of TeacherOption)
         Dim options As New List(Of TeacherOption)()
-        If Not File.Exists(_teachersStoragePath) Then
-            Return options
-        End If
+        Dim result = _teacherManagementService.GetTeachers()
 
-        Try
-            Dim json As String = File.ReadAllText(_teachersStoragePath)
-            If String.IsNullOrWhiteSpace(json) Then
-                Return options
-            End If
-
-            Dim records As List(Of TeacherStorageRecord) =
-                JsonSerializer.Deserialize(Of List(Of TeacherStorageRecord))(json, _jsonOptions)
-            If records Is Nothing Then
-                Return options
-            End If
-
-            For Each record As TeacherStorageRecord In records
-                Dim teacherId As String = NormalizeText(record.TeacherId)
-                Dim fullName As String = NormalizeText(record.FullName)
-                Dim department As String = NormalizeText(record.Department)
-
-                If String.IsNullOrWhiteSpace(teacherId) AndAlso String.IsNullOrWhiteSpace(fullName) Then
-                    Continue For
-                End If
-
-                options.Add(New TeacherOption With {
-                    .TeacherId = teacherId,
-                    .FullName = fullName,
-                    .Department = department
-                })
-            Next
-        Catch ex As Exception
-            MessageBox.Show("Unable to load teachers for scheduling." & Environment.NewLine & ex.Message,
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
                             "Scheduling",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning)
-        End Try
+            Return options
+        End If
+
+        For Each record As TeacherRecord In result.Data
+            Dim teacherId As String = NormalizeText(record.EmployeeNumber)
+            Dim fullName As String = NormalizeText(record.FullName)
+            Dim department As String = NormalizeText(record.DepartmentDisplayName)
+
+            If String.IsNullOrWhiteSpace(teacherId) AndAlso String.IsNullOrWhiteSpace(fullName) Then
+                Continue For
+            End If
+
+            options.Add(New TeacherOption With {
+                .TeacherId = teacherId,
+                .FullName = fullName,
+                .Department = department
+            })
+        Next
 
         options.Sort(Function(left, right) String.Compare(left.DisplayName, right.DisplayName, StringComparison.OrdinalIgnoreCase))
         Return options

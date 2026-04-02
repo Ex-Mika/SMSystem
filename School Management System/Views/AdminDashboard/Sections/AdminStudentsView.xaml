@@ -40,7 +40,9 @@
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
-        <Style x:Key="StudentFormComboInputStyle" TargetType="ComboBox" BasedOn="{StaticResource DashboardFilterComboBoxStyle}">
+        <Style x:Key="StudentFormComboInputStyle"
+               TargetType="ComboBox"
+               BasedOn="{StaticResource DashboardFilterComboBoxStyle}">
             <Setter Property="Width" Value="Auto"/>
             <Setter Property="Height" Value="36"/>
             <Setter Property="Margin" Value="0,6,0,0"/>
@@ -51,44 +53,92 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Background" Value="#F8FBFF"/>
         </Style>
+
+        <Style x:Key="StudentDataGridHeaderStyle"
+               TargetType="DataGridColumnHeader"
+               BasedOn="{StaticResource DashboardManagementDataGridHeaderStyle}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="StudentDataGridCellStyle"
+               TargetType="DataGridCell"
+               BasedOn="{StaticResource DashboardManagementDataGridCellStyle}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="StudentDataGridRowStyle"
+               TargetType="DataGridRow"
+               BasedOn="{StaticResource DashboardManagementDataGridRowStyle}">
+            <Setter Property="Height" Value="56"/>
+        </Style>
+
+        <Style x:Key="StudentDataGridTextStyle" TargetType="TextBlock">
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer x:Name="StudentsRootScrollViewer"
+                      VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="20,18,20,22">
                 <Border Style="{StaticResource DashboardCardBorderStyle}">
                     <StackPanel Margin="18">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0"
-                                       Text="Students"
-                                       FontSize="22"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                            <TextBlock x:Name="StudentsCountTextBlock"
-                                       Grid.Column="1"
-                                       VerticalAlignment="Center"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"
-                                       Text="0 students"/>
-                        </Grid>
-
-                        <TextBlock Margin="0,6,0,0"
-                                   FontSize="12"
-                                   Foreground="{StaticResource DashboardTextMutedBrush}"
-                                   Text="Select a row to view student details on the left. Use New, Edit, or Delete to manage records."/>
-
-                        <Grid Margin="0,14,0,0">
+                        <UniformGrid Columns="3">
+                            <Border Margin="0,0,12,0" Style="{StaticResource DashboardProfileStatCardStyle}">
+                                <StackPanel>
+                                    <TextBlock FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                                               Text="Visible Students"/>
+                                    <TextBlock x:Name="StudentsVisibleCountTextBlock"
+                                               Margin="0,8,0,0"
+                                               FontSize="24"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                               Text="0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Margin="6,0,6,0" Style="{StaticResource DashboardProfileStatCardStyle}">
+                                <StackPanel>
+                                    <TextBlock FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                                               Text="Courses Covered"/>
+                                    <TextBlock x:Name="StudentsCourseCountTextBlock"
+                                               Margin="0,8,0,0"
+                                               FontSize="24"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                               Text="0"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Margin="12,0,0,0" Style="{StaticResource DashboardProfileStatCardStyle}">
+                                <StackPanel>
+                                    <TextBlock FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                                               Text="Sections Active"/>
+                                    <TextBlock x:Name="StudentsSectionCountTextBlock"
+                                               Margin="0,8,0,0"
+                                               FontSize="24"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                               Text="0"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        <Grid Margin="0,16,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="460"/>
                                 <ColumnDefinition Width="14"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-
                             <Border Grid.Column="0"
                                     BorderBrush="{StaticResource DashboardBorderBrush}"
                                     BorderThickness="1"
@@ -108,37 +158,71 @@
                                                 BorderThickness="0,0,0,1"
                                                 Background="#FCFDFE">
                                             <StackPanel>
-                                                <TextBlock Text="Student Details"
+                                                <TextBlock Text="Student Profile"
                                                            FontSize="20"
                                                            FontWeight="Bold"
                                                            Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                                                <TextBlock x:Name="StudentDetailsSubtitleTextBlock"
-                                                           Margin="0,3,0,0"
-                                                           Text="Select a student from the table."
+                                                <TextBlock Margin="0,3,0,0"
                                                            FontSize="12"
-                                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                           Text="Preview the selected record before editing or deleting it."/>
                                             </StackPanel>
                                         </Border>
 
-                                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                             <StackPanel Margin="18,12,18,14">
-                                                 <TextBlock Style="{StaticResource StudentFormLabelStyle}"
-                                                            Margin="0,0,0,0"
-                                                            Text="Photo"/>
-                                                 <Border Style="{StaticResource StudentDetailsValueBorderStyle}"
-                                                         Padding="0"
-                                                         Width="160"
-                                                         Height="160"
-                                                         HorizontalAlignment="Left">
-                                                     <Image x:Name="StudentDetailsPhotoImage"
-                                                            Stretch="UniformToFill"/>
-                                                 </Border>
+                                        <ScrollViewer x:Name="StudentDetailsScrollViewer"
+                                                      Grid.Row="1"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      PreviewMouseWheel="NestedPanelScrollViewer_PreviewMouseWheel">
+                                            <StackPanel Margin="18,12,18,14">
+                                                <Border Padding="16"
+                                                        CornerRadius="14"
+                                                        Background="#F4F9FF"
+                                                        BorderBrush="#D8E7F8"
+                                                        BorderThickness="1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="88"/>
+                                                            <ColumnDefinition Width="12"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Width="88"
+                                                                Height="88"
+                                                                CornerRadius="12"
+                                                                BorderBrush="#D6E6F7"
+                                                                BorderThickness="1"
+                                                                Background="White">
+                                                            <Image x:Name="StudentDetailsPhotoImage" Stretch="UniformToFill"/>
+                                                        </Border>
+                                                        <StackPanel Grid.Column="2">
+                                                            <TextBlock FontSize="11"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                                       Text="SELECTED PROFILE"/>
+                                                            <TextBlock x:Name="StudentDetailsHeroNameTextBlock"
+                                                                       Margin="0,6,0,0"
+                                                                       FontSize="20"
+                                                                       FontWeight="Bold"
+                                                                       Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                                       Text="No student selected"
+                                                                       TextWrapping="Wrap"/>
+                                                            <TextBlock x:Name="StudentDetailsSubtitleTextBlock"
+                                                                       Margin="0,4,0,0"
+                                                                       FontSize="12"
+                                                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                                       Text="Choose a student from the roster to preview details."
+                                                                       TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
 
-                                                 <TextBlock Style="{StaticResource StudentFormLabelStyle}"
-                                                            Margin="0,0,0,0"
-                                                            Text="Student ID"/>
-                                                 <Border Style="{StaticResource StudentDetailsValueBorderStyle}">
-                                                     <TextBlock x:Name="StudentDetailsStudentIdTextBlock" Style="{StaticResource StudentDetailsValueTextStyle}"/>
+                                                <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0,14,0,0" Text="Student ID"/>
+                                                <Border Style="{StaticResource StudentDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="StudentDetailsStudentIdTextBlock" Style="{StaticResource StudentDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Email"/>
+                                                <Border Style="{StaticResource StudentDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="StudentDetailsEmailTextBlock" Style="{StaticResource StudentDetailsValueTextStyle}"/>
                                                 </Border>
 
                                                 <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Full Name"/>
@@ -146,25 +230,15 @@
                                                     <TextBlock x:Name="StudentDetailsFullNameTextBlock" Style="{StaticResource StudentDetailsValueTextStyle}"/>
                                                 </Border>
 
-                                                <Grid Margin="0,10,0,0">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="10"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel Grid.Column="0">
-                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0" Text="Year Level"/>
-                                                        <Border Style="{StaticResource StudentDetailsValueBorderStyle}">
-                                                            <TextBlock x:Name="StudentDetailsYearLevelTextBlock" Style="{StaticResource StudentDetailsValueTextStyle}"/>
-                                                        </Border>
-                                                    </StackPanel>
-                                                    <StackPanel Grid.Column="2">
-                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0" Text="Section"/>
-                                                        <Border Style="{StaticResource StudentDetailsValueBorderStyle}">
-                                                            <TextBlock x:Name="StudentDetailsSectionTextBlock" Style="{StaticResource StudentDetailsValueTextStyle}"/>
-                                                        </Border>
-                                                    </StackPanel>
-                                                </Grid>
+                                                <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Year Level"/>
+                                                <Border Style="{StaticResource StudentDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="StudentDetailsYearLevelTextBlock" Style="{StaticResource StudentDetailsValueTextStyle}"/>
+                                                </Border>
+
+                                                <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Section"/>
+                                                <Border Style="{StaticResource StudentDetailsValueBorderStyle}">
+                                                    <TextBlock x:Name="StudentDetailsSectionTextBlock" Style="{StaticResource StudentDetailsValueTextStyle}"/>
+                                                </Border>
 
                                                 <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Course"/>
                                                 <Border Style="{StaticResource StudentDetailsValueBorderStyle}">
@@ -179,29 +253,21 @@
                                                 BorderThickness="0,1,0,0"
                                                 Background="#FCFDFE">
                                             <UniformGrid Columns="3">
-                                                <Button Height="38"
-                                                        Margin="0,0,6,0"
+                                                <Button x:Name="OpenAddStudentButton" Height="38" Margin="0,0,6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#137FEC"
+                                                        Background="{StaticResource DashboardPrimaryBrush}"
                                                         Foreground="White"
-                                                        Click="OpenAddStudentButton_Click"
-                                                        Content="New"/>
-                                                <Button x:Name="EditSelectedStudentButton"
-                                                        Height="38"
-                                                        Margin="6,0,6,0"
+                                                        Click="OpenAddStudentButton_Click" Content="New"/>
+                                                <Button x:Name="EditSelectedStudentButton" Height="38" Margin="6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
                                                         Background="#EAF4FF"
                                                         Foreground="{StaticResource DashboardPrimaryBrush}"
-                                                        Click="EditSelectedStudentButton_Click"
-                                                        Content="Edit"/>
-                                                <Button x:Name="DeleteSelectedStudentButton"
-                                                        Height="38"
-                                                        Margin="6,0,0,0"
+                                                        Click="EditSelectedStudentButton_Click" Content="Edit"/>
+                                                <Button x:Name="DeleteSelectedStudentButton" Height="38" Margin="6,0,0,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
                                                         Background="#FFECEE"
                                                         Foreground="#D64545"
-                                                        Click="DeleteSelectedStudentButton_Click"
-                                                        Content="Delete"/>
+                                                        Click="DeleteSelectedStudentButton_Click" Content="Delete"/>
                                             </UniformGrid>
                                         </Border>
                                     </Grid>
@@ -219,122 +285,118 @@
                                                 BorderThickness="0,0,0,1"
                                                 Background="#FCFDFE">
                                             <StackPanel>
-                                                <TextBlock x:Name="StudentFormTitleTextBlock"
-                                                           Text="Add Student"
-                                                           FontSize="20"
-                                                           FontWeight="Bold"
+                                                <TextBlock x:Name="StudentFormTitleTextBlock" Text="Add Student"
+                                                           FontSize="20" FontWeight="Bold"
                                                            Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                                                <TextBlock x:Name="StudentFormSubtitleTextBlock"
-                                                           Margin="0,3,0,0"
+                                                <TextBlock x:Name="StudentFormSubtitleTextBlock" Margin="0,3,0,0"
                                                            Text="Create a new student record."
                                                            FontSize="12"
                                                            Foreground="{StaticResource DashboardTextMutedBrush}"/>
                                             </StackPanel>
                                         </Border>
 
-                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer x:Name="StudentFormScrollViewer"
+                                                      Grid.Row="1"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      PreviewMouseWheel="NestedPanelScrollViewer_PreviewMouseWheel">
                                             <StackPanel Margin="18,12,18,14">
-                                                <Grid Margin="0,0,0,0">
+                                                <Border Padding="12"
+                                                        CornerRadius="10"
+                                                        Background="#F5F9FF"
+                                                        BorderBrush="#D8E8FA"
+                                                        BorderThickness="1">
+                                                    <TextBlock FontSize="12"
+                                                               Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                               Text="Student accounts use the student ID to generate the default PRMSU local email."
+                                                               TextWrapping="Wrap"/>
+                                                </Border>
+                                                <Grid Margin="0,14,0,0">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="12"/>
-                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="16"/>
+                                                        <ColumnDefinition Width="140"/>
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel Grid.Column="0">
                                                         <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0" Text="Student ID"/>
                                                         <TextBox x:Name="StudentFormStudentIdTextBox" Style="{StaticResource StudentFormTextInputStyle}"/>
-                                                    </StackPanel>
-                                                    <StackPanel Grid.Column="2">
-                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0" Text="Year Level"/>
+
+                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Year Level"/>
                                                         <ComboBox x:Name="StudentFormYearLevelComboBox" Style="{StaticResource StudentFormComboInputStyle}">
                                                             <ComboBoxItem Content="1st Year"/>
                                                             <ComboBoxItem Content="2nd Year"/>
                                                             <ComboBoxItem Content="3rd Year"/>
                                                             <ComboBoxItem Content="4th Year"/>
                                                         </ComboBox>
-                                                    </StackPanel>
-                                                </Grid>
 
-                                                 <Grid Margin="0,12,0,0">
-                                                     <Grid.ColumnDefinitions>
-                                                         <ColumnDefinition Width="*"/>
-                                                         <ColumnDefinition Width="12"/>
-                                                         <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel Grid.Column="0">
-                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0" Text="First Name"/>
+                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="First Name"/>
                                                         <TextBox x:Name="StudentFormFirstNameTextBox" Style="{StaticResource StudentFormTextInputStyle}"/>
-                                                    </StackPanel>
-                                                    <StackPanel Grid.Column="2">
-                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0" Text="Last Name"/>
+
+                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Last Name"/>
                                                         <TextBox x:Name="StudentFormLastNameTextBox" Style="{StaticResource StudentFormTextInputStyle}"/>
-                                                    </StackPanel>
-                                                </Grid>
 
-                                                <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Middle Name"/>
-                                                <TextBox x:Name="StudentFormMiddleNameTextBox" Style="{StaticResource StudentFormTextInputStyle}"/>
+                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Middle Name"/>
+                                                        <TextBox x:Name="StudentFormMiddleNameTextBox" Style="{StaticResource StudentFormTextInputStyle}"/>
 
-                                                <Grid Margin="0,12,0,0">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="12"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel Grid.Column="0">
-                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0" Text="Course"/>
+                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Course"/>
                                                         <TextBox x:Name="StudentFormCourseTextBox" Style="{StaticResource StudentFormTextInputStyle}"/>
-                                                    </StackPanel>
-                                                    <StackPanel Grid.Column="2">
-                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Margin="0" Text="Section"/>
+
+                                                         <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Section"/>
                                                          <TextBox x:Name="StudentFormSectionTextBox" Style="{StaticResource StudentFormTextInputStyle}"/>
+
+                                                        <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Password"/>
+                                                        <TextBox x:Name="StudentFormPasswordTextBox" Style="{StaticResource StudentFormTextInputStyle}"/>
+                                                        <TextBlock Margin="0,4,0,0"
+                                                                   FontSize="11"
+                                                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                                   Text="Leave blank to use the default password when creating, or keep the current password while editing."
+                                                                   TextWrapping="Wrap"/>
                                                      </StackPanel>
-                                                 </Grid>
 
-                                                 <TextBlock Style="{StaticResource StudentFormLabelStyle}" Text="Photo"/>
-                                                 <Grid Margin="0,6,0,0">
-                                                     <Grid.ColumnDefinitions>
-                                                         <ColumnDefinition Width="*"/>
-                                                         <ColumnDefinition Width="8"/>
-                                                         <ColumnDefinition Width="100"/>
-                                                         <ColumnDefinition Width="8"/>
-                                                         <ColumnDefinition Width="72"/>
-                                                     </Grid.ColumnDefinitions>
-                                                     <TextBox x:Name="StudentFormPhotoPathTextBox"
-                                                              Grid.Column="0"
-                                                              Style="{StaticResource StudentFormTextInputStyle}"
-                                                              Margin="0"
-                                                              TextChanged="StudentFormPhotoPathTextBox_TextChanged"/>
-                                                     <Button Grid.Column="2"
-                                                             Height="36"
-                                                             Margin="0"
-                                                             Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                             Background="#EAF4FF"
-                                                             Foreground="{StaticResource DashboardPrimaryBrush}"
-                                                             Click="BrowseStudentPhotoButton_Click"
-                                                             Content="Browse"/>
-                                                     <Button Grid.Column="4"
-                                                             Height="36"
-                                                             Margin="0"
-                                                             Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                             Background="#F3F6FA"
-                                                             Foreground="{StaticResource DashboardTextMutedBrush}"
-                                                             Click="ClearStudentPhotoButton_Click"
-                                                             Content="Clear"/>
-                                                 </Grid>
-
-                                                 <Border Margin="0,8,0,0"
-                                                         Width="140"
-                                                         Height="140"
-                                                         HorizontalAlignment="Left"
-                                                         BorderBrush="{StaticResource DashboardBorderBrush}"
-                                                         BorderThickness="1"
-                                                         CornerRadius="8"
-                                                         Background="#F8FBFF">
-                                                     <Image x:Name="StudentFormPhotoPreviewImage"
-                                                            Stretch="UniformToFill"/>
-                                                 </Border>
-                                             </StackPanel>
-                                         </ScrollViewer>
+                                                     <Border Grid.Column="2"
+                                                             Padding="12"
+                                                             VerticalAlignment="Top"
+                                                             CornerRadius="12"
+                                                             Background="#FBFDFF"
+                                                             BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                             BorderThickness="1">
+                                                        <StackPanel>
+                                                            <TextBlock FontSize="12"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                                       Text="PHOTO PREVIEW"/>
+                                                            <Border Margin="0,10,0,0"
+                                                                    Width="116"
+                                                                    Height="116"
+                                                                    HorizontalAlignment="Center"
+                                                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="10"
+                                                                    Background="#F8FBFF">
+                                                                <Image x:Name="StudentFormPhotoPreviewImage" Stretch="UniformToFill"/>
+                                                            </Border>
+                                                            <Button Width="116"
+                                                                    Height="36"
+                                                                    Margin="0,10,0,0"
+                                                                    HorizontalAlignment="Center"
+                                                                    Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                                    Background="#EAF4FF"
+                                                                    Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                                    Click="BrowseStudentPhotoButton_Click"
+                                                                    Content="Browse"/>
+                                                            <Button Width="116"
+                                                                    Height="36"
+                                                                    Margin="0,8,0,0"
+                                                                    HorizontalAlignment="Center"
+                                                                    Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                                    Background="#F3F6FA"
+                                                                    Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                                    Click="ClearStudentPhotoButton_Click"
+                                                                    Content="Clear"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Grid>
+                                            </StackPanel>
+                                        </ScrollViewer>
 
                                         <Border Grid.Row="2"
                                                 Padding="18,14"
@@ -342,27 +404,20 @@
                                                 BorderThickness="0,1,0,0"
                                                 Background="#FCFDFE">
                                             <UniformGrid Columns="2">
-                                                <Button x:Name="SaveStudentFormButton"
-                                                        Height="38"
-                                                        Margin="0,0,6,0"
+                                                <Button x:Name="SaveStudentFormButton" Height="38" Margin="0,0,6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#137FEC"
-                                                        Foreground="White"
-                                                        Click="SaveStudentFormButton_Click"
-                                                        Content="Add Student"/>
-                                                <Button Height="38"
-                                                        Margin="6,0,0,0"
+                                                        Background="#137FEC" Foreground="White"
+                                                        Click="SaveStudentFormButton_Click" Content="Add Student"/>
+                                                <Button Height="38" Margin="6,0,0,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
                                                         Background="#F3F6FA"
                                                         Foreground="{StaticResource DashboardTextMutedBrush}"
-                                                        Click="CancelStudentFormButton_Click"
-                                                        Content="Cancel"/>
+                                                        Click="CancelStudentFormButton_Click" Content="Cancel"/>
                                             </UniformGrid>
                                         </Border>
                                     </Grid>
                                 </Grid>
                             </Border>
-
                             <Border Grid.Column="2"
                                     BorderBrush="{StaticResource DashboardBorderBrush}"
                                     BorderThickness="1"
@@ -371,26 +426,88 @@
                                     local:RoundedClipHelper.CornerRadius="10"
                                     ClipToBounds="True"
                                     SnapsToDevicePixels="True">
-                                <DataGrid x:Name="StudentsDataGrid"
-                                          Style="{StaticResource DashboardManagementDataGridStyle}"
-                                          ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
-                                          CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
-                                          RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
-                                          BorderThickness="0"
-                                          ColumnWidth="*"
-                                          local:RoundedClipHelper.CornerRadius="10"
-                                          ClipToBounds="True"
-                                          CanUserSortColumns="True"
-                                          SelectionChanged="StudentsDataGrid_SelectionChanged"
-                                          MinHeight="640">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Student ID" Binding="{Binding [Student ID]}" Width="*"/>
-                                        <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" Width="*"/>
-                                        <DataGridTextColumn Header="Year Level" Binding="{Binding [Year Level]}" Width="*"/>
-                                        <DataGridTextColumn Header="Course" Binding="{Binding [Course]}" Width="*"/>
-                                        <DataGridTextColumn Header="Section" Binding="{Binding [Section]}" Width="*"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Border Grid.Row="0"
+                                            Padding="16,14"
+                                            BorderBrush="{StaticResource DashboardBorderBrush}"
+                                            BorderThickness="0,0,0,1"
+                                            Background="#FCFDFE">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Student Roster"
+                                                           FontSize="18"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                                                <TextBlock Margin="0,4,0,0"
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                           Text="Select a row to sync the profile card. Use the dashboard search and header action to manage this list."
+                                                           TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1"
+                                                        Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
+                                                <Border Padding="10,5"
+                                                        Margin="0,0,8,0"
+                                                        CornerRadius="999"
+                                                        Background="#F3F8FF"
+                                                        BorderBrush="#D6E7FB"
+                                                        BorderThickness="1">
+                                                    <TextBlock x:Name="StudentsSearchStateTextBlock"
+                                                               MaxWidth="180"
+                                                               FontSize="12"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               Text="All records"/>
+                                                </Border>
+                                                <Border Padding="10,5"
+                                                        CornerRadius="999"
+                                                        Background="#F6F8FB"
+                                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                        BorderThickness="1">
+                                                    <TextBlock x:Name="StudentsCountTextBlock"
+                                                               FontSize="12"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                               Text="0 students"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <DataGrid x:Name="StudentsDataGrid"
+                                              Grid.Row="1"
+                                              Style="{StaticResource DashboardManagementDataGridStyle}"
+                                              ColumnHeaderStyle="{StaticResource StudentDataGridHeaderStyle}"
+                                              CellStyle="{StaticResource StudentDataGridCellStyle}"
+                                              RowStyle="{StaticResource StudentDataGridRowStyle}"
+                                              BorderThickness="0"
+                                              ColumnWidth="*"
+                                              local:RoundedClipHelper.CornerRadius="10"
+                                              ClipToBounds="True"
+                                              CanUserSortColumns="True"
+                                              PreviewMouseWheel="StudentsDataGrid_PreviewMouseWheel"
+                                              SelectionChanged="StudentsDataGrid_SelectionChanged"
+                                              MinHeight="640">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Student ID" Binding="{Binding [Student ID]}" SortMemberPath="Student ID" Width="*" ElementStyle="{StaticResource StudentDataGridTextStyle}"/>
+                                            <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" SortMemberPath="Full Name" Width="*" ElementStyle="{StaticResource StudentDataGridTextStyle}"/>
+                                            <DataGridTextColumn Header="Year Level" Binding="{Binding [Year Level]}" SortMemberPath="Year Level" Width="*" ElementStyle="{StaticResource StudentDataGridTextStyle}"/>
+                                            <DataGridTextColumn Header="Course" Binding="{Binding [Course]}" SortMemberPath="Course" Width="*" ElementStyle="{StaticResource StudentDataGridTextStyle}"/>
+                                            <DataGridTextColumn Header="Section" Binding="{Binding [Section]}" SortMemberPath="Section" Width="*" ElementStyle="{StaticResource StudentDataGridTextStyle}"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
                             </Border>
                         </Grid>
                     </StackPanel>

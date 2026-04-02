@@ -153,9 +153,12 @@
                                            Margin="14,0,0,0"
                                            Style="{StaticResource LoginFieldIconStyle}"/>
                                 <TextBox x:Name="UsernameTextBox"
-                                         Padding="38,0,14,0"
-                                         Style="{StaticResource LoginTextInputStyle}"/>
-                                <TextBlock Text="Enter your ID" Margin="38,0,0,0">
+                                          Padding="38,0,14,0"
+                                          TextChanged="UsernameTextBox_TextChanged"
+                                          Style="{StaticResource LoginTextInputStyle}"/>
+                                <TextBlock x:Name="IdentifierPlaceholderTextBlock"
+                                           Text="Enter your ID"
+                                           Margin="38,0,0,0">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock" BasedOn="{StaticResource LoginPlaceholderTextStyle}">
                                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -247,18 +250,22 @@
                                       FontSize="14"
                                       VerticalAlignment="Center"
                                       Foreground="#7D8DA8"/>
-                            <Button Grid.Column="1" Style="{StaticResource InlineLinkButtonStyle}">
-                                <TextBlock Text="Forgot Password?"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource Brush.Primary}"/>
-                            </Button>
+                       
                         </Grid>
-                        <Button Height="48"
+                        <TextBlock x:Name="LoginStatusTextBlock"
+                                   Margin="0,14,0,0"
+                                   Visibility="Collapsed"
+                                   TextWrapping="Wrap"
+                                   Foreground="#C94A56"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"/>
+                        <Button x:Name="LoginButton"
+                                Height="48"
                                 Margin="0,20,0,0"
                                 FontSize="16"
                                 FontWeight="SemiBold"
                                 Style="{StaticResource PrimaryActionButtonStyle}"
+                                IsDefault="True"
                                 Click="LoginButton_Click">
                             <StackPanel Orientation="Horizontal"
                                         HorizontalAlignment="Center"

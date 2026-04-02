@@ -5,18 +5,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
     <StackPanel>
-        <TextBlock Text="Consultation Schedule"
+        <TextBlock Text="Submission"
                    Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-        <TextBlock Text="Follow your booked sessions and pending consultation requests."
+        <TextBlock Text="Finalize your enrollment details and send your request for approval."
                    Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
         <UniformGrid Margin="0,14,0,0"
                      Columns="2">
             <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
                 <StackPanel>
-                    <TextBlock Text="Booked Sessions"
+                    <TextBlock Text="Requirements Complete"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0"
+                    <TextBlock Text="0%"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -24,9 +24,9 @@
 
             <Border Style="{StaticResource DashboardProfileStatCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="Pending Requests"
+                    <TextBlock Text="Adviser Approval"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0"
+                    <TextBlock Text="Pending"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -36,10 +36,10 @@
         <Border Margin="0,14,0,0"
                 Style="{StaticResource DashboardProfileSectionCardStyle}">
             <StackPanel>
-                <TextBlock Text="Consultation Queue"
+                <TextBlock Text="Enrollment Checklist"
                            Style="{StaticResource DashboardProfileSectionTitleStyle}"
                            FontSize="16"/>
-                <TextBlock Text="Faculty availability and your appointment status."
+                <TextBlock Text="Complete all required steps before submitting your load."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
                 <Grid Margin="0,14,0,0">
@@ -61,16 +61,16 @@
                                 <ColumnDefinition Width="1.2*"/>
                                 <ColumnDefinition Width="1.2*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Faculty"
+                            <TextBlock Text="Requirement"
                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                             <TextBlock Grid.Column="1"
-                                       Text="Course"
+                                       Text="Status"
                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                             <TextBlock Grid.Column="2"
-                                       Text="Date"
+                                       Text="Updated"
                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                             <TextBlock Grid.Column="3"
-                                       Text="Status"
+                                       Text="Notes"
                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                         </Grid>
                     </Border>
@@ -89,7 +89,7 @@
                                 <ColumnDefinition Width="1.2*"/>
                                 <ColumnDefinition Width="1.2*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="No consultations queued."
+                            <TextBlock Text="No checklist generated."
                                        Foreground="{StaticResource DashboardTextMutedBrush}"/>
                             <TextBlock Grid.Column="1"
                                        Text="--"
@@ -104,13 +104,34 @@
                                     Background="#EFF4FB"
                                     BorderBrush="#D4DFED"
                                     BorderThickness="1">
-                                <TextBlock Text="Open"
+                                <TextBlock Text="Pending"
                                            FontSize="11"
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource DashboardTextMutedBrush}"/>
                             </Border>
                         </Grid>
                     </Border>
+                </Grid>
+
+                <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Width="124"
+                            Height="36"
+                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                            Background="#EFF4FB"
+                            Foreground="{StaticResource DashboardTextMutedBrush}"
+                            Content="Save Draft"/>
+
+                    <Button Grid.Column="1"
+                            Margin="10,0,0,0"
+                            Width="172"
+                            Height="36"
+                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                            Content="Submit Enrollment"/>
                 </Grid>
             </StackPanel>
         </Border>

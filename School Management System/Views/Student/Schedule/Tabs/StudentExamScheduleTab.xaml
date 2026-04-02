@@ -5,16 +5,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
     <StackPanel>
-        <TextBlock Text="Exam Schedule"
+        <TextBlock Text="Selected Load"
                    Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-        <TextBlock Text="Monitor upcoming exams and their assigned slots."
+        <TextBlock Text="Review the subjects currently added to your enrollment draft."
                    Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
         <UniformGrid Margin="0,14,0,0"
                      Columns="3">
             <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
                 <StackPanel>
-                    <TextBlock Text="Upcoming Exams"
+                    <TextBlock Text="Selected Subjects"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                     <TextBlock Text="0"
                                Margin="0,4,0,0"
@@ -24,7 +24,7 @@
 
             <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
                 <StackPanel>
-                    <TextBlock Text="This Month"
+                    <TextBlock Text="Total Units"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                     <TextBlock Text="0"
                                Margin="0,4,0,0"
@@ -34,7 +34,7 @@
 
             <Border Style="{StaticResource DashboardProfileStatCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="Completed"
+                    <TextBlock Text="Conflicts"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                     <TextBlock Text="0"
                                Margin="0,4,0,0"
@@ -46,10 +46,10 @@
         <Border Margin="0,14,0,0"
                 Style="{StaticResource DashboardProfileSectionCardStyle}">
             <StackPanel>
-                <TextBlock Text="Exam Timetable"
+                <TextBlock Text="Chosen Subjects"
                            Style="{StaticResource DashboardProfileSectionTitleStyle}"
                            FontSize="16"/>
-                <TextBlock Text="Official exam slots by subject."
+                <TextBlock Text="Edit your selected sections before final submission."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
                 <Grid Margin="0,14,0,0">
@@ -68,15 +68,19 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*"/>
                                 <ColumnDefinition Width="1.4*"/>
-                                <ColumnDefinition Width="1.4*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1.1*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Subject"
                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                             <TextBlock Grid.Column="1"
-                                       Text="Date"
+                                       Text="Section"
                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                             <TextBlock Grid.Column="2"
-                                       Text="Time"
+                                       Text="Units"
+                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                            <TextBlock Grid.Column="3"
+                                       Text="Action"
                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                         </Grid>
                     </Border>
@@ -92,16 +96,29 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*"/>
                                 <ColumnDefinition Width="1.4*"/>
-                                <ColumnDefinition Width="1.4*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1.1*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="No exams scheduled yet."
+                            <TextBlock Text="No subjects selected yet."
                                        Foreground="{StaticResource DashboardTextMutedBrush}"/>
                             <TextBlock Grid.Column="1"
                                        Text="--"
                                        Foreground="{StaticResource DashboardTextMutedBrush}"/>
                             <TextBlock Grid.Column="2"
-                                       Text="--"
+                                       Text="0"
                                        Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            <Border Grid.Column="3"
+                                    HorizontalAlignment="Left"
+                                    Padding="8,3"
+                                    CornerRadius="999"
+                                    Background="#EFF4FB"
+                                    BorderBrush="#D4DFED"
+                                    BorderThickness="1">
+                                <TextBlock Text="Remove"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            </Border>
                         </Grid>
                     </Border>
                 </Grid>

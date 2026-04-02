@@ -240,11 +240,19 @@
                                                         <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Margin="0" Text="Role"/>
                                                         <TextBox x:Name="AdministratorFormRoleTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
                                                     </StackPanel>
-                                                    <StackPanel Grid.Column="2">
-                                                        <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Margin="0" Text="Email"/>
-                                                        <TextBox x:Name="AdministratorFormEmailTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
-                                                    </StackPanel>
-                                                </Grid>
+                                                     <StackPanel Grid.Column="2">
+                                                         <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Margin="0" Text="Email"/>
+                                                         <TextBox x:Name="AdministratorFormEmailTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
+                                                     </StackPanel>
+                                                 </Grid>
+
+                                                <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Text="Password"/>
+                                                <TextBox x:Name="AdministratorFormPasswordTextBox" Style="{StaticResource AdministratorFormTextInputStyle}"/>
+                                                <TextBlock Margin="0,4,0,0"
+                                                           FontSize="11"
+                                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                           Text="Leave blank to use the default password when creating, or keep the current password while editing."
+                                                           TextWrapping="Wrap"/>
 
                                                 <TextBlock Style="{StaticResource AdministratorFormLabelStyle}" Text="Photo"/>
                                                 <Grid Margin="0,6,0,0">

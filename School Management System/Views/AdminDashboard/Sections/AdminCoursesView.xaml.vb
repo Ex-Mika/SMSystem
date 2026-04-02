@@ -44,6 +44,10 @@ Class AdminCoursesView
         ApplyCoursesFilter()
     End Sub
 
+    Public Sub RefreshData()
+        LoadCoursesTable(GetSelectedCourseCode())
+    End Sub
+
     Public Sub SetCoursesTable(table As DataTable)
         _coursesTable = NormalizeCoursesTable(table)
         CoursesDataGrid.ItemsSource = _coursesTable.DefaultView
@@ -53,9 +57,13 @@ Class AdminCoursesView
         RefreshCourseDetailsPanel()
     End Sub
 
-    Private Sub LoadCoursesTable()
+    Private Sub LoadCoursesTable(Optional courseCodeToSelect As String = "")
         Dim coursesTable As DataTable = FetchCoursesTable()
         SetCoursesTable(coursesTable)
+
+        If Not String.IsNullOrWhiteSpace(courseCodeToSelect) Then
+            SelectCourseByCode(courseCodeToSelect)
+        End If
     End Sub
 
     Private Function FetchCoursesTable() As DataTable
@@ -485,6 +493,15 @@ Class AdminCoursesView
             CoursesDataGrid.SelectedItem = _coursesTable.DefaultView(0)
         End If
     End Sub
+
+    Private Function GetSelectedCourseCode() As String
+        Dim selectedRow As DataRow = TryGetSelectedGridRow()
+        If selectedRow Is Nothing Then
+            Return String.Empty
+        End If
+
+        Return ReadRowValue(selectedRow, "Course Code")
+    End Function
 
     Private Function TryGetSelectedGridRow() As DataRow
         Dim selectedRowView As DataRowView = TryCast(CoursesDataGrid.SelectedItem, DataRowView)

@@ -5,70 +5,178 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:School_Management_System"
              mc:Ignorable="d">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="20,18,20,22">
             <Border Style="{StaticResource DashboardCardBorderStyle}">
-                <Grid Margin="18">
+                <Grid Margin="22">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel>
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="0"
+                                Margin="0,0,18,0">
                         <TextBlock Text="Grades"
-                                   FontSize="24"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                        <TextBlock x:Name="GradesHeaderNameTextBlock"
+                                   Text="Student"
+                                   Margin="0,4,0,0"
+                                   FontSize="32"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock Text="Track your current performance, assessment components, and term history."
+                                   Margin="0,6,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
                         <TextBlock x:Name="GradesStudentIdTextBlock"
                                    Text=""
-                                   Margin="0,4,0,0"
-                                   FontSize="13"
+                                   Margin="0,8,0,0"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Border Margin="0,0,8,0"
-                                Padding="12,8"
-                                CornerRadius="8"
-                                Background="#F4F8FD"
-                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top">
+                        <Border Width="76"
+                                Height="76"
+                                CornerRadius="38"
+                                Background="#E4F0FF"
+                                BorderBrush="#C9DDF7"
                                 BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock Text="Current GWA" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                <TextBlock Text="0" FontSize="17" FontWeight="Bold"/>
-                            </StackPanel>
+                            <TextBlock Text="&#xE9D9;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="28"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource DashboardPrimaryBrush}"/>
                         </Border>
-                        <Border Padding="12,8"
-                                CornerRadius="8"
-                                Background="#F4F8FD"
-                                BorderBrush="{StaticResource DashboardBorderBrush}"
-                                BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock Text="Completed Units" FontSize="11" Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                <TextBlock Text="0" FontSize="17" FontWeight="Bold"/>
-                            </StackPanel>
-                        </Border>
+                        <WrapPanel Margin="0,12,0,0"
+                                   HorizontalAlignment="Right">
+                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
+                                <TextBlock Text="Current Term"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                            </Border>
+                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
+                                <TextBlock Text="Posted Grades"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                            </Border>
+                        </WrapPanel>
                     </StackPanel>
+
+                    <UniformGrid Grid.Row="1"
+                                 Grid.ColumnSpan="2"
+                                 Margin="0,20,0,0"
+                                 Columns="3">
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Current GWA"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0.00"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Passed Subjects"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Academic Standing"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="Good"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
                 </Grid>
             </Border>
 
             <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,18,0,0">
-                <TabControl Margin="18"
-                            Background="Transparent"
-                            BorderThickness="0">
-                    <TabItem Header="Current">
-                        <local:StudentCurrentGradesTab x:Name="CurrentGradesTabView"
-                                                       Margin="0,14,0,0"/>
-                    </TabItem>
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                    <TabItem Header="Breakdown">
-                        <local:StudentGradeBreakdownTab Margin="0,14,0,0"/>
-                    </TabItem>
+                    <StackPanel>
+                        <TextBlock Text="Grade Tracker"
+                                   Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                        <TextBlock Text="Switch between the current term, score components, and historical records."
+                                   Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                    </StackPanel>
 
-                    <TabItem Header="History">
-                        <local:StudentGradeHistoryTab Margin="0,14,0,0"/>
-                    </TabItem>
-                </TabControl>
+                    <Grid Grid.Row="1" Margin="0,16,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="CurrentTermSectionButton"
+                                    Grid.Column="0"
+                                    Width="118"
+                                    Style="{StaticResource DashboardProfileSegmentSelectedButtonStyle}"
+                                    Click="CurrentTermSectionButton_Click"
+                                    Content="Current Term"/>
+
+                            <Button x:Name="BreakdownSectionButton"
+                                    Grid.Column="1"
+                                    Width="110"
+                                    Margin="8,0,0,0"
+                                    Style="{StaticResource DashboardProfileSegmentButtonStyle}"
+                                    Click="BreakdownSectionButton_Click"
+                                    Content="Breakdown"/>
+
+                            <Button x:Name="HistorySectionButton"
+                                    Grid.Column="2"
+                                    Width="96"
+                                    Margin="8,0,0,0"
+                                    Style="{StaticResource DashboardProfileSegmentButtonStyle}"
+                                    Click="HistorySectionButton_Click"
+                                    Content="History"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,14,0,0">
+                            <local:StudentCurrentGradesTab x:Name="CurrentGradesTabView"/>
+
+                            <local:StudentGradeBreakdownTab x:Name="GradeBreakdownTabView"
+                                                           Visibility="Collapsed"/>
+
+                            <local:StudentGradeHistoryTab x:Name="GradeHistoryTabView"
+                                                          Visibility="Collapsed"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
             </Border>
         </StackPanel>
     </ScrollViewer>

@@ -6,6 +6,8 @@ Imports System.Text.Json
 Imports System.Windows.Documents
 Imports System.Windows.Media
 Imports Microsoft.Win32
+Imports School_Management_System.Backend.Models
+Imports School_Management_System.Backend.Services
 
 Class AdminReportsView
     Private Enum StatusTone
@@ -20,13 +22,6 @@ Class AdminReportsView
         Public Property YearLevel As String
         Public Property Course As String
         Public Property Section As String
-    End Class
-
-    Private Class TeacherStorageRecord
-        Public Property TeacherId As String
-        Public Property FullName As String
-        Public Property Department As String
-        Public Property Advisory As String
     End Class
 
     Private Class CourseStorageRecord
@@ -63,11 +58,10 @@ Class AdminReportsView
     Private Const TotalReportOptions As Integer = 6
 
     Private _searchTerm As String = String.Empty
+    Private ReadOnly _teacherManagementService As New TeacherManagementService()
 
     Private ReadOnly _studentsStoragePath As String =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "students.json")
-    Private ReadOnly _teachersStoragePath As String =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "teachers.json")
     Private ReadOnly _coursesStoragePath As String =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SchoolManagementSystem", "courses.json")
     Private ReadOnly _departmentsStoragePath As String =
@@ -88,6 +82,10 @@ Class AdminReportsView
 
     Public Sub ApplySearchFilter(searchTerm As String)
         _searchTerm = If(searchTerm, String.Empty).Trim()
+        ApplyReportsFilter()
+    End Sub
+
+    Public Sub RefreshData()
         ApplyReportsFilter()
     End Sub
 
@@ -245,15 +243,23 @@ Class AdminReportsView
     End Function
 
     Private Function GetTeachersReportRows() As List(Of String())
-        Dim records As List(Of TeacherStorageRecord) = ReadRecordsFromStorage(Of TeacherStorageRecord)(_teachersStoragePath, "teachers")
-
         Dim rows As New List(Of String())()
-        For Each record As TeacherStorageRecord In records
+        Dim result = _teacherManagementService.GetTeachers()
+
+        If Not result.IsSuccess Then
+            MessageBox.Show(result.Message,
+                            "Reports",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning)
+            Return rows
+        End If
+
+        For Each record As TeacherRecord In result.Data
             rows.Add(New String() {
-                NormalizeValue(record.TeacherId),
+                NormalizeValue(record.EmployeeNumber),
                 NormalizeValue(record.FullName),
-                NormalizeValue(record.Department),
-                NormalizeValue(record.Advisory)
+                NormalizeValue(record.DepartmentDisplayName),
+                NormalizeValue(record.AdvisorySection)
             })
         Next
 

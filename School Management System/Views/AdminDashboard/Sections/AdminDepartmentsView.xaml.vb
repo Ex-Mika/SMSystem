@@ -42,6 +42,10 @@ Class AdminDepartmentsView
         ApplyDepartmentsFilter()
     End Sub
 
+    Public Sub RefreshData()
+        LoadDepartmentsTable(GetSelectedDepartmentId())
+    End Sub
+
     Public Sub SetDepartmentsTable(table As DataTable)
         _departmentsTable = NormalizeDepartmentsTable(table)
         DepartmentsDataGrid.ItemsSource = _departmentsTable.DefaultView
@@ -51,9 +55,13 @@ Class AdminDepartmentsView
         RefreshDepartmentDetailsPanel()
     End Sub
 
-    Private Sub LoadDepartmentsTable()
+    Private Sub LoadDepartmentsTable(Optional departmentIdToSelect As String = "")
         Dim departmentsTable As DataTable = FetchDepartmentsTable()
         SetDepartmentsTable(departmentsTable)
+
+        If Not String.IsNullOrWhiteSpace(departmentIdToSelect) Then
+            SelectDepartmentById(departmentIdToSelect)
+        End If
     End Sub
 
     Private Function FetchDepartmentsTable() As DataTable
@@ -468,6 +476,15 @@ Class AdminDepartmentsView
             DepartmentsDataGrid.SelectedItem = _departmentsTable.DefaultView(0)
         End If
     End Sub
+
+    Private Function GetSelectedDepartmentId() As String
+        Dim selectedRow As DataRow = TryGetSelectedGridRow()
+        If selectedRow Is Nothing Then
+            Return String.Empty
+        End If
+
+        Return ReadRowValue(selectedRow, "Department ID")
+    End Function
 
     Private Function TryGetSelectedGridRow() As DataRow
         Dim selectedRowView As DataRowView = TryCast(DepartmentsDataGrid.SelectedItem, DataRowView)

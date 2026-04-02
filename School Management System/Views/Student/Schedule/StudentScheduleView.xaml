@@ -26,12 +26,12 @@
                                    FontSize="12"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                        <TextBlock Text="Student Timetable"
+                        <TextBlock Text="Student Enrollment"
                                    Margin="0,4,0,0"
                                    FontSize="32"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                        <TextBlock Text="Track weekly classes, exam windows, and consultation appointments."
+                        <TextBlock Text="Plan your load, review available classes, and submit enrollment for approval."
                                    Margin="0,6,0,0"
                                    FontSize="13"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"
@@ -64,13 +64,13 @@
                         <WrapPanel Margin="0,12,0,0"
                                    HorizontalAlignment="Right">
                             <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
-                                <TextBlock Text="Week View"
+                                <TextBlock Text="Open Term"
                                            FontSize="11"
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource DashboardPrimaryBrush}"/>
                             </Border>
                             <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
-                                <TextBlock Text="Live Updates"
+                                <TextBlock Text="Adviser Review"
                                            FontSize="11"
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource DashboardPrimaryBrush}"/>
@@ -84,7 +84,7 @@
                                  Columns="3">
                         <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
                             <StackPanel>
-                                <TextBlock Text="Total Sessions"
+                                <TextBlock Text="Selected Subjects"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                                 <TextBlock Text="0"
                                            Margin="0,4,0,0"
@@ -93,7 +93,7 @@
                         </Border>
                         <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
                             <StackPanel>
-                                <TextBlock Text="Upcoming Exams"
+                                <TextBlock Text="Total Units"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                                 <TextBlock Text="0"
                                            Margin="0,4,0,0"
@@ -102,9 +102,9 @@
                         </Border>
                         <Border Style="{StaticResource DashboardProfileStatCardStyle}">
                             <StackPanel>
-                                <TextBlock Text="Consultations"
+                                <TextBlock Text="Enrollment Status"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="0"
+                                <TextBlock Text="Draft"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -121,28 +121,60 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel>
-                        <TextBlock Text="Schedule Planner"
+                        <TextBlock Text="Enrollment Workflow"
                                    Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                        <TextBlock Text="Switch between weekly classes, exam timetable, and consultation schedule."
+                        <TextBlock Text="Review offerings, build your load, and finalize your submission."
                                    Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
                     </StackPanel>
 
-                    <TabControl Grid.Row="1"
-                                Margin="0,16,0,0"
-                                Style="{StaticResource DashboardProfileTabControlStyle}"
-                                ItemContainerStyle="{StaticResource DashboardProfileTabItemStyle}">
-                        <TabItem Header="Weekly">
+                    <Grid Grid.Row="1" Margin="0,16,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="AvailableSubjectsSectionButton"
+                                    Grid.Column="0"
+                                    Width="132"
+                                    Style="{StaticResource DashboardProfileSegmentSelectedButtonStyle}"
+                                    Click="AvailableSubjectsSectionButton_Click"
+                                    Content="Available Subjects"/>
+
+                            <Button x:Name="SelectedLoadSectionButton"
+                                    Grid.Column="1"
+                                    Width="114"
+                                    Margin="8,0,0,0"
+                                    Style="{StaticResource DashboardProfileSegmentButtonStyle}"
+                                    Click="SelectedLoadSectionButton_Click"
+                                    Content="Selected Load"/>
+
+                            <Button x:Name="SubmissionSectionButton"
+                                    Grid.Column="2"
+                                    Width="98"
+                                    Margin="8,0,0,0"
+                                    Style="{StaticResource DashboardProfileSegmentButtonStyle}"
+                                    Click="SubmissionSectionButton_Click"
+                                    Content="Submission"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,14,0,0">
                             <local:StudentWeeklyScheduleTab x:Name="WeeklyScheduleTabView"/>
-                        </TabItem>
 
-                        <TabItem Header="Exams">
-                            <local:StudentExamScheduleTab/>
-                        </TabItem>
+                            <local:StudentExamScheduleTab x:Name="SelectedLoadTabView"
+                                                          Visibility="Collapsed"/>
 
-                        <TabItem Header="Consultations">
-                            <local:StudentConsultationScheduleTab/>
-                        </TabItem>
-                    </TabControl>
+                            <local:StudentConsultationScheduleTab x:Name="SubmissionTabView"
+                                                                  Visibility="Collapsed"/>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Border>
         </StackPanel>

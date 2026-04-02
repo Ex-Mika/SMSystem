@@ -112,42 +112,22 @@
 
         ContentTitleTextBlock.Text = GetSectionTitle(section)
         SearchPlaceholderTextBlock.Text = GetSectionSearchPlaceholder(section)
+        UpdateHeaderSectionAction(section)
 
         ApplySidebarSelectionStyles(section)
 
-        If section = AdminDashboardSection.Students Then
-            StudentsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf section = AdminDashboardSection.Teachers Then
-            TeachersContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf section = AdminDashboardSection.Administrators Then
-            AdministratorsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf section = AdminDashboardSection.Courses Then
-            CoursesContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf section = AdminDashboardSection.Subjects Then
-            SubjectsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf section = AdminDashboardSection.Reports Then
-            ReportsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf section = AdminDashboardSection.Scheduling Then
-            SchedulingContentView.ApplySearchFilter(SearchActionsTextBox.Text)
+        RefreshSectionData(section)
+        ApplySearchFilterToSection(section, SearchActionsTextBox.Text)
+    End Sub
+
+    Private Sub HeaderSectionActionButton_Click(sender As Object, e As RoutedEventArgs)
+        If _activeSection = AdminDashboardSection.Students Then
+            StudentsContentView.OpenAddStudentFormFromDashboard()
         End If
     End Sub
 
     Private Sub SearchActionsTextBox_TextChanged(sender As Object, e As TextChangedEventArgs)
-        If _activeSection = AdminDashboardSection.Students Then
-            StudentsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf _activeSection = AdminDashboardSection.Teachers Then
-            TeachersContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf _activeSection = AdminDashboardSection.Administrators Then
-            AdministratorsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf _activeSection = AdminDashboardSection.Courses Then
-            CoursesContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf _activeSection = AdminDashboardSection.Subjects Then
-            SubjectsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf _activeSection = AdminDashboardSection.Reports Then
-            ReportsContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        ElseIf _activeSection = AdminDashboardSection.Scheduling Then
-            SchedulingContentView.ApplySearchFilter(SearchActionsTextBox.Text)
-        End If
+        ApplySearchFilterToSection(_activeSection, SearchActionsTextBox.Text)
     End Sub
 
     Private Sub ApplySidebarSelectionStyles(activeSection As AdminDashboardSection)
@@ -160,6 +140,58 @@
         ApplySidebarButtonState(SubjectsNavButton, SubjectsNavIconBorder, SubjectsNavIconText, SubjectsNavText, activeSection = AdminDashboardSection.Subjects)
         ApplySidebarButtonState(ReportsNavButton, ReportsNavIconBorder, ReportsNavIconText, ReportsNavText, activeSection = AdminDashboardSection.Reports)
         ApplySidebarButtonState(SchedulingNavButton, SchedulingNavIconBorder, SchedulingNavIconText, SchedulingNavText, activeSection = AdminDashboardSection.Scheduling)
+    End Sub
+
+    Private Sub UpdateHeaderSectionAction(section As AdminDashboardSection)
+        If HeaderSectionActionButton Is Nothing Then
+            Return
+        End If
+
+        HeaderSectionActionButton.Visibility = Visibility.Collapsed
+    End Sub
+
+    Private Sub RefreshSectionData(section As AdminDashboardSection)
+        Select Case section
+            Case AdminDashboardSection.Dashboard
+                DashboardContentView.RefreshData()
+            Case AdminDashboardSection.Students
+                StudentsContentView.RefreshData()
+            Case AdminDashboardSection.Teachers
+                TeachersContentView.RefreshData()
+            Case AdminDashboardSection.Administrators
+                AdministratorsContentView.RefreshData()
+            Case AdminDashboardSection.Courses
+                CoursesContentView.RefreshData()
+            Case AdminDashboardSection.Departments
+                DepartmentsContentView.RefreshData()
+            Case AdminDashboardSection.Subjects
+                SubjectsContentView.RefreshData()
+            Case AdminDashboardSection.Reports
+                ReportsContentView.RefreshData()
+            Case AdminDashboardSection.Scheduling
+                SchedulingContentView.RefreshData()
+        End Select
+    End Sub
+
+    Private Sub ApplySearchFilterToSection(section As AdminDashboardSection, searchTerm As String)
+        Select Case section
+            Case AdminDashboardSection.Students
+                StudentsContentView.ApplySearchFilter(searchTerm)
+            Case AdminDashboardSection.Teachers
+                TeachersContentView.ApplySearchFilter(searchTerm)
+            Case AdminDashboardSection.Administrators
+                AdministratorsContentView.ApplySearchFilter(searchTerm)
+            Case AdminDashboardSection.Courses
+                CoursesContentView.ApplySearchFilter(searchTerm)
+            Case AdminDashboardSection.Departments
+                DepartmentsContentView.ApplySearchFilter(searchTerm)
+            Case AdminDashboardSection.Subjects
+                SubjectsContentView.ApplySearchFilter(searchTerm)
+            Case AdminDashboardSection.Reports
+                ReportsContentView.ApplySearchFilter(searchTerm)
+            Case AdminDashboardSection.Scheduling
+                SchedulingContentView.ApplySearchFilter(searchTerm)
+        End Select
     End Sub
 
     Private Sub ApplySidebarButtonState(navButton As Button, navIconBorder As Border, navIconText As TextBlock, navText As TextBlock, isSelected As Boolean)

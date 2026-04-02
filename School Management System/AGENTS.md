@@ -10,7 +10,8 @@
 - Do not add mock database layers or fake backend services unless explicitly requested.
 - Keep changes modular and maintainable.
 - Preserve the current visual language (blue gradient theme, card-based login, PRMSU branding).
-
+- Do not make lines of code go over 300
+	
 ## Current Structure
 - `School Management System/Views/` -> windows and view markup/code-behind
 - `School Management System/Resources/Styles/` -> shared colors and control styles

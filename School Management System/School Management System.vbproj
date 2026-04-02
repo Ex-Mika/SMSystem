@@ -20,10 +20,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="MySql.Data">
+      <HintPath>$(UserProfile)\.nuget\packages\mysql.data\9.4.0\lib\net9.0\MySql.Data.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\Images\prmsu-campus-bg.png" />
     <Resource Include="Resources\Images\Icons\eye-closed.png" />
     <Resource Include="Resources\Images\Icons\eye-open.png" />
     <Resource Include="Resources\Images\prmsu-logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Database\**\*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

@@ -344,8 +344,18 @@
                             </Grid>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button Style="{StaticResource DashboardHeaderIconButtonStyle}" Margin="0,0,4,0"/>
-                            <Border Width="1" Height="26" Background="{StaticResource DashboardBorderBrush}" Margin="12,0"/>
+                            <Button x:Name="HeaderSectionActionButton"
+                                    MinWidth="122"
+                                    Height="36"
+                                    Margin="0,0,12,0"
+                                    Padding="16,0"
+                                    Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                    Background="#137FEC"
+                                    Foreground="White"
+                                    Visibility="Collapsed"
+                                    Click="HeaderSectionActionButton_Click"
+                                    Content="Add Student"/>
+                            <Border Width="1" Height="26" Background="{StaticResource DashboardBorderBrush}" Margin="0,0,12,0"/>
                             <Border Width="36" Height="36" CornerRadius="18" Background="#DCE8F8" BorderBrush="{StaticResource DashboardBorderBrush}" BorderThickness="1">
                                 <TextBlock Text="A" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" FontWeight="Bold" Foreground="#1F3E6F"/>
                             </Border>

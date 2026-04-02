@@ -1,0 +1,210 @@
+<UserControl x:Class="TeacherGradingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="20,18,20,22">
+            <Border Style="{StaticResource DashboardCardBorderStyle}">
+                <Grid Margin="22">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="0"
+                                Margin="0,0,18,0">
+                        <TextBlock Text="Grading"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                        <TextBlock Text="Grading Center"
+                                   Margin="0,4,0,0"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock Text="Review pending checks, publish results, and monitor class performance."
+                                   Margin="0,6,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock x:Name="GradingTeacherIdTextBlock"
+                                   Margin="0,8,0,0"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top">
+                        <Border Width="76"
+                                Height="76"
+                                CornerRadius="38"
+                                Background="#E4F0FF"
+                                BorderBrush="#C9DDF7"
+                                BorderThickness="1">
+                            <TextBlock Text="&#xE9D9;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="28"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                        </Border>
+                        <WrapPanel Margin="0,12,0,0"
+                                   HorizontalAlignment="Right">
+                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
+                                <TextBlock Text="Score Review"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                            </Border>
+                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
+                                <TextBlock Text="Publishing"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                            </Border>
+                        </WrapPanel>
+                    </StackPanel>
+
+                    <UniformGrid Grid.Row="1"
+                                 Grid.ColumnSpan="2"
+                                 Margin="0,20,0,0"
+                                 Columns="3">
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Pending Checks"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Published Grades"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Class Average"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0.00"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,18,0,0">
+                <Grid Margin="18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="Grading Workflow"
+                                   Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                        <TextBlock Text="Switch between pending checks, published results, and term history."
+                                   Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" Margin="0,16,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="PendingSectionButton"
+                                    Grid.Column="0"
+                                    Width="102"
+                                    Style="{StaticResource DashboardProfileSegmentSelectedButtonStyle}"
+                                    Click="PendingSectionButton_Click"
+                                    Content="Pending"/>
+
+                            <Button x:Name="PublishedSectionButton"
+                                    Grid.Column="1"
+                                    Width="112"
+                                    Margin="8,0,0,0"
+                                    Style="{StaticResource DashboardProfileSegmentButtonStyle}"
+                                    Click="PublishedSectionButton_Click"
+                                    Content="Published"/>
+
+                            <Button x:Name="HistorySectionButton"
+                                    Grid.Column="2"
+                                    Width="94"
+                                    Margin="8,0,0,0"
+                                    Style="{StaticResource DashboardProfileSegmentButtonStyle}"
+                                    Click="HistorySectionButton_Click"
+                                    Content="History"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="0,14,0,0">
+                            <StackPanel x:Name="PendingTabView">
+                                <TextBlock Text="Pending Activities"
+                                           Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                                <TextBlock Text="Assessments waiting for review and scoring."
+                                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                                <Border Margin="0,12,0,0"
+                                        Style="{StaticResource DashboardProfileSectionCardStyle}">
+                                    <TextBlock Text="No pending grading tasks."
+                                               Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel x:Name="PublishedTabView"
+                                        Visibility="Collapsed">
+                                <TextBlock Text="Published Scores"
+                                           Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                                <TextBlock Text="Latest published grades per handled section."
+                                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                                <Border Margin="0,12,0,0"
+                                        Style="{StaticResource DashboardProfileSectionCardStyle}">
+                                    <TextBlock Text="No published scores yet."
+                                               Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel x:Name="HistoryTabView"
+                                        Visibility="Collapsed">
+                                <TextBlock Text="Grade History"
+                                           Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                                <TextBlock Text="Archived grading activity by term."
+                                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                                <Border Margin="0,12,0,0"
+                                        Style="{StaticResource DashboardProfileSectionCardStyle}">
+                                    <TextBlock Text="No grading history loaded."
+                                               Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

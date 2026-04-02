@@ -46,6 +46,10 @@ Class AdminSubjectsView
         ApplySubjectsFilter()
     End Sub
 
+    Public Sub RefreshData()
+        LoadSubjectsTable(GetSelectedSubjectCode())
+    End Sub
+
     Public Sub SetSubjectsTable(table As DataTable)
         _subjectsTable = NormalizeSubjectsTable(table)
         SubjectsDataGrid.ItemsSource = _subjectsTable.DefaultView
@@ -55,9 +59,13 @@ Class AdminSubjectsView
         RefreshSubjectDetailsPanel()
     End Sub
 
-    Private Sub LoadSubjectsTable()
+    Private Sub LoadSubjectsTable(Optional subjectCodeToSelect As String = "")
         Dim subjectsTable As DataTable = FetchSubjectsTable()
         SetSubjectsTable(subjectsTable)
+
+        If Not String.IsNullOrWhiteSpace(subjectCodeToSelect) Then
+            SelectSubjectByCode(subjectCodeToSelect)
+        End If
     End Sub
 
     Private Function FetchSubjectsTable() As DataTable
@@ -499,6 +507,15 @@ Class AdminSubjectsView
             SubjectsDataGrid.SelectedItem = _subjectsTable.DefaultView(0)
         End If
     End Sub
+
+    Private Function GetSelectedSubjectCode() As String
+        Dim selectedRow As DataRow = TryGetSelectedGridRow()
+        If selectedRow Is Nothing Then
+            Return String.Empty
+        End If
+
+        Return ReadRowValue(selectedRow, "Subject Code")
+    End Function
 
     Private Function TryGetSelectedGridRow() As DataRow
         Dim selectedRowView As DataRowView = TryCast(SubjectsDataGrid.SelectedItem, DataRowView)

@@ -1,0 +1,194 @@
+<UserControl x:Class="TeacherScheduleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="20,18,20,22">
+            <Border Style="{StaticResource DashboardCardBorderStyle}">
+                <Grid Margin="22">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="0"
+                                Margin="0,0,18,0">
+                        <TextBlock Text="Schedule"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                        <TextBlock Text="Teaching Calendar"
+                                   Margin="0,4,0,0"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock Text="Track weekly class slots, consultations, and school events."
+                                   Margin="0,6,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock x:Name="ScheduleTeacherIdTextBlock"
+                                   Margin="0,8,0,0"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top">
+                        <Border Width="76"
+                                Height="76"
+                                CornerRadius="38"
+                                Background="#E4F0FF"
+                                BorderBrush="#C9DDF7"
+                                BorderThickness="1">
+                            <TextBlock Text="&#xE823;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="28"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                        </Border>
+                        <WrapPanel Margin="0,12,0,0"
+                                   HorizontalAlignment="Right">
+                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
+                                <TextBlock Text="Week View"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                            </Border>
+                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
+                                <TextBlock Text="Live Updates"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                            </Border>
+                        </WrapPanel>
+                    </StackPanel>
+
+                    <UniformGrid Grid.Row="1"
+                                 Grid.ColumnSpan="2"
+                                 Margin="0,20,0,0"
+                                 Columns="3">
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Weekly Sessions"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="Consultations"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Room Changes"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Text="0"
+                                           Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,18,0,0">
+                <StackPanel Margin="18">
+                    <TextBlock Text="Weekly Schedule"
+                               Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                    <TextBlock Text="Current session plan across all handled sections."
+                               Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+
+                    <Grid Margin="0,14,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0"
+                                Background="#F5F9FF"
+                                BorderBrush="#DCE8F8"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Day"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="Session"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="Subject"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Grid.Column="3"
+                                           Text="Section"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                <TextBlock Grid.Column="4"
+                                           Text="Room"
+                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Margin="0,8,0,0"
+                                Background="White"
+                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,11">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="No schedule data loaded."
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="--"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="--"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Grid.Column="3"
+                                           Text="--"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                <TextBlock Grid.Column="4"
+                                           Text="--"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

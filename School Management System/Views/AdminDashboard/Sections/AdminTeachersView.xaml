@@ -39,10 +39,40 @@
             <Setter Property="Text" Value="--"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
+
+        <Style x:Key="TeacherDataGridHeaderStyle"
+               TargetType="DataGridColumnHeader"
+               BasedOn="{StaticResource DashboardManagementDataGridHeaderStyle}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="TeacherDataGridCellStyle"
+               TargetType="DataGridCell"
+               BasedOn="{StaticResource DashboardManagementDataGridCellStyle}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="TeacherDataGridRowStyle"
+               TargetType="DataGridRow"
+               BasedOn="{StaticResource DashboardManagementDataGridRowStyle}">
+            <Setter Property="Height" Value="56"/>
+        </Style>
+
+        <Style x:Key="TeacherDataGridTextStyle" TargetType="TextBlock">
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer x:Name="TeachersRootScrollViewer"
+                      VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="20,18,20,22">
                 <Border Style="{StaticResource DashboardCardBorderStyle}">
                     <StackPanel Margin="18">
@@ -108,7 +138,10 @@
                                             </StackPanel>
                                         </Border>
 
-                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer x:Name="TeacherDetailsScrollViewer"
+                                                      Grid.Row="1"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      PreviewMouseWheel="NestedPanelScrollViewer_PreviewMouseWheel">
                                             <StackPanel Margin="18,12,18,14">
                                                 <TextBlock Style="{StaticResource TeacherFormLabelStyle}"
                                                            Margin="0,0,0,0"
@@ -204,7 +237,10 @@
                                             </StackPanel>
                                         </Border>
 
-                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer x:Name="TeacherFormScrollViewer"
+                                                      Grid.Row="1"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      PreviewMouseWheel="NestedPanelScrollViewer_PreviewMouseWheel">
                                             <StackPanel Margin="18,12,18,14">
                                                 <TextBlock Style="{StaticResource TeacherFormLabelStyle}"
                                                            Margin="0,0,0,0"
@@ -329,21 +365,22 @@
                                     SnapsToDevicePixels="True">
                                 <DataGrid x:Name="TeachersDataGrid"
                                           Style="{StaticResource DashboardManagementDataGridStyle}"
-                                          ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
-                                          CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
-                                          RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                          ColumnHeaderStyle="{StaticResource TeacherDataGridHeaderStyle}"
+                                          CellStyle="{StaticResource TeacherDataGridCellStyle}"
+                                          RowStyle="{StaticResource TeacherDataGridRowStyle}"
                                           BorderThickness="0"
                                           ColumnWidth="*"
                                           local:RoundedClipHelper.CornerRadius="10"
                                           ClipToBounds="True"
                                           CanUserSortColumns="True"
+                                          PreviewMouseWheel="TeachersDataGrid_PreviewMouseWheel"
                                           SelectionChanged="TeachersDataGrid_SelectionChanged"
                                           MinHeight="640">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Teacher ID" Binding="{Binding [Teacher ID]}" SortMemberPath="Teacher ID" Width="*"/>
-                                        <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" SortMemberPath="Full Name" Width="*"/>
-                                        <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" SortMemberPath="Department" Width="*"/>
-                                        <DataGridTextColumn Header="Advisory" Binding="{Binding [Advisory]}" SortMemberPath="Advisory" Width="*"/>
+                                        <DataGridTextColumn Header="Teacher ID" Binding="{Binding [Teacher ID]}" SortMemberPath="Teacher ID" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
+                                        <DataGridTextColumn Header="Full Name" Binding="{Binding [Full Name]}" SortMemberPath="Full Name" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
+                                        <DataGridTextColumn Header="Department" Binding="{Binding [Department]}" SortMemberPath="Department" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
+                                        <DataGridTextColumn Header="Advisory" Binding="{Binding [Advisory]}" SortMemberPath="Advisory" Width="*" ElementStyle="{StaticResource TeacherDataGridTextStyle}"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Border>
