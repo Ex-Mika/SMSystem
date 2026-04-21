@@ -1,3 +1,4 @@
+Imports System.IO
 Imports System.Text
 Imports MySql.Data.MySqlClient
 Imports School_Management_System.Backend.Common
@@ -9,13 +10,21 @@ Namespace Backend.Services
         Public Const DefaultStudentPassword As String = "Admin@123"
 
         Private ReadOnly _studentRepository As StudentRepository
+        Private ReadOnly _profileImageStorageService As ProfileImageStorageService
 
         Public Sub New()
-            Me.New(New StudentRepository())
+            Me.New(New StudentRepository(), New ProfileImageStorageService())
         End Sub
 
         Public Sub New(studentRepository As StudentRepository)
+            Me.New(studentRepository, New ProfileImageStorageService())
+        End Sub
+
+        Public Sub New(studentRepository As StudentRepository,
+                       profileImageStorageService As ProfileImageStorageService)
             _studentRepository = studentRepository
+            _profileImageStorageService =
+                If(profileImageStorageService, New ProfileImageStorageService())
         End Sub
 
         Public Function GetStudents() As ServiceResult(Of List(Of StudentRecord))
@@ -28,16 +37,49 @@ Namespace Backend.Services
             End Try
         End Function
 
+        Public Function GetStudentByStudentNumber(studentNumber As String) As ServiceResult(Of StudentRecord)
+            If String.IsNullOrWhiteSpace(studentNumber) Then
+                Return ServiceResult(Of StudentRecord).Failure("Student ID is required.")
+            End If
+
+            Try
+                Dim student As StudentRecord = _studentRepository.GetByStudentNumber(studentNumber.Trim())
+                If student Is Nothing Then
+                    Return ServiceResult(Of StudentRecord).Failure(
+                        "The selected student no longer exists.")
+                End If
+
+                Return ServiceResult(Of StudentRecord).Success(student)
+            Catch ex As MySqlException
+                Return ServiceResult(Of StudentRecord).Failure(
+                    BuildDatabaseErrorMessage("load", ex))
+            Catch ex As Exception
+                Return ServiceResult(Of StudentRecord).Failure(
+                    "Unable to load student records." &
+                    Environment.NewLine &
+                    ex.Message)
+            End Try
+        End Function
+
         Public Function CreateStudent(request As StudentSaveRequest) As ServiceResult(Of StudentRecord)
             Dim validationMessage As String = ValidateRequest(request, False)
             If Not String.IsNullOrWhiteSpace(validationMessage) Then
                 Return ServiceResult(Of StudentRecord).Failure(validationMessage)
             End If
 
+            Dim preparedPhotoPath As String = String.Empty
+
             Try
                 If _studentRepository.GetByStudentNumber(request.StudentNumber) IsNot Nothing Then
                     Return ServiceResult(Of StudentRecord).Failure("Student ID already exists.")
                 End If
+
+                preparedPhotoPath =
+                    _profileImageStorageService.StoreProfileImage(
+                        ProfileImageStorageService.ProfileImageOwnerType.Student,
+                        request.StudentNumber,
+                        request.PhotoPath)
+                request.PhotoPath = preparedPhotoPath
 
                 Dim passwordToUse As String = GetPasswordForCreate(request.Password)
                 Dim createdRecord As StudentRecord =
@@ -52,10 +94,16 @@ Namespace Backend.Services
 
                 Return ServiceResult(Of StudentRecord).Success(createdRecord, message)
             Catch ex As InvalidOperationException
+                CleanupPreparedProfileImage(preparedPhotoPath, String.Empty)
                 Return ServiceResult(Of StudentRecord).Failure(ex.Message)
             Catch ex As MySqlException
+                CleanupPreparedProfileImage(preparedPhotoPath, String.Empty)
                 Return ServiceResult(Of StudentRecord).Failure(
                     BuildDatabaseErrorMessage("create", ex))
+            Catch ex As IOException
+                CleanupPreparedProfileImage(preparedPhotoPath, String.Empty)
+                Return ServiceResult(Of StudentRecord).Failure(
+                    BuildProfileImageErrorMessage("save", ex))
             End Try
         End Function
 
@@ -65,8 +113,11 @@ Namespace Backend.Services
                 Return ServiceResult(Of StudentRecord).Failure(validationMessage)
             End If
 
+            Dim existingRecord As StudentRecord = Nothing
+            Dim preparedPhotoPath As String = String.Empty
+
             Try
-                Dim existingRecord As StudentRecord =
+                existingRecord =
                     _studentRepository.GetByStudentNumber(request.OriginalStudentNumber)
                 If existingRecord Is Nothing Then
                     Return ServiceResult(Of StudentRecord).Failure(
@@ -87,6 +138,14 @@ Namespace Backend.Services
                     passwordHash = Database.DatabaseModule.HashPassword(request.Password.Trim())
                 End If
 
+                preparedPhotoPath =
+                    _profileImageStorageService.StoreProfileImage(
+                        ProfileImageStorageService.ProfileImageOwnerType.Student,
+                        request.StudentNumber,
+                        request.PhotoPath,
+                        existingRecord.PhotoPath)
+                request.PhotoPath = preparedPhotoPath
+
                 Dim updatedRecord As StudentRecord =
                     _studentRepository.Update(existingRecord,
                                               request,
@@ -94,12 +153,28 @@ Namespace Backend.Services
                                               shouldUpdatePassword,
                                               passwordHash)
 
+                CleanupObsoleteManagedImage(existingRecord.PhotoPath, updatedRecord.PhotoPath)
                 Return ServiceResult(Of StudentRecord).Success(updatedRecord, "Student updated.")
             Catch ex As InvalidOperationException
+                CleanupPreparedProfileImage(preparedPhotoPath,
+                                            If(existingRecord Is Nothing,
+                                               String.Empty,
+                                               existingRecord.PhotoPath))
                 Return ServiceResult(Of StudentRecord).Failure(ex.Message)
             Catch ex As MySqlException
+                CleanupPreparedProfileImage(preparedPhotoPath,
+                                            If(existingRecord Is Nothing,
+                                               String.Empty,
+                                               existingRecord.PhotoPath))
                 Return ServiceResult(Of StudentRecord).Failure(
                     BuildDatabaseErrorMessage("update", ex))
+            Catch ex As IOException
+                CleanupPreparedProfileImage(preparedPhotoPath,
+                                            If(existingRecord Is Nothing,
+                                               String.Empty,
+                                               existingRecord.PhotoPath))
+                Return ServiceResult(Of StudentRecord).Failure(
+                    BuildProfileImageErrorMessage("save", ex))
             End Try
         End Function
 
@@ -109,6 +184,13 @@ Namespace Backend.Services
             End If
 
             Try
+                Dim existingRecord As StudentRecord =
+                    _studentRepository.GetByStudentNumber(studentNumber.Trim())
+                If existingRecord Is Nothing Then
+                    Return ServiceResult(Of Boolean).Failure(
+                        "The selected student no longer exists.")
+                End If
+
                 Dim deleted As Boolean =
                     _studentRepository.DeleteByStudentNumber(studentNumber.Trim())
                 If Not deleted Then
@@ -116,10 +198,60 @@ Namespace Backend.Services
                         "The selected student no longer exists.")
                 End If
 
+                CleanupObsoleteManagedImage(existingRecord.PhotoPath, String.Empty)
                 Return ServiceResult(Of Boolean).Success(True, "Student deleted.")
             Catch ex As MySqlException
                 Return ServiceResult(Of Boolean).Failure(
                     BuildDatabaseErrorMessage("delete", ex))
+            End Try
+        End Function
+
+        Public Function UpdateStudentSection(studentNumber As String,
+                                             sectionName As String) As ServiceResult(Of StudentRecord)
+            Dim normalizedStudentNumber As String = If(studentNumber, String.Empty).Trim()
+            Dim normalizedSectionName As String = If(sectionName, String.Empty).Trim()
+
+            If String.IsNullOrWhiteSpace(normalizedStudentNumber) Then
+                Return ServiceResult(Of StudentRecord).Failure("Student ID is required.")
+            End If
+
+            If String.IsNullOrWhiteSpace(normalizedSectionName) Then
+                Return ServiceResult(Of StudentRecord).Failure("Section is required.")
+            End If
+
+            Try
+                Dim existingRecord As StudentRecord =
+                    _studentRepository.GetByStudentNumber(normalizedStudentNumber)
+                If existingRecord Is Nothing Then
+                    Return ServiceResult(Of StudentRecord).Failure(
+                        "The selected student no longer exists.")
+                End If
+
+                Dim currentSection As String = If(existingRecord.SectionName, String.Empty).Trim()
+                If String.Equals(currentSection,
+                                 normalizedSectionName,
+                                 StringComparison.OrdinalIgnoreCase) Then
+                    Return ServiceResult(Of StudentRecord).Success(existingRecord,
+                                                                   "Section updated.")
+                End If
+
+                If Not _studentRepository.UpdateSection(existingRecord.StudentRecordId,
+                                                        normalizedSectionName) Then
+                    Return ServiceResult(Of StudentRecord).Failure(
+                        "Unable to update the selected section right now.")
+                End If
+
+                Dim updatedRecord As StudentRecord =
+                    _studentRepository.GetByStudentNumber(normalizedStudentNumber)
+                If updatedRecord Is Nothing Then
+                    Return ServiceResult(Of StudentRecord).Failure(
+                        "The selected student no longer exists.")
+                End If
+
+                Return ServiceResult(Of StudentRecord).Success(updatedRecord, "Section updated.")
+            Catch ex As MySqlException
+                Return ServiceResult(Of StudentRecord).Failure(
+                    BuildDatabaseErrorMessage("update", ex))
             End Try
         End Function
 
@@ -219,5 +351,56 @@ Namespace Backend.Services
                 Environment.NewLine &
                 ex.Message
         End Function
+
+        Private Function BuildProfileImageErrorMessage(operationName As String,
+                                                       ex As IOException) As String
+            If TypeOf ex Is FileNotFoundException Then
+                Return "The selected student photo file could not be found."
+            End If
+
+            Return "Unable to " & operationName & " the selected student photo locally." &
+                Environment.NewLine &
+                ex.Message
+        End Function
+
+        Private Sub CleanupPreparedProfileImage(preparedPhotoPath As String,
+                                                preservedPhotoPath As String)
+            Dim normalizedPreparedPhotoPath As String =
+                If(preparedPhotoPath, String.Empty).Trim()
+            Dim normalizedPreservedPhotoPath As String =
+                If(preservedPhotoPath, String.Empty).Trim()
+
+            If String.IsNullOrWhiteSpace(normalizedPreparedPhotoPath) Then
+                Return
+            End If
+
+            If String.Equals(normalizedPreparedPhotoPath,
+                             normalizedPreservedPhotoPath,
+                             StringComparison.OrdinalIgnoreCase) Then
+                Return
+            End If
+
+            _profileImageStorageService.DeleteManagedImage(normalizedPreparedPhotoPath)
+        End Sub
+
+        Private Sub CleanupObsoleteManagedImage(previousPhotoPath As String,
+                                                currentPhotoPath As String)
+            Dim normalizedPreviousPhotoPath As String =
+                If(previousPhotoPath, String.Empty).Trim()
+            Dim normalizedCurrentPhotoPath As String =
+                If(currentPhotoPath, String.Empty).Trim()
+
+            If String.IsNullOrWhiteSpace(normalizedPreviousPhotoPath) Then
+                Return
+            End If
+
+            If String.Equals(normalizedPreviousPhotoPath,
+                             normalizedCurrentPhotoPath,
+                             StringComparison.OrdinalIgnoreCase) Then
+                Return
+            End If
+
+            _profileImageStorageService.DeleteManagedImage(normalizedPreviousPhotoPath)
+        End Sub
     End Class
 End Namespace

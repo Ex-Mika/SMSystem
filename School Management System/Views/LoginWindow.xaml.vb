@@ -282,7 +282,9 @@ Class LoginWindow
 
         If user.Role = UserRole.Student Then
             Dim studentDashboard As New StudentDashboardWindow()
-            studentDashboard.SetLoggedInStudent(resolvedIdentifier, resolvedDisplayName)
+            studentDashboard.SetLoggedInStudent(resolvedIdentifier,
+                                                resolvedDisplayName,
+                                                user.PhotoPath)
             studentDashboard.Show()
             Close()
             Return
@@ -297,6 +299,10 @@ Class LoginWindow
         End If
 
         Dim adminDashboard As New AdminDashboardWindow()
+        adminDashboard.SetLoggedInAdmin(resolvedIdentifier,
+                                        resolvedDisplayName,
+                                        user.ProfileTitle,
+                                        user.PhotoPath)
         adminDashboard.Show()
         Close()
     End Sub

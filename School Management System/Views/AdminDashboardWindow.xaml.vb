@@ -1,4 +1,7 @@
-﻿Class AdminDashboardWindow
+Imports System.IO
+Imports System.Windows.Media.Imaging
+
+Class AdminDashboardWindow
     Private Enum AdminDashboardSection
         Dashboard
         Students
@@ -12,11 +15,27 @@
     End Enum
 
     Private _activeSection As AdminDashboardSection = AdminDashboardSection.Dashboard
+    Public Property LoggedInAdminCode As String = String.Empty
+    Public Property LoggedInAdminName As String = String.Empty
+    Public Property LoggedInAdminRoleTitle As String = String.Empty
+    Public Property LoggedInAdminPhotoPath As String = String.Empty
 
     Public Sub New()
         InitializeComponent()
         UpdateMaximizeRestoreIcon()
+        ApplyLoggedInAdminProfile()
         SetActiveSection(AdminDashboardSection.Dashboard)
+    End Sub
+
+    Public Sub SetLoggedInAdmin(adminCode As String,
+                                Optional adminName As String = "",
+                                Optional adminRoleTitle As String = "",
+                                Optional adminPhotoPath As String = "")
+        LoggedInAdminCode = If(adminCode, String.Empty).Trim()
+        LoggedInAdminName = If(adminName, String.Empty).Trim()
+        LoggedInAdminRoleTitle = If(adminRoleTitle, String.Empty).Trim()
+        LoggedInAdminPhotoPath = If(adminPhotoPath, String.Empty).Trim()
+        ApplyLoggedInAdminProfile()
     End Sub
 
     Private Sub TitleBar_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs)
@@ -246,6 +265,85 @@
                 Return "Search students, staff, or actions..."
         End Select
     End Function
+
+    Private Sub ApplyLoggedInAdminProfile()
+        Dim adminName As String = If(LoggedInAdminName, String.Empty).Trim()
+        Dim adminCode As String = If(LoggedInAdminCode, String.Empty).Trim()
+        Dim adminRoleTitle As String = If(LoggedInAdminRoleTitle, String.Empty).Trim()
+
+        If HeaderAdminNameTextBlock IsNot Nothing Then
+            HeaderAdminNameTextBlock.Text = If(String.IsNullOrWhiteSpace(adminName),
+                                               "Administrator",
+                                               adminName)
+        End If
+
+        If HeaderAdminRoleTextBlock IsNot Nothing Then
+            HeaderAdminRoleTextBlock.Text = ResolveAdminRoleSubtitle(adminRoleTitle, adminCode)
+        End If
+
+        If HeaderAdminInitialTextBlock IsNot Nothing Then
+            HeaderAdminInitialTextBlock.Text = BuildAdminInitial(adminName, adminCode)
+        End If
+
+        UpdateHeaderAdminPhoto()
+    End Sub
+
+    Private Function ResolveAdminRoleSubtitle(adminRoleTitle As String, adminCode As String) As String
+        If Not String.IsNullOrWhiteSpace(adminRoleTitle) Then
+            Return adminRoleTitle.Trim()
+        End If
+
+        If Not String.IsNullOrWhiteSpace(adminCode) Then
+            Return adminCode.Trim()
+        End If
+
+        Return "Administrator"
+    End Function
+
+    Private Function BuildAdminInitial(adminName As String, adminCode As String) As String
+        Dim sourceText As String = adminName
+        If String.IsNullOrWhiteSpace(sourceText) Then
+            sourceText = adminCode
+        End If
+
+        sourceText = If(sourceText, String.Empty).Trim()
+        If String.IsNullOrWhiteSpace(sourceText) Then
+            Return "A"
+        End If
+
+        Return sourceText.Substring(0, 1).ToUpperInvariant()
+    End Function
+
+    Private Sub UpdateHeaderAdminPhoto()
+        If HeaderAdminProfileImage Is Nothing OrElse HeaderAdminInitialTextBlock Is Nothing Then
+            Return
+        End If
+
+        Dim normalizedPath As String = If(LoggedInAdminPhotoPath, String.Empty).Trim()
+        If String.IsNullOrWhiteSpace(normalizedPath) OrElse Not File.Exists(normalizedPath) Then
+            HeaderAdminProfileImage.Source = Nothing
+            HeaderAdminProfileImage.Visibility = Visibility.Collapsed
+            HeaderAdminInitialTextBlock.Visibility = Visibility.Visible
+            Return
+        End If
+
+        Try
+            Dim bitmap As New BitmapImage()
+            bitmap.BeginInit()
+            bitmap.CacheOption = BitmapCacheOption.OnLoad
+            bitmap.UriSource = New Uri(normalizedPath, UriKind.Absolute)
+            bitmap.EndInit()
+            bitmap.Freeze()
+
+            HeaderAdminProfileImage.Source = bitmap
+            HeaderAdminProfileImage.Visibility = Visibility.Visible
+            HeaderAdminInitialTextBlock.Visibility = Visibility.Collapsed
+        Catch
+            HeaderAdminProfileImage.Source = Nothing
+            HeaderAdminProfileImage.Visibility = Visibility.Collapsed
+            HeaderAdminInitialTextBlock.Visibility = Visibility.Visible
+        End Try
+    End Sub
 
     Private Sub SignOutButton_Click(sender As Object, e As RoutedEventArgs)
         Dim loginWindow As New LoginWindow()

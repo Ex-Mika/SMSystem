@@ -3,8 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:School_Management_System"
              mc:Ignorable="d">
-    <StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -12,113 +18,103 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel>
-                <TextBlock Text="Available Subjects"
+                <TextBlock Text="Weekly Schedule"
                            Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                <TextBlock Text="Browse open offerings for your active enrollment term."
+                <TextBlock Text="Review your Monday to Friday class timetable for the active term."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
                 <TextBlock x:Name="WeeklyScheduleStudentIdTextBlock"
                            Margin="0,8,0,0"
                            FontSize="12"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                <TextBlock x:Name="WeeklyScheduleStatusTextBlock"
+                           Margin="0,6,0,0"
+                           FontSize="12"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                           Text="No student schedule loaded."
+                           TextWrapping="Wrap"/>
             </StackPanel>
 
             <WrapPanel Grid.Column="1"
+                       Margin="14,0,0,0"
                        HorizontalAlignment="Right"
-                       VerticalAlignment="Top"
-                       Margin="14,0,0,0">
-                <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,8,0">
+                       VerticalAlignment="Top">
+                <Border Margin="0,0,8,0"
+                        Style="{StaticResource DashboardProfileStatCardStyle}">
                     <StackPanel MinWidth="118">
-                        <TextBlock Text="Offered Subjects"
+                        <TextBlock Text="Assigned Slots"
                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                        <TextBlock Text="0"
+                        <TextBlock x:Name="WeeklyScheduleSlotCountTextBlock"
                                    Margin="0,4,0,0"
+                                   Text="0"
+                                   Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                    </StackPanel>
+                </Border>
+                <Border Margin="0,0,8,0"
+                        Style="{StaticResource DashboardProfileStatCardStyle}">
+                    <StackPanel MinWidth="118">
+                        <TextBlock Text="Active Days"
+                                   Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock x:Name="WeeklyScheduleDayCountTextBlock"
+                                   Margin="0,4,0,0"
+                                   Text="0"
                                    Style="{StaticResource DashboardProfileStatValueStyle}"/>
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource DashboardProfileStatCardStyle}">
-                    <StackPanel MinWidth="118">
-                        <TextBlock Text="Open Sections"
+                    <StackPanel MinWidth="140">
+                        <TextBlock Text="Section"
                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                        <TextBlock Text="0"
-                                   Margin="0,4,0,0"
-                                   Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                        <TextBlock x:Name="WeeklyScheduleSectionTextBlock"
+                                    Margin="0,4,0,0"
+                                    Text="--"
+                                    Style="{StaticResource DashboardProfileStatValueStyle}"/>
                     </StackPanel>
                 </Border>
             </WrapPanel>
         </Grid>
 
-        <Border Margin="0,14,0,0"
+        <Border Grid.Row="1"
+                Margin="0,14,0,0"
                 Style="{StaticResource DashboardProfileSectionCardStyle}">
-            <StackPanel>
-                <TextBlock Text="Subject Offerings"
-                           Style="{StaticResource DashboardProfileSectionTitleStyle}"
-                           FontSize="16"/>
-                <TextBlock Text="Subjects and sections currently open for enrollment."
-                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <Grid Margin="0,14,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Class Timetable"
+                               FontSize="16"
+                               Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                    <TextBlock Text="Monday to Friday schedule sorted by time, using the same timetable layout as scheduling."
+                               Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                </StackPanel>
 
-                    <Border Grid.Row="0"
-                            Background="#F5F9FF"
-                            BorderBrush="#DCE8F8"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="12,10">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.2*"/>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1.5*"/>
-                                <ColumnDefinition Width="1.3*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Code"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="1"
-                                        Text="Subject"
-                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="2"
-                                        Text="Units"
-                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="3"
-                                        Text="Schedule"
-                                        Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                        </Grid>
-                    </Border>
-
-                    <Border Grid.Row="1"
-                            Margin="0,8,0,0"
-                            Background="White"
-                            BorderBrush="{StaticResource DashboardBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="12,11">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.2*"/>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1.5*"/>
-                                <ColumnDefinition Width="1.3*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="No offered subjects loaded."
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="1"
-                                        Text="--"
-                                        Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="2"
-                                        Text="0"
-                                        Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="3"
-                                        Text="--"
-                                        Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </StackPanel>
+                <Border Grid.Row="1"
+                        Margin="0,14,0,0"
+                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        local:RoundedClipHelper.CornerRadius="8"
+                        ClipToBounds="True">
+                    <DataGrid x:Name="StudentTimetableDataGrid"
+                              Style="{StaticResource DashboardManagementDataGridStyle}"
+                              ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                              CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                              RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                              BorderThickness="0"
+                              ColumnWidth="*"
+                              HeadersVisibility="Column"
+                              RowHeaderWidth="0"
+                              CanUserSortColumns="False"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              SelectionUnit="Cell"
+                              SelectionMode="Single"
+                              MinHeight="280"/>
+                </Border>
+            </Grid>
         </Border>
-    </StackPanel>
+    </Grid>
 </UserControl>

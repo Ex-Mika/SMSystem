@@ -1,5 +1,7 @@
 Imports System.Data
 Imports System.IO
+Imports System.Windows.Input
+Imports System.Windows.Media
 Imports System.Windows.Media.Imaging
 Imports Microsoft.Win32
 Imports School_Management_System.Backend.Models
@@ -198,6 +200,27 @@ Class AdminAdministratorsView
         RefreshAdministratorDetailsPanel()
     End Sub
 
+    Private Sub NestedPanelScrollViewer_PreviewMouseWheel(sender As Object, e As MouseWheelEventArgs)
+        Dim activeScrollViewer As ScrollViewer = TryCast(sender, ScrollViewer)
+        If activeScrollViewer Is Nothing OrElse CanScrollViewerConsumeWheel(activeScrollViewer, e.Delta) Then
+            Return
+        End If
+
+        ForwardWheelToRootScrollViewer(sender, e)
+    End Sub
+
+    Private Sub AdministratorsDataGrid_PreviewMouseWheel(sender As Object, e As MouseWheelEventArgs)
+        Dim activeScrollViewer As ScrollViewer =
+            FindDescendantScrollViewer(TryCast(sender, DependencyObject))
+
+        If activeScrollViewer IsNot Nothing AndAlso
+           CanScrollViewerConsumeWheel(activeScrollViewer, e.Delta) Then
+            Return
+        End If
+
+        ForwardWheelToRootScrollViewer(sender, e)
+    End Sub
+
     Private Sub BrowseAdministratorPhotoButton_Click(sender As Object, e As RoutedEventArgs)
         Dim dialog As New OpenFileDialog() With {
             .Title = "Select Administrator Photo",
@@ -359,6 +382,58 @@ Class AdminAdministratorsView
         End If
 
         Return selectedRowView.Row
+    End Function
+
+    Private Function CanScrollViewerConsumeWheel(scrollViewer As ScrollViewer,
+                                                 delta As Integer) As Boolean
+        If scrollViewer Is Nothing OrElse delta = 0 Then
+            Return False
+        End If
+
+        If scrollViewer.ScrollableHeight <= 0 Then
+            Return False
+        End If
+
+        If delta > 0 Then
+            Return scrollViewer.VerticalOffset > 0
+        End If
+
+        Return scrollViewer.VerticalOffset < scrollViewer.ScrollableHeight
+    End Function
+
+    Private Sub ForwardWheelToRootScrollViewer(source As Object, e As MouseWheelEventArgs)
+        If e Is Nothing OrElse AdministratorsRootScrollViewer Is Nothing Then
+            Return
+        End If
+
+        e.Handled = True
+
+        Dim forwardedEventArgs As New MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+        forwardedEventArgs.RoutedEvent = UIElement.MouseWheelEvent
+        forwardedEventArgs.Source = source
+        AdministratorsRootScrollViewer.RaiseEvent(forwardedEventArgs)
+    End Sub
+
+    Private Function FindDescendantScrollViewer(root As DependencyObject) As ScrollViewer
+        If root Is Nothing Then
+            Return Nothing
+        End If
+
+        If TypeOf root Is ScrollViewer Then
+            Return DirectCast(root, ScrollViewer)
+        End If
+
+        Dim childCount As Integer = VisualTreeHelper.GetChildrenCount(root)
+        For index As Integer = 0 To childCount - 1
+            Dim child As DependencyObject = VisualTreeHelper.GetChild(root, index)
+            Dim scrollViewer As ScrollViewer = FindDescendantScrollViewer(child)
+
+            If scrollViewer IsNot Nothing Then
+                Return scrollViewer
+            End If
+        Next
+
+        Return Nothing
     End Function
 
     Private Sub RefreshAdministratorDetailsPanel()

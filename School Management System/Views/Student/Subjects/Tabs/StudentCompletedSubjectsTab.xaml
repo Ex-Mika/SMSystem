@@ -59,8 +59,8 @@
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0"
-                            Background="#F5F9FF"
-                            BorderBrush="#DCE8F8"
+                            Background="{StaticResource DashboardSoftSurfaceBrush}"
+                            BorderBrush="{StaticResource DashboardSoftBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="12,10">

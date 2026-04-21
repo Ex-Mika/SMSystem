@@ -52,15 +52,15 @@
                         <Border Width="76"
                                 Height="76"
                                 CornerRadius="38"
-                                Background="#E4F0FF"
-                                BorderBrush="#C9DDF7"
+                                Background="{StaticResource DashboardPrimarySoftBrush}"
+                                BorderBrush="{StaticResource DashboardSoftBorderBrush}"
                                 BorderThickness="1">
                             <TextBlock Text="&#xE9D9;"
                                        FontFamily="Segoe MDL2 Assets"
                                        FontSize="28"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                                       Foreground="{StaticResource DashboardAccentTextBrush}"/>
                         </Border>
                         <WrapPanel Margin="0,12,0,0"
                                    HorizontalAlignment="Right">
@@ -68,13 +68,13 @@
                                 <TextBlock Text="Current Term"
                                            FontSize="11"
                                            FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                                           Foreground="{StaticResource DashboardAccentTextBrush}"/>
                             </Border>
                             <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
                                 <TextBlock Text="Posted Grades"
                                            FontSize="11"
                                            FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                                           Foreground="{StaticResource DashboardAccentTextBrush}"/>
                             </Border>
                         </WrapPanel>
                     </StackPanel>
@@ -87,7 +87,8 @@
                             <StackPanel>
                                 <TextBlock Text="Current GWA"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="0.00"
+                                <TextBlock x:Name="CurrentGwaTextBlock"
+                                           Text="0.00"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -96,7 +97,8 @@
                             <StackPanel>
                                 <TextBlock Text="Passed Subjects"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="0"
+                                <TextBlock x:Name="PassedSubjectsTextBlock"
+                                           Text="0"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -105,7 +107,8 @@
                             <StackPanel>
                                 <TextBlock Text="Academic Standing"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="Good"
+                                <TextBlock x:Name="AcademicStandingTextBlock"
+                                           Text="Pending"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>

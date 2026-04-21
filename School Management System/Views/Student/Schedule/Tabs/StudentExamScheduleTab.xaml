@@ -5,18 +5,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
     <StackPanel>
-        <TextBlock Text="Selected Load"
+        <TextBlock Text="Enrollment"
                    Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-        <TextBlock Text="Review the subjects currently added to your enrollment draft."
+        <TextBlock Text="Choose from the subjects available to your year level and build your load."
                    Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+
+        <TextBlock x:Name="EnrollmentStatusTextBlock"
+                   Margin="0,10,0,0"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                   TextWrapping="Wrap"/>
 
         <UniformGrid Margin="0,14,0,0"
                      Columns="3">
             <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
                 <StackPanel>
-                    <TextBlock Text="Selected Subjects"
+                    <TextBlock Text="Available Subjects"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0"
+                    <TextBlock x:Name="AvailableSubjectsCountTextBlock"
+                               Text="0"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -24,9 +32,10 @@
 
             <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
                 <StackPanel>
-                    <TextBlock Text="Total Units"
+                    <TextBlock Text="Selected Subjects"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0"
+                    <TextBlock x:Name="SelectedSubjectsCountTextBlock"
+                               Text="0"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -34,9 +43,10 @@
 
             <Border Style="{StaticResource DashboardProfileStatCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="Conflicts"
+                    <TextBlock Text="Total Units"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0"
+                    <TextBlock x:Name="SelectedSubjectsUnitsTextBlock"
+                               Text="0"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -46,82 +56,210 @@
         <Border Margin="0,14,0,0"
                 Style="{StaticResource DashboardProfileSectionCardStyle}">
             <StackPanel>
-                <TextBlock Text="Chosen Subjects"
+                <TextBlock Text="Available Subjects"
                            Style="{StaticResource DashboardProfileSectionTitleStyle}"
                            FontSize="16"/>
-                <TextBlock Text="Edit your selected sections before final submission."
+                <TextBlock Text="Only subjects tagged to your year level are listed here."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
-                <Grid Margin="0,14,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <Border Margin="0,14,0,0"
+                        Background="{StaticResource DashboardSoftSurfaceBrush}"
+                        BorderBrush="{StaticResource DashboardSoftBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="128"/>
+                            <ColumnDefinition Width="72"/>
+                            <ColumnDefinition Width="104"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Subject"
+                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock Grid.Column="1"
+                                   HorizontalAlignment="Center"
+                                    Text="Year Level"
+                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock Grid.Column="2"
+                                   HorizontalAlignment="Center"
+                                    Text="Units"
+                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock Grid.Column="3"
+                                   HorizontalAlignment="Center"
+                                    Text="Action"
+                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                    </Grid>
+                </Border>
 
-                    <Border Grid.Row="0"
-                            Background="#F5F9FF"
-                            BorderBrush="#DCE8F8"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="12,10">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1.4*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1.1*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Subject"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="1"
-                                       Text="Section"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="2"
-                                       Text="Units"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="3"
-                                       Text="Action"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                        </Grid>
-                    </Border>
+                <TextBlock x:Name="AvailableSubjectsEmptyTextBlock"
+                           Margin="0,12,0,0"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                           Text="No eligible subjects are available right now."
+                           Visibility="Collapsed"/>
 
-                    <Border Grid.Row="1"
-                            Margin="0,8,0,0"
-                            Background="White"
-                            BorderBrush="{StaticResource DashboardBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="12,11">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1.4*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1.1*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="No subjects selected yet."
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="1"
-                                       Text="--"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="2"
-                                       Text="0"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <Border Grid.Column="3"
-                                    HorizontalAlignment="Left"
-                                    Padding="8,3"
-                                    CornerRadius="999"
-                                    Background="#EFF4FB"
-                                    BorderBrush="#D4DFED"
-                                    BorderThickness="1">
-                                <TextBlock Text="Remove"
-                                           FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                <ItemsControl x:Name="AvailableSubjectsItemsControl"
+                              Margin="0,8,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,8"
+                                    Background="White"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12,11">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="128"/>
+                                        <ColumnDefinition Width="72"/>
+                                        <ColumnDefinition Width="104"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Margin="0,0,12,0">
+                                        <TextBlock Text="{Binding SubjectName}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   TextWrapping="Wrap"/>
+                                        <TextBlock Margin="0,4,0,0"
+                                                   Text="{Binding SubjectCode}"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="1"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               TextAlignment="Center"
+                                               Text="{Binding YearLevel}"
+                                               Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+
+                                    <TextBlock Grid.Column="2"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               TextAlignment="Center"
+                                               Text="{Binding Units}"
+                                               Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+
+                                    <Button Grid.Column="3"
+                                            Width="92"
+                                            Height="32"
+                                            Margin="12,0,0,0"
+                                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                            Click="AvailableSubjectEnrollButton_Click"
+                                            Content="Enroll"
+                                            Tag="{Binding SubjectCode}"/>
+                                </Grid>
                             </Border>
-                        </Grid>
-                    </Border>
-                </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <Border Margin="0,14,0,0"
+                Style="{StaticResource DashboardProfileSectionCardStyle}">
+            <StackPanel>
+                <TextBlock Text="Current Selected Load"
+                           Style="{StaticResource DashboardProfileSectionTitleStyle}"
+                           FontSize="16"/>
+                <TextBlock x:Name="SelectedSubjectsStatusTextBlock"
+                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+
+                <Border Margin="0,14,0,0"
+                        Background="{StaticResource DashboardSoftSurfaceBrush}"
+                        BorderBrush="{StaticResource DashboardSoftBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="128"/>
+                            <ColumnDefinition Width="72"/>
+                            <ColumnDefinition Width="104"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Subject"
+                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock Grid.Column="1"
+                                   HorizontalAlignment="Center"
+                                   Text="Year Level"
+                                   Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock Grid.Column="2"
+                                   HorizontalAlignment="Center"
+                                   Text="Units"
+                                   Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock Grid.Column="3"
+                                   HorizontalAlignment="Center"
+                                   Text="Action"
+                                   Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                    </Grid>
+                </Border>
+
+                <TextBlock x:Name="SelectedSubjectsEmptyTextBlock"
+                           Margin="0,12,0,0"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                           Text="No subjects added yet."
+                           Visibility="Collapsed"/>
+
+                <ItemsControl x:Name="SelectedSubjectsItemsControl"
+                              Margin="0,8,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,8"
+                                    Background="White"
+                                    BorderBrush="{StaticResource DashboardBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="12,11">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="128"/>
+                                        <ColumnDefinition Width="72"/>
+                                        <ColumnDefinition Width="104"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Margin="0,0,12,0">
+                                        <TextBlock Text="{Binding SubjectName}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   TextWrapping="Wrap"/>
+                                        <TextBlock Margin="0,4,0,0"
+                                                   Text="{Binding SubjectCode}"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="1"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               TextAlignment="Center"
+                                               Text="{Binding YearLevel}"
+                                               Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+
+                                    <TextBlock Grid.Column="2"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               TextAlignment="Center"
+                                               Text="{Binding Units}"
+                                               Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+
+                                    <Button Grid.Column="3"
+                                            Width="92"
+                                            Height="32"
+                                            Margin="12,0,0,0"
+                                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                            Background="{StaticResource DashboardSoftSurfaceBrush}"
+                                            Foreground="{StaticResource DashboardTextMutedBrush}"
+                                            Click="SelectedSubjectRemoveButton_Click"
+                                            Content="Remove"
+                                            Tag="{Binding SubjectCode}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </StackPanel>
         </Border>
     </StackPanel>

@@ -23,24 +23,26 @@
                            Foreground="{StaticResource DashboardTextMutedBrush}"/>
             </StackPanel>
 
-            <WrapPanel Grid.Column="1"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Top"
-                       Margin="14,0,0,0">
+             <WrapPanel Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="14,0,0,0">
                 <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,8,0">
                     <StackPanel MinWidth="118">
                         <TextBlock Text="Total Units"
                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                        <TextBlock Text="0"
+                        <TextBlock x:Name="CurrentTotalUnitsTextBlock"
+                                   Text="0"
                                    Margin="0,4,0,0"
                                    Style="{StaticResource DashboardProfileStatValueStyle}"/>
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource DashboardProfileStatCardStyle}">
                     <StackPanel MinWidth="118">
-                        <TextBlock Text="Lab Hours"
+                        <TextBlock Text="Section"
                                    Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                        <TextBlock Text="0"
+                        <TextBlock x:Name="CurrentSectionTextBlock"
+                                   Text="Not Selected"
                                    Margin="0,4,0,0"
                                    Style="{StaticResource DashboardProfileStatValueStyle}"/>
                     </StackPanel>
@@ -56,6 +58,12 @@
                            FontSize="16"/>
                 <TextBlock Text="Subjects currently tagged to your active enrollment."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                <TextBlock x:Name="CurrentSubjectsStatusTextBlock"
+                           Margin="0,10,0,0"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                           TextWrapping="Wrap"/>
 
                 <Grid Margin="0,14,0,0">
                     <Grid.RowDefinitions>
@@ -64,8 +72,8 @@
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0"
-                            Background="#F5F9FF"
-                            BorderBrush="#DCE8F8"
+                            Background="{StaticResource DashboardSoftSurfaceBrush}"
+                            BorderBrush="{StaticResource DashboardSoftBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="12,10">
@@ -90,42 +98,71 @@
                         </Grid>
                     </Border>
 
-                    <Border Grid.Row="1"
+                    <Border x:Name="CurrentSubjectsEmptyStateBorder"
+                            Grid.Row="1"
                             Margin="0,8,0,0"
                             Background="White"
                             BorderBrush="{StaticResource DashboardBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="12,11">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1.2*"/>
-                                <ColumnDefinition Width="0.9*"/>
-                                <ColumnDefinition Width="1*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="No subjects loaded yet."
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="1"
-                                       Text="--"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="2"
-                                       Text="0"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <Border Grid.Column="3"
-                                    HorizontalAlignment="Left"
-                                    Padding="8,3"
-                                    CornerRadius="999"
-                                    Background="#EFF4FB"
-                                    BorderBrush="#D4DFED"
-                                    BorderThickness="1">
-                                <TextBlock Text="Pending"
-                                           FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            </Border>
-                        </Grid>
+                        <TextBlock x:Name="CurrentSubjectsEmptyTextBlock"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
                     </Border>
+
+                    <ItemsControl x:Name="CurrentSubjectsItemsControl"
+                                  Grid.Row="1"
+                                  Margin="0,8,0,0"
+                                  Visibility="Collapsed">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,8"
+                                        Background="White"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12,11">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="1.2*"/>
+                                            <ColumnDefinition Width="0.9*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding SubjectName}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   TextWrapping="Wrap"/>
+
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding SubjectCode}"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding Units}"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   VerticalAlignment="Center"/>
+
+                                        <Border Grid.Column="3"
+                                                HorizontalAlignment="Left"
+                                                Padding="8,3"
+                                                CornerRadius="999"
+                                                Background="{StaticResource DashboardPrimarySoftBrush}"
+                                                BorderBrush="{StaticResource DashboardSoftBorderBrush}"
+                                                BorderThickness="1">
+                                            <TextBlock Text="{Binding StatusText}"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource DashboardAccentTextBrush}"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
             </StackPanel>
         </Border>

@@ -1,6 +1,9 @@
 Imports System.Collections.Generic
 Imports System.Data
-Imports System.Windows.Data
+Imports System.Windows.Media
+Imports School_Management_System.Backend.Common
+Imports School_Management_System.Backend.Models
+Imports School_Management_System.Backend.Services
 
 Class StudentDashboardWindow
     Private Enum StudentDashboardSection
@@ -11,20 +14,30 @@ Class StudentDashboardWindow
         Profile
     End Enum
 
+    Private ReadOnly _studentManagementService As New StudentManagementService()
+    Private ReadOnly _headerStudentAvatarFallbackBrush As Brush
+
     Public Property LoggedInStudentId As String = String.Empty
     Public Property LoggedInStudentName As String = String.Empty
+    Public Property LoggedInStudentPhotoPath As String = String.Empty
 
     Public Sub New()
         InitializeComponent()
+        _headerStudentAvatarFallbackBrush = HeaderStudentAvatarBorder.Background
+        AddHandler ClassScheduleContentView.TimetableChanged, AddressOf ClassScheduleContentView_TimetableChanged
+        AddHandler ProfileContentView.ProfileUpdated, AddressOf ProfileContentView_ProfileUpdated
         UpdateMaximizeRestoreIcon()
         ApplyLoggedInStudentProfile()
         LoadDashboardTimetable()
         SetActiveSection(StudentDashboardSection.Dashboard)
     End Sub
 
-    Public Sub SetLoggedInStudent(studentId As String, Optional studentName As String = "")
+    Public Sub SetLoggedInStudent(studentId As String,
+                                  Optional studentName As String = "",
+                                  Optional studentPhotoPath As String = "")
         LoggedInStudentId = If(studentId, String.Empty).Trim()
         LoggedInStudentName = If(studentName, String.Empty).Trim()
+        LoggedInStudentPhotoPath = If(studentPhotoPath, String.Empty).Trim()
         ApplyLoggedInStudentProfile()
         LoadDashboardTimetable()
     End Sub
@@ -119,12 +132,16 @@ Class StudentDashboardWindow
         GradesContentView.Visibility = If(isGradesSelected, Visibility.Visible, Visibility.Collapsed)
         ProfileContentView.Visibility = If(isProfileSelected, Visibility.Visible, Visibility.Collapsed)
 
+        If isGradesSelected Then
+            GradesContentView.SetStudentContext(LoggedInStudentId, LoggedInStudentName)
+        End If
+
         If isDashboardSelected Then
             ContentTitleTextBlock.Text = "Overview"
         ElseIf isMySubjectsSelected Then
             ContentTitleTextBlock.Text = "My Subjects"
         ElseIf isClassScheduleSelected Then
-            ContentTitleTextBlock.Text = "Enrollment"
+            ContentTitleTextBlock.Text = "Class Schedule"
         ElseIf isGradesSelected Then
             ContentTitleTextBlock.Text = "Grades"
         Else
@@ -135,6 +152,38 @@ Class StudentDashboardWindow
         ApplySidebarSelectionStyles(section)
     End Sub
 
+    Private Sub ClassScheduleContentView_TimetableChanged(sender As Object, e As EventArgs)
+        Dim studentId As String = If(LoggedInStudentId, String.Empty).Trim()
+        Dim studentName As String = If(LoggedInStudentName, String.Empty).Trim()
+        Dim studentRecord As StudentRecord = LoadStudentRecord(studentId)
+        Dim displayName As String = ResolveDisplayName(studentRecord, studentName)
+        Dim photoPath As String = ResolveStudentPhotoPath(studentRecord, LoggedInStudentPhotoPath)
+
+        ApplyStudentShellDetails(studentRecord, studentId, displayName, photoPath)
+        SetDashboardTimetable(ClassScheduleContentView.GetCurrentTimetableSnapshot())
+        MySubjectsContentView.SetStudentContext(studentId, displayName)
+        ProfileContentView.SetStudentContext(studentId, displayName, photoPath)
+    End Sub
+
+    Private Sub ProfileContentView_ProfileUpdated(sender As Object,
+                                                  e As StudentProfileView.StudentProfileUpdatedEventArgs)
+        If e Is Nothing OrElse e.Student Is Nothing Then
+            Return
+        End If
+
+        LoggedInStudentId = If(e.Student.StudentNumber, LoggedInStudentId).Trim()
+        LoggedInStudentName = ResolveDisplayName(e.Student, LoggedInStudentName)
+        LoggedInStudentPhotoPath = ResolveStudentPhotoPath(e.Student, LoggedInStudentPhotoPath)
+
+        ApplyStudentShellDetails(e.Student,
+                                 LoggedInStudentId,
+                                 LoggedInStudentName,
+                                 LoggedInStudentPhotoPath)
+        MySubjectsContentView.SetStudentContext(LoggedInStudentId, LoggedInStudentName)
+        ClassScheduleContentView.SetStudentContext(LoggedInStudentId, LoggedInStudentName)
+        GradesContentView.SetStudentContext(LoggedInStudentId, LoggedInStudentName)
+    End Sub
+
     Private Sub ApplySidebarSelectionStyles(activeSection As StudentDashboardSection)
         ApplySidebarButtonState(DashboardNavButton, DashboardNavIconBorder, DashboardNavIconText, DashboardNavText, activeSection = StudentDashboardSection.Dashboard)
         ApplySidebarButtonState(MySubjectsNavButton, MySubjectsNavIconBorder, MySubjectsNavIconText, MySubjectsNavText, activeSection = StudentDashboardSection.MySubjects)
@@ -143,195 +192,78 @@ Class StudentDashboardWindow
         ApplySidebarButtonState(ProfileNavButton, ProfileNavIconBorder, ProfileNavIconText, ProfileNavText, activeSection = StudentDashboardSection.Profile)
     End Sub
 
-    Private Sub ApplySidebarButtonState(navButton As Button, navIconBorder As Border, navIconText As TextBlock, navText As TextBlock, isSelected As Boolean)
-        navButton.Style = CType(FindResource(If(isSelected, "DashboardSidebarNavSelectedButtonStyle", "DashboardSidebarNavButtonStyle")), Style)
-        navIconBorder.Style = CType(FindResource(If(isSelected, "DashboardSidebarIconSelectedBadgeStyle", "DashboardSidebarIconBadgeStyle")), Style)
-        navIconText.Style = CType(FindResource(If(isSelected, "DashboardSidebarIconGlyphSelectedStyle", "DashboardSidebarIconGlyphStyle")), Style)
-        navText.Style = CType(FindResource(If(isSelected, "DashboardSidebarNavTextSelectedStyle", "DashboardSidebarNavTextStyle")), Style)
+    Private Sub ApplySidebarButtonState(navButton As Button,
+                                        navIconBorder As Border,
+                                        navIconText As TextBlock,
+                                        navText As TextBlock,
+                                        isSelected As Boolean)
+        navButton.Style = CType(FindResource(If(isSelected,
+                                                "DashboardSidebarNavSelectedButtonStyle",
+                                                "DashboardSidebarNavButtonStyle")), Style)
+        navIconBorder.Style = CType(FindResource(If(isSelected,
+                                                    "DashboardSidebarIconSelectedBadgeStyle",
+                                                    "DashboardSidebarIconBadgeStyle")), Style)
+        navIconText.Style = CType(FindResource(If(isSelected,
+                                                  "DashboardSidebarIconGlyphSelectedStyle",
+                                                  "DashboardSidebarIconGlyphStyle")), Style)
+        navText.Style = CType(FindResource(If(isSelected,
+                                              "DashboardSidebarNavTextSelectedStyle",
+                                              "DashboardSidebarNavTextStyle")), Style)
     End Sub
 
     Private Sub ApplyLoggedInStudentProfile()
         Dim studentId As String = If(LoggedInStudentId, String.Empty).Trim()
         Dim studentName As String = If(LoggedInStudentName, String.Empty).Trim()
+        Dim studentRecord As StudentRecord = LoadStudentRecord(studentId)
+        Dim displayName As String = ResolveDisplayName(studentRecord, studentName)
+        Dim photoPath As String = ResolveStudentPhotoPath(studentRecord, LoggedInStudentPhotoPath)
 
-        HeaderStudentNameTextBlock.Text = If(String.IsNullOrWhiteSpace(studentName), "Student", studentName)
-        HeaderStudentIdTextBlock.Text = If(String.IsNullOrWhiteSpace(studentId), " ", studentId)
-        SidebarStudentSubtitleTextBlock.Text = If(String.IsNullOrWhiteSpace(studentId), "Student Dashboard", studentId)
-        MySubjectsContentView.SetStudentContext(studentId, studentName)
-        ClassScheduleContentView.SetStudentContext(studentId, studentName)
-        GradesContentView.SetStudentContext(studentId, studentName)
-        ProfileContentView.SetStudentContext(studentId, studentName)
+        ApplyStudentShellDetails(studentRecord, studentId, displayName, photoPath)
+        MySubjectsContentView.SetStudentContext(studentId, displayName)
+        ClassScheduleContentView.SetStudentContext(studentId, displayName)
+        GradesContentView.SetStudentContext(studentId, displayName)
+        ProfileContentView.SetStudentContext(studentId, displayName, photoPath)
+    End Sub
+
+    Private Sub ApplyStudentShellDetails(student As StudentRecord,
+                                         fallbackStudentId As String,
+                                         displayName As String,
+                                         photoPath As String)
+        HeaderStudentNameTextBlock.Text = displayName
+        HeaderStudentIdTextBlock.Text = ResolveHeaderAcademicSummary(student, fallbackStudentId)
+        SidebarStudentSubtitleTextBlock.Text = ResolveSidebarSubtitle(student, fallbackStudentId)
+        HeaderStudentInitialTextBlock.Text = BuildStudentInitial(displayName, fallbackStudentId)
+        DashboardProfileImageHelper.ApplyProfilePhoto(HeaderStudentAvatarBorder,
+                                                      HeaderStudentInitialTextBlock,
+                                                      photoPath,
+                                                      _headerStudentAvatarFallbackBrush)
     End Sub
 
     Public Sub SetDashboardTimetable(table As DataTable)
         Dim resolvedTable As DataTable = table
         If resolvedTable Is Nothing OrElse resolvedTable.Columns.Count = 0 Then
-            resolvedTable = CreateDefaultDashboardTimetable()
+            resolvedTable = StudentTimetablePresenter.CreateEmptyTable()
         End If
 
-        resolvedTable = EnsureSessionColumn(resolvedTable)
-        BuildDashboardTimetableColumns(resolvedTable)
+        StudentTimetablePresenter.ConfigureDataGrid(DashboardTimetableDataGrid, resolvedTable)
         DashboardTimetableDataGrid.ItemsSource = resolvedTable.DefaultView
     End Sub
 
     Private Sub LoadDashboardTimetable()
         Dim timetableTable As DataTable = FetchDashboardTimetableForStudent(LoggedInStudentId)
         If timetableTable Is Nothing Then
-            timetableTable = CreateDefaultDashboardTimetable()
+            timetableTable = StudentTimetablePresenter.CreateEmptyTable()
         End If
 
         SetDashboardTimetable(timetableTable)
     End Sub
 
     Private Function FetchDashboardTimetableForStudent(studentId As String) As DataTable
-        ' Hook your database query here and return the result as a DataTable.
-        Return Nothing
-    End Function
-
-    Private Function CreateDefaultDashboardTimetable() As DataTable
-        Return CreateEmptyDashboardTimetable(New String() {"Mon", "Tue", "Wed", "Thu", "Fri"}, 2)
-    End Function
-
-    Private Function EnsureSessionColumn(source As DataTable) As DataTable
-        If source Is Nothing Then
-            Return Nothing
+        If ClassScheduleContentView Is Nothing Then
+            Return StudentTimetablePresenter.CreateEmptyTable()
         End If
 
-        Dim table As DataTable = source.Copy()
-        Dim sessionColumn As DataColumn = FindTableColumn(table, "Session")
-
-        If sessionColumn Is Nothing Then
-            Dim aliasColumn As DataColumn = FindTableColumn(table, "Time", "Time Slot", "Timeslot", "Period", "Slot", "Schedule")
-            If aliasColumn IsNot Nothing Then
-                aliasColumn.ColumnName = "Session"
-                sessionColumn = aliasColumn
-            End If
-        End If
-
-        If sessionColumn Is Nothing Then
-            sessionColumn = New DataColumn("Session", GetType(String))
-            table.Columns.Add(sessionColumn)
-            For Each row As DataRow In table.Rows
-                row("Session") = "--"
-            Next
-        End If
-
-        For Each row As DataRow In table.Rows
-            Dim sessionValue As String = If(row("Session"), String.Empty).ToString().Trim()
-            If String.IsNullOrWhiteSpace(sessionValue) Then
-                row("Session") = "--"
-            End If
-        Next
-
-        sessionColumn.SetOrdinal(0)
-
-        Return table
-    End Function
-
-    Private Function FindTableColumn(table As DataTable, ParamArray columnNames() As String) As DataColumn
-        If table Is Nothing OrElse columnNames Is Nothing Then
-            Return Nothing
-        End If
-
-        For Each requestedName As String In columnNames
-            Dim normalizedRequestedName As String = If(requestedName, String.Empty).Trim()
-            If String.IsNullOrWhiteSpace(normalizedRequestedName) Then
-                Continue For
-            End If
-
-            For Each candidateColumn As DataColumn In table.Columns
-                If String.Equals(candidateColumn.ColumnName, normalizedRequestedName, StringComparison.OrdinalIgnoreCase) Then
-                    Return candidateColumn
-                End If
-            Next
-        Next
-
-        Return Nothing
-    End Function
-
-    Private Function CreateEmptyDashboardTimetable(dayHeaders As IEnumerable(Of String), rowCount As Integer) As DataTable
-        Dim table As New DataTable()
-        table.Columns.Add("Session", GetType(String))
-
-        Dim normalizedDays As New List(Of String)()
-        If dayHeaders IsNot Nothing Then
-            For Each dayHeader As String In dayHeaders
-                Dim normalizedDay As String = If(dayHeader, String.Empty).Trim()
-                If String.IsNullOrWhiteSpace(normalizedDay) Then
-                    Continue For
-                End If
-
-                Dim exists As Boolean = False
-                For Each existingDay As String In normalizedDays
-                    If String.Equals(existingDay, normalizedDay, StringComparison.OrdinalIgnoreCase) Then
-                        exists = True
-                        Exit For
-                    End If
-                Next
-
-                If Not exists Then
-                    normalizedDays.Add(normalizedDay)
-                    table.Columns.Add(normalizedDay, GetType(String))
-                End If
-            Next
-        End If
-
-        If normalizedDays.Count = 0 Then
-            For Each fallbackDay As String In New String() {"Mon", "Tue", "Wed", "Thu", "Fri"}
-                normalizedDays.Add(fallbackDay)
-                table.Columns.Add(fallbackDay, GetType(String))
-            Next
-        End If
-
-        Dim safeRowCount As Integer = Math.Max(1, rowCount)
-        For rowIndex As Integer = 0 To safeRowCount - 1
-            Dim row As DataRow = table.NewRow()
-            row("Session") = "--"
-
-            For Each day As String In normalizedDays
-                row(day) = "--"
-            Next
-
-            table.Rows.Add(row)
-        Next
-
-        Return table
-    End Function
-
-    Private Sub BuildDashboardTimetableColumns(sourceTable As DataTable)
-        If DashboardTimetableDataGrid Is Nothing OrElse sourceTable Is Nothing Then
-            Return
-        End If
-
-        DashboardTimetableDataGrid.Columns.Clear()
-
-        Dim sessionColumn As New DataGridTextColumn()
-        sessionColumn.Header = "Session"
-        sessionColumn.Binding = New Binding(BuildDataTableBindingPath("Session"))
-        sessionColumn.IsReadOnly = True
-        sessionColumn.CanUserSort = False
-        sessionColumn.MinWidth = 130
-        sessionColumn.Width = New DataGridLength(1, DataGridLengthUnitType.SizeToCells)
-        DashboardTimetableDataGrid.Columns.Add(sessionColumn)
-
-        For Each tableColumn As DataColumn In sourceTable.Columns
-            If String.Equals(tableColumn.ColumnName, "Session", StringComparison.OrdinalIgnoreCase) Then
-                Continue For
-            End If
-
-            Dim dynamicColumn As New DataGridTextColumn()
-            dynamicColumn.Header = tableColumn.ColumnName
-            dynamicColumn.Binding = New Binding(BuildDataTableBindingPath(tableColumn.ColumnName))
-            dynamicColumn.IsReadOnly = True
-            dynamicColumn.CanUserSort = False
-            dynamicColumn.Width = New DataGridLength(1, DataGridLengthUnitType.Star)
-            DashboardTimetableDataGrid.Columns.Add(dynamicColumn)
-        Next
-    End Sub
-
-    Private Function BuildDataTableBindingPath(columnName As String) As String
-        Dim safeColumnName As String = If(columnName, String.Empty)
-        Return "[" & safeColumnName.Replace("]", "]]") & "]"
+        Return ClassScheduleContentView.GetCurrentTimetableSnapshot()
     End Function
 
     Private Sub UpdateMaximizeRestoreIcon()
@@ -341,4 +273,120 @@ Class StudentDashboardWindow
 
         MaximizeRestoreIcon.Text = If(WindowState = WindowState.Maximized, ChrW(&HE923), ChrW(&HE922))
     End Sub
+
+    Private Function LoadStudentRecord(studentId As String) As StudentRecord
+        If String.IsNullOrWhiteSpace(studentId) Then
+            Return Nothing
+        End If
+
+        Dim result = _studentManagementService.GetStudentByStudentNumber(studentId)
+        If result Is Nothing OrElse Not result.IsSuccess Then
+            Return Nothing
+        End If
+
+        Return result.Data
+    End Function
+
+    Private Function ResolveDisplayName(student As StudentRecord,
+                                        fallbackName As String) As String
+        If student IsNot Nothing Then
+            Dim fullName As String = If(student.FullName, String.Empty).Trim()
+            If Not String.IsNullOrWhiteSpace(fullName) Then
+                Return fullName
+            End If
+        End If
+
+        Dim normalizedFallbackName As String = If(fallbackName, String.Empty).Trim()
+        If String.IsNullOrWhiteSpace(normalizedFallbackName) Then
+            Return "Student"
+        End If
+
+        Return normalizedFallbackName
+    End Function
+
+    Private Function ResolveStudentPhotoPath(student As StudentRecord,
+                                             fallbackPhotoPath As String) As String
+        If student IsNot Nothing Then
+            Dim normalizedPhotoPath As String = If(student.PhotoPath, String.Empty).Trim()
+            If Not String.IsNullOrWhiteSpace(normalizedPhotoPath) Then
+                Return normalizedPhotoPath
+            End If
+        End If
+
+        Return If(fallbackPhotoPath, String.Empty).Trim()
+    End Function
+
+    Private Function BuildStudentInitial(displayName As String,
+                                         fallbackStudentId As String) As String
+        Dim sourceText As String = If(displayName, String.Empty).Trim()
+        If String.IsNullOrWhiteSpace(sourceText) Then
+            sourceText = If(fallbackStudentId, String.Empty).Trim()
+        End If
+
+        If String.IsNullOrWhiteSpace(sourceText) Then
+            Return "S"
+        End If
+
+        Return sourceText.Substring(0, 1).ToUpperInvariant()
+    End Function
+
+    Private Function ResolveHeaderAcademicSummary(student As StudentRecord,
+                                                  fallbackStudentId As String) As String
+        Dim summaryParts As New List(Of String)()
+
+        If student IsNot Nothing Then
+            Dim courseName As String = If(student.CourseDisplayName, String.Empty).Trim()
+            Dim yearLabel As String = If(student.YearLevelLabel, String.Empty).Trim()
+            Dim sectionLabel As String = BuildSectionDisplayLabel(student)
+
+            If Not String.IsNullOrWhiteSpace(courseName) Then
+                summaryParts.Add(courseName)
+            End If
+
+            If Not String.IsNullOrWhiteSpace(yearLabel) Then
+                summaryParts.Add(yearLabel)
+            End If
+
+            If Not String.IsNullOrWhiteSpace(sectionLabel) Then
+                summaryParts.Add(sectionLabel)
+            End If
+        End If
+
+        If summaryParts.Count = 0 Then
+            Return If(String.IsNullOrWhiteSpace(fallbackStudentId), " ", fallbackStudentId)
+        End If
+
+        Return String.Join(" | ", summaryParts)
+    End Function
+
+    Private Function ResolveSidebarSubtitle(student As StudentRecord,
+                                            fallbackStudentId As String) As String
+        If student IsNot Nothing Then
+            Dim yearLabel As String = If(student.YearLevelLabel, String.Empty).Trim()
+            Dim courseName As String = If(student.CourseDisplayName, String.Empty).Trim()
+
+            If Not String.IsNullOrWhiteSpace(courseName) AndAlso
+               Not String.IsNullOrWhiteSpace(yearLabel) Then
+                Return courseName & " | " & yearLabel
+            End If
+
+            If Not String.IsNullOrWhiteSpace(courseName) Then
+                Return courseName
+            End If
+
+            If Not String.IsNullOrWhiteSpace(yearLabel) Then
+                Return yearLabel
+            End If
+        End If
+
+        If String.IsNullOrWhiteSpace(fallbackStudentId) Then
+            Return "Student Dashboard"
+        End If
+
+        Return fallbackStudentId
+    End Function
+
+    Private Function BuildSectionDisplayLabel(student As StudentRecord) As String
+        Return StudentScheduleHelper.BuildStudentSectionValue(student, String.Empty)
+    End Function
 End Class

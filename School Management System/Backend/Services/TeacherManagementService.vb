@@ -1,3 +1,4 @@
+Imports System.IO
 Imports System.Text
 Imports MySql.Data.MySqlClient
 Imports School_Management_System.Backend.Common
@@ -9,13 +10,21 @@ Namespace Backend.Services
         Public Const DefaultTeacherPassword As String = "Admin@123"
 
         Private ReadOnly _teacherRepository As TeacherRepository
+        Private ReadOnly _profileImageStorageService As ProfileImageStorageService
 
         Public Sub New()
-            Me.New(New TeacherRepository())
+            Me.New(New TeacherRepository(), New ProfileImageStorageService())
         End Sub
 
         Public Sub New(teacherRepository As TeacherRepository)
+            Me.New(teacherRepository, New ProfileImageStorageService())
+        End Sub
+
+        Public Sub New(teacherRepository As TeacherRepository,
+                       profileImageStorageService As ProfileImageStorageService)
             _teacherRepository = teacherRepository
+            _profileImageStorageService =
+                If(profileImageStorageService, New ProfileImageStorageService())
         End Sub
 
         Public Function GetTeachers() As ServiceResult(Of List(Of TeacherRecord))
@@ -28,16 +37,50 @@ Namespace Backend.Services
             End Try
         End Function
 
+        Public Function GetTeacherByEmployeeNumber(employeeNumber As String) As ServiceResult(Of TeacherRecord)
+            If String.IsNullOrWhiteSpace(employeeNumber) Then
+                Return ServiceResult(Of TeacherRecord).Failure("Teacher ID is required.")
+            End If
+
+            Try
+                Dim teacher As TeacherRecord =
+                    _teacherRepository.GetByEmployeeNumber(employeeNumber.Trim())
+                If teacher Is Nothing Then
+                    Return ServiceResult(Of TeacherRecord).Failure(
+                        "The selected teacher no longer exists.")
+                End If
+
+                Return ServiceResult(Of TeacherRecord).Success(teacher)
+            Catch ex As MySqlException
+                Return ServiceResult(Of TeacherRecord).Failure(
+                    BuildDatabaseErrorMessage("load", ex))
+            Catch ex As Exception
+                Return ServiceResult(Of TeacherRecord).Failure(
+                    "Unable to load teacher records." &
+                    Environment.NewLine &
+                    ex.Message)
+            End Try
+        End Function
+
         Public Function CreateTeacher(request As TeacherSaveRequest) As ServiceResult(Of TeacherRecord)
             Dim validationMessage As String = ValidateRequest(request, False)
             If Not String.IsNullOrWhiteSpace(validationMessage) Then
                 Return ServiceResult(Of TeacherRecord).Failure(validationMessage)
             End If
 
+            Dim preparedPhotoPath As String = String.Empty
+
             Try
                 If _teacherRepository.GetByEmployeeNumber(request.EmployeeNumber) IsNot Nothing Then
                     Return ServiceResult(Of TeacherRecord).Failure("Teacher ID already exists.")
                 End If
+
+                preparedPhotoPath =
+                    _profileImageStorageService.StoreProfileImage(
+                        ProfileImageStorageService.ProfileImageOwnerType.Teacher,
+                        request.EmployeeNumber,
+                        request.PhotoPath)
+                request.PhotoPath = preparedPhotoPath
 
                 Dim passwordToUse As String = GetPasswordForCreate(request.Password)
                 Dim createdRecord As TeacherRecord =
@@ -52,8 +95,13 @@ Namespace Backend.Services
 
                 Return ServiceResult(Of TeacherRecord).Success(createdRecord, message)
             Catch ex As MySqlException
+                CleanupPreparedProfileImage(preparedPhotoPath, String.Empty)
                 Return ServiceResult(Of TeacherRecord).Failure(
                     BuildDatabaseErrorMessage("create", ex))
+            Catch ex As IOException
+                CleanupPreparedProfileImage(preparedPhotoPath, String.Empty)
+                Return ServiceResult(Of TeacherRecord).Failure(
+                    BuildProfileImageErrorMessage("save", ex))
             End Try
         End Function
 
@@ -63,8 +111,11 @@ Namespace Backend.Services
                 Return ServiceResult(Of TeacherRecord).Failure(validationMessage)
             End If
 
+            Dim existingRecord As TeacherRecord = Nothing
+            Dim preparedPhotoPath As String = String.Empty
+
             Try
-                Dim existingRecord As TeacherRecord =
+                existingRecord =
                     _teacherRepository.GetByEmployeeNumber(request.OriginalEmployeeNumber)
                 If existingRecord Is Nothing Then
                     Return ServiceResult(Of TeacherRecord).Failure(
@@ -85,6 +136,14 @@ Namespace Backend.Services
                     passwordHash = Database.DatabaseModule.HashPassword(request.Password.Trim())
                 End If
 
+                preparedPhotoPath =
+                    _profileImageStorageService.StoreProfileImage(
+                        ProfileImageStorageService.ProfileImageOwnerType.Teacher,
+                        request.EmployeeNumber,
+                        request.PhotoPath,
+                        existingRecord.PhotoPath)
+                request.PhotoPath = preparedPhotoPath
+
                 Dim updatedRecord As TeacherRecord =
                     _teacherRepository.Update(existingRecord,
                                               request,
@@ -92,10 +151,22 @@ Namespace Backend.Services
                                               shouldUpdatePassword,
                                               passwordHash)
 
+                CleanupObsoleteManagedImage(existingRecord.PhotoPath, updatedRecord.PhotoPath)
                 Return ServiceResult(Of TeacherRecord).Success(updatedRecord, "Teacher updated.")
             Catch ex As MySqlException
+                CleanupPreparedProfileImage(preparedPhotoPath,
+                                            If(existingRecord Is Nothing,
+                                               String.Empty,
+                                               existingRecord.PhotoPath))
                 Return ServiceResult(Of TeacherRecord).Failure(
                     BuildDatabaseErrorMessage("update", ex))
+            Catch ex As IOException
+                CleanupPreparedProfileImage(preparedPhotoPath,
+                                            If(existingRecord Is Nothing,
+                                               String.Empty,
+                                               existingRecord.PhotoPath))
+                Return ServiceResult(Of TeacherRecord).Failure(
+                    BuildProfileImageErrorMessage("save", ex))
             End Try
         End Function
 
@@ -105,6 +176,13 @@ Namespace Backend.Services
             End If
 
             Try
+                Dim existingRecord As TeacherRecord =
+                    _teacherRepository.GetByEmployeeNumber(employeeNumber.Trim())
+                If existingRecord Is Nothing Then
+                    Return ServiceResult(Of Boolean).Failure(
+                        "The selected teacher no longer exists.")
+                End If
+
                 Dim deleted As Boolean =
                     _teacherRepository.DeleteByEmployeeNumber(employeeNumber.Trim())
                 If Not deleted Then
@@ -112,6 +190,7 @@ Namespace Backend.Services
                         "The selected teacher no longer exists.")
                 End If
 
+                CleanupObsoleteManagedImage(existingRecord.PhotoPath, String.Empty)
                 Return ServiceResult(Of Boolean).Success(True, "Teacher deleted.")
             Catch ex As MySqlException
                 Return ServiceResult(Of Boolean).Failure(
@@ -210,5 +289,56 @@ Namespace Backend.Services
                 Environment.NewLine &
                 ex.Message
         End Function
+
+        Private Function BuildProfileImageErrorMessage(operationName As String,
+                                                       ex As IOException) As String
+            If TypeOf ex Is FileNotFoundException Then
+                Return "The selected teacher photo file could not be found."
+            End If
+
+            Return "Unable to " & operationName & " the selected teacher photo locally." &
+                Environment.NewLine &
+                ex.Message
+        End Function
+
+        Private Sub CleanupPreparedProfileImage(preparedPhotoPath As String,
+                                                preservedPhotoPath As String)
+            Dim normalizedPreparedPhotoPath As String =
+                If(preparedPhotoPath, String.Empty).Trim()
+            Dim normalizedPreservedPhotoPath As String =
+                If(preservedPhotoPath, String.Empty).Trim()
+
+            If String.IsNullOrWhiteSpace(normalizedPreparedPhotoPath) Then
+                Return
+            End If
+
+            If String.Equals(normalizedPreparedPhotoPath,
+                             normalizedPreservedPhotoPath,
+                             StringComparison.OrdinalIgnoreCase) Then
+                Return
+            End If
+
+            _profileImageStorageService.DeleteManagedImage(normalizedPreparedPhotoPath)
+        End Sub
+
+        Private Sub CleanupObsoleteManagedImage(previousPhotoPath As String,
+                                                currentPhotoPath As String)
+            Dim normalizedPreviousPhotoPath As String =
+                If(previousPhotoPath, String.Empty).Trim()
+            Dim normalizedCurrentPhotoPath As String =
+                If(currentPhotoPath, String.Empty).Trim()
+
+            If String.IsNullOrWhiteSpace(normalizedPreviousPhotoPath) Then
+                Return
+            End If
+
+            If String.Equals(normalizedPreviousPhotoPath,
+                             normalizedCurrentPhotoPath,
+                             StringComparison.OrdinalIgnoreCase) Then
+                Return
+            End If
+
+            _profileImageStorageService.DeleteManagedImage(normalizedPreviousPhotoPath)
+        End Sub
     End Class
 End Namespace

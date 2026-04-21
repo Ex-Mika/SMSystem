@@ -11,6 +11,8 @@ Namespace Backend.Repositories
             "u.email, " &
             "u.password_hash, " &
             "u.is_active, " &
+            "COALESCE(s.photo_path, t.photo_path, a.photo_path, '') AS photo_path, " &
+            "COALESCE(t.position_title, a.role_title, '') AS profile_title, " &
             "COALESCE(s.student_number, t.employee_number, a.admin_code, u.email) AS reference_code " &
             "FROM users u " &
             "LEFT JOIN students s ON s.user_id = u.user_id " &
@@ -54,7 +56,9 @@ Namespace Backend.Repositories
                 .Email = Convert.ToString(reader("email")),
                 .PasswordHash = Convert.ToString(reader("password_hash")),
                 .IsActive = Convert.ToBoolean(reader("is_active")),
-                .ReferenceCode = Convert.ToString(reader("reference_code"))
+                .ReferenceCode = Convert.ToString(reader("reference_code")),
+                .PhotoPath = Convert.ToString(reader("photo_path")),
+                .ProfileTitle = Convert.ToString(reader("profile_title"))
             }
         End Function
     End Class

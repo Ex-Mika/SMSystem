@@ -21,7 +21,7 @@
             <StackPanel>
                 <TextBlock Text="Identity"
                            Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                <TextBlock Text="Primary personal details used in school records."
+                <TextBlock Text="Update the name details attached to your student record."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
                 <StackPanel Margin="0,14,0,0">
@@ -35,31 +35,51 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,10,0,0">
-                    <TextBlock Text="Full Name"
+                    <TextBlock Text="First Name"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock x:Name="StudentNameValueTextBlock"
+                    <Border x:Name="FirstNameValueBorder"
+                            Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
+                        <TextBlock x:Name="FirstNameValueTextBlock"
                                    Style="{StaticResource DashboardProfileFieldValueStyle}"
                                    Text=""/>
                     </Border>
+                    <TextBox x:Name="FirstNameEditTextBox"
+                             Margin="0,6,0,0"
+                             Style="{StaticResource DashboardProfileInputTextBoxStyle}"
+                             TextChanged="EditableNameTextBox_TextChanged"
+                             Visibility="Collapsed"/>
                 </StackPanel>
 
                 <StackPanel Margin="0,10,0,0">
-                    <TextBlock Text="Date of Birth"
+                    <TextBlock Text="Middle Name"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock Style="{StaticResource DashboardProfileFieldValueStyle}"
-                                   Text="Not set"/>
+                    <Border x:Name="MiddleNameValueBorder"
+                            Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
+                        <TextBlock x:Name="MiddleNameValueTextBlock"
+                                   Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                   Text=""/>
                     </Border>
+                    <TextBox x:Name="MiddleNameEditTextBox"
+                             Margin="0,6,0,0"
+                             Style="{StaticResource DashboardProfileInputTextBoxStyle}"
+                             TextChanged="EditableNameTextBox_TextChanged"
+                             Visibility="Collapsed"/>
                 </StackPanel>
 
                 <StackPanel Margin="0,10,0,0">
-                    <TextBlock Text="Sex"
+                    <TextBlock Text="Last Name"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock Style="{StaticResource DashboardProfileFieldValueStyle}"
-                                   Text="Not set"/>
+                    <Border x:Name="LastNameValueBorder"
+                            Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
+                        <TextBlock x:Name="LastNameValueTextBlock"
+                                   Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                   Text=""/>
                     </Border>
+                    <TextBox x:Name="LastNameEditTextBox"
+                             Margin="0,6,0,0"
+                             Style="{StaticResource DashboardProfileInputTextBoxStyle}"
+                             TextChanged="EditableNameTextBox_TextChanged"
+                             Visibility="Collapsed"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -69,38 +89,54 @@
                 Margin="10,0,0,12"
                 Style="{StaticResource DashboardProfileSectionCardStyle}">
             <StackPanel>
-                <TextBlock Text="Contact &amp; Residence"
+                <TextBlock Text="Profile Photo"
                            Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                <TextBlock Text="Current communication and home address information."
+                <TextBlock Text="Choose the photo shown across your student dashboard."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
-                <StackPanel Margin="0,14,0,0">
-                    <TextBlock Text="Address"
-                               Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock Style="{StaticResource DashboardProfileFieldValueStyle}"
-                                   Text="No address on file"
-                                   TextWrapping="Wrap"/>
-                    </Border>
-                </StackPanel>
+                <Border x:Name="StudentPhotoAvatarBorder"
+                        Width="118"
+                        Height="118"
+                        Margin="0,16,0,0"
+                        HorizontalAlignment="Left"
+                        CornerRadius="59"
+                        Background="{StaticResource DashboardAvatarSurfaceBrush}"
+                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                        BorderThickness="1">
+                    <TextBlock x:Name="StudentPhotoInitialTextBlock"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="42"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource DashboardAvatarForegroundBrush}"
+                               Text="S"/>
+                </Border>
 
-                <StackPanel Margin="0,10,0,0">
-                    <TextBlock Text="City / Province"
-                               Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock Style="{StaticResource DashboardProfileFieldValueStyle}"
-                                   Text="Not set"/>
-                    </Border>
-                </StackPanel>
+                <TextBlock x:Name="StudentPhotoStatusTextBlock"
+                           Margin="0,12,0,0"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                           TextWrapping="Wrap"/>
 
-                <StackPanel Margin="0,10,0,0">
-                    <TextBlock Text="Emergency Contact"
-                               Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock Style="{StaticResource DashboardProfileFieldValueStyle}"
-                                   Text="Not set"/>
-                    </Border>
-                </StackPanel>
+                <WrapPanel Margin="0,14,0,0">
+                    <Button x:Name="BrowseStudentPhotoButton"
+                            Width="120"
+                            Height="34"
+                            Margin="0,0,10,8"
+                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                            Click="BrowseStudentPhotoButton_Click"
+                            Content="Browse Photo"
+                            Visibility="Collapsed"/>
+                    <Button x:Name="ClearStudentPhotoButton"
+                            Width="100"
+                            Height="34"
+                            Margin="0,0,0,8"
+                            Style="{StaticResource DashboardSecondaryActionButtonStyle}"
+                            Click="ClearStudentPhotoButton_Click"
+                            Content="Clear Photo"
+                            Visibility="Collapsed"/>
+                </WrapPanel>
             </StackPanel>
         </Border>
 
@@ -108,9 +144,9 @@
                 Grid.ColumnSpan="2"
                 Style="{StaticResource DashboardProfileSectionCardStyle}">
             <StackPanel>
-                <TextBlock Text="Notes"
+                <TextBlock Text="Editing Notes"
                            Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                <TextBlock Text="Complete your personal details to improve identity verification and communication."
+                <TextBlock x:Name="ProfilePersonalNotesTextBlock"
                            Margin="0,8,0,0"
                            FontSize="13"
                            Foreground="{StaticResource DashboardTextMutedBrush}"

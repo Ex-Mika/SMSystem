@@ -4,6 +4,7 @@ Imports System.Windows.Input
 Imports System.Windows.Media
 Imports System.Windows.Media.Imaging
 Imports Microsoft.Win32
+Imports School_Management_System.Backend.Common
 Imports School_Management_System.Backend.Models
 Imports School_Management_System.Backend.Services
 
@@ -100,7 +101,10 @@ Class AdminStudentsView
             row("Last Name") = record.LastName
             row("Year Level") = record.YearLevelLabel
             row("Course") = record.CourseDisplayName
-            row("Section") = record.SectionName
+            row("Section") = StudentScheduleHelper.BuildSectionValue(
+                record.SectionName,
+                record.YearLevelLabel,
+                String.Empty)
             row("Photo Path") = record.PhotoPath
             row("Email") = record.Email
             table.Rows.Add(row)

@@ -1,4 +1,5 @@
 Imports System.Net.Mail
+Imports System.IO
 Imports MySql.Data.MySqlClient
 Imports School_Management_System.Backend.Common
 Imports School_Management_System.Backend.Models
@@ -9,13 +10,21 @@ Namespace Backend.Services
         Public Const DefaultAdministratorPassword As String = "Admin@123"
 
         Private ReadOnly _administratorRepository As AdministratorRepository
+        Private ReadOnly _profileImageStorageService As ProfileImageStorageService
 
         Public Sub New()
-            Me.New(New AdministratorRepository())
+            Me.New(New AdministratorRepository(), New ProfileImageStorageService())
         End Sub
 
         Public Sub New(administratorRepository As AdministratorRepository)
+            Me.New(administratorRepository, New ProfileImageStorageService())
+        End Sub
+
+        Public Sub New(administratorRepository As AdministratorRepository,
+                       profileImageStorageService As ProfileImageStorageService)
             _administratorRepository = administratorRepository
+            _profileImageStorageService =
+                If(profileImageStorageService, New ProfileImageStorageService())
         End Sub
 
         Public Function GetAdministrators() As ServiceResult(Of List(Of AdministratorRecord))
@@ -34,6 +43,8 @@ Namespace Backend.Services
                 Return ServiceResult(Of AdministratorRecord).Failure(validationMessage)
             End If
 
+            Dim preparedPhotoPath As String = String.Empty
+
             Try
                 If _administratorRepository.GetByAdministratorCode(request.AdministratorCode) IsNot Nothing Then
                     Return ServiceResult(Of AdministratorRecord).Failure("Administrator ID already exists.")
@@ -42,6 +53,13 @@ Namespace Backend.Services
                 If _administratorRepository.GetByEmail(request.Email) IsNot Nothing Then
                     Return ServiceResult(Of AdministratorRecord).Failure("Email address already exists.")
                 End If
+
+                preparedPhotoPath =
+                    _profileImageStorageService.StoreProfileImage(
+                        ProfileImageStorageService.ProfileImageOwnerType.Administrator,
+                        request.AdministratorCode,
+                        request.PhotoPath)
+                request.PhotoPath = preparedPhotoPath
 
                 Dim passwordToUse As String = GetPasswordForCreate(request.Password)
                 Dim createdRecord As AdministratorRecord =
@@ -55,8 +73,13 @@ Namespace Backend.Services
 
                 Return ServiceResult(Of AdministratorRecord).Success(createdRecord, message)
             Catch ex As MySqlException
+                CleanupPreparedProfileImage(preparedPhotoPath, String.Empty)
                 Return ServiceResult(Of AdministratorRecord).Failure(
                     BuildDatabaseErrorMessage("create", ex))
+            Catch ex As IOException
+                CleanupPreparedProfileImage(preparedPhotoPath, String.Empty)
+                Return ServiceResult(Of AdministratorRecord).Failure(
+                    BuildProfileImageErrorMessage("save", ex))
             End Try
         End Function
 
@@ -66,8 +89,11 @@ Namespace Backend.Services
                 Return ServiceResult(Of AdministratorRecord).Failure(validationMessage)
             End If
 
+            Dim existingRecord As AdministratorRecord = Nothing
+            Dim preparedPhotoPath As String = String.Empty
+
             Try
-                Dim existingRecord As AdministratorRecord =
+                existingRecord =
                     _administratorRepository.GetByAdministratorCode(request.OriginalAdministratorCode)
                 If existingRecord Is Nothing Then
                     Return ServiceResult(Of AdministratorRecord).Failure(
@@ -95,17 +121,37 @@ Namespace Backend.Services
                     passwordHash = Database.DatabaseModule.HashPassword(request.Password.Trim())
                 End If
 
+                preparedPhotoPath =
+                    _profileImageStorageService.StoreProfileImage(
+                        ProfileImageStorageService.ProfileImageOwnerType.Administrator,
+                        request.AdministratorCode,
+                        request.PhotoPath,
+                        existingRecord.PhotoPath)
+                request.PhotoPath = preparedPhotoPath
+
                 Dim updatedRecord As AdministratorRecord =
                     _administratorRepository.Update(existingRecord,
                                                     request,
                                                     shouldUpdatePassword,
                                                     passwordHash)
 
+                CleanupObsoleteManagedImage(existingRecord.PhotoPath, updatedRecord.PhotoPath)
                 Return ServiceResult(Of AdministratorRecord).Success(updatedRecord,
                                                                      "Administrator updated.")
             Catch ex As MySqlException
+                CleanupPreparedProfileImage(preparedPhotoPath,
+                                            If(existingRecord Is Nothing,
+                                               String.Empty,
+                                               existingRecord.PhotoPath))
                 Return ServiceResult(Of AdministratorRecord).Failure(
                     BuildDatabaseErrorMessage("update", ex))
+            Catch ex As IOException
+                CleanupPreparedProfileImage(preparedPhotoPath,
+                                            If(existingRecord Is Nothing,
+                                               String.Empty,
+                                               existingRecord.PhotoPath))
+                Return ServiceResult(Of AdministratorRecord).Failure(
+                    BuildProfileImageErrorMessage("save", ex))
             End Try
         End Function
 
@@ -115,6 +161,13 @@ Namespace Backend.Services
             End If
 
             Try
+                Dim existingRecord As AdministratorRecord =
+                    _administratorRepository.GetByAdministratorCode(administratorCode.Trim())
+                If existingRecord Is Nothing Then
+                    Return ServiceResult(Of Boolean).Failure(
+                        "The selected administrator no longer exists.")
+                End If
+
                 Dim deleted As Boolean =
                     _administratorRepository.DeleteByAdministratorCode(administratorCode.Trim())
                 If Not deleted Then
@@ -122,6 +175,7 @@ Namespace Backend.Services
                         "The selected administrator no longer exists.")
                 End If
 
+                CleanupObsoleteManagedImage(existingRecord.PhotoPath, String.Empty)
                 Return ServiceResult(Of Boolean).Success(True, "Administrator deleted.")
             Catch ex As MySqlException
                 Return ServiceResult(Of Boolean).Failure(
@@ -200,5 +254,57 @@ Namespace Backend.Services
                 Environment.NewLine &
                 ex.Message
         End Function
+
+        Private Function BuildProfileImageErrorMessage(operationName As String,
+                                                       ex As IOException) As String
+            If TypeOf ex Is FileNotFoundException Then
+                Return "The selected administrator photo file could not be found."
+            End If
+
+            Return "Unable to " & operationName &
+                " the selected administrator photo locally." &
+                Environment.NewLine &
+                ex.Message
+        End Function
+
+        Private Sub CleanupPreparedProfileImage(preparedPhotoPath As String,
+                                                preservedPhotoPath As String)
+            Dim normalizedPreparedPhotoPath As String =
+                If(preparedPhotoPath, String.Empty).Trim()
+            Dim normalizedPreservedPhotoPath As String =
+                If(preservedPhotoPath, String.Empty).Trim()
+
+            If String.IsNullOrWhiteSpace(normalizedPreparedPhotoPath) Then
+                Return
+            End If
+
+            If String.Equals(normalizedPreparedPhotoPath,
+                             normalizedPreservedPhotoPath,
+                             StringComparison.OrdinalIgnoreCase) Then
+                Return
+            End If
+
+            _profileImageStorageService.DeleteManagedImage(normalizedPreparedPhotoPath)
+        End Sub
+
+        Private Sub CleanupObsoleteManagedImage(previousPhotoPath As String,
+                                                currentPhotoPath As String)
+            Dim normalizedPreviousPhotoPath As String =
+                If(previousPhotoPath, String.Empty).Trim()
+            Dim normalizedCurrentPhotoPath As String =
+                If(currentPhotoPath, String.Empty).Trim()
+
+            If String.IsNullOrWhiteSpace(normalizedPreviousPhotoPath) Then
+                Return
+            End If
+
+            If String.Equals(normalizedPreviousPhotoPath,
+                             normalizedCurrentPhotoPath,
+                             StringComparison.OrdinalIgnoreCase) Then
+                Return
+            End If
+
+            _profileImageStorageService.DeleteManagedImage(normalizedPreviousPhotoPath)
+        End Sub
     End Class
 End Namespace

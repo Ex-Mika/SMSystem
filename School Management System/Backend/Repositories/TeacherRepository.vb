@@ -278,12 +278,12 @@ Namespace Backend.Repositories
                 parts.Add(request.FirstName.Trim())
             End If
 
-            If Not String.IsNullOrWhiteSpace(request.LastName) Then
-                parts.Add(request.LastName.Trim())
-            End If
-
             If Not String.IsNullOrWhiteSpace(request.MiddleName) Then
                 parts.Add(request.MiddleName.Trim())
+            End If
+
+            If Not String.IsNullOrWhiteSpace(request.LastName) Then
+                parts.Add(request.LastName.Trim())
             End If
 
             Return String.Join(" ", parts)

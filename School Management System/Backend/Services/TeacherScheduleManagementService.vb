@@ -47,6 +47,11 @@ Namespace Backend.Services
             Catch ex As MySqlException
                 Return ServiceResult(Of List(Of TeacherScheduleRecord)).Failure(
                     BuildDatabaseErrorMessage("load", ex))
+            Catch ex As Exception
+                Return ServiceResult(Of List(Of TeacherScheduleRecord)).Failure(
+                    "Unable to load schedule records." &
+                    Environment.NewLine &
+                    ex.Message)
             End Try
         End Function
 
@@ -59,6 +64,11 @@ Namespace Backend.Services
 
             Try
                 EnsureLegacySchedulesImported()
+
+                Dim conflictMessage As String = GetConflictMessage(normalizedRequest)
+                If Not String.IsNullOrWhiteSpace(conflictMessage) Then
+                    Return ServiceResult(Of TeacherScheduleRecord).Failure(conflictMessage)
+                End If
 
                 Dim savedRecord As TeacherScheduleRecord = _scheduleRepository.Save(normalizedRequest)
                 If savedRecord Is Nothing Then
@@ -129,6 +139,12 @@ Namespace Backend.Services
                 Return "Session is required in 24-hour format."
             End If
 
+            Dim startMinutes As Integer
+            Dim endMinutes As Integer
+            If Not TryParseSessionRange(request.Session, startMinutes, endMinutes) Then
+                Return "Session is required in 24-hour format."
+            End If
+
             If String.IsNullOrWhiteSpace(request.SubjectCode) AndAlso
                String.IsNullOrWhiteSpace(request.SubjectName) Then
                 Return "Select a subject before saving a slot."
@@ -175,6 +191,12 @@ Namespace Backend.Services
             For Each request As TeacherScheduleSaveRequest In requests
                 Dim validationMessage As String = ValidateRequest(request)
                 If Not String.IsNullOrWhiteSpace(validationMessage) Then
+                    skippedCount += 1
+                    Continue For
+                End If
+
+                Dim conflictMessage As String = GetConflictMessage(request)
+                If Not String.IsNullOrWhiteSpace(conflictMessage) Then
                     skippedCount += 1
                     Continue For
                 End If
@@ -265,6 +287,229 @@ Namespace Backend.Services
             Return "Unable to " & operationName & " schedule records." &
                 Environment.NewLine &
                 ex.Message
+        End Function
+
+        Private Function GetConflictMessage(request As TeacherScheduleSaveRequest) As String
+            If request Is Nothing Then
+                Return String.Empty
+            End If
+
+            Dim schedules As List(Of TeacherScheduleRecord) = _scheduleRepository.GetAll()
+            Dim teacherConflict As TeacherScheduleRecord = FindTeacherConflict(request, schedules)
+            If teacherConflict IsNot Nothing Then
+                Return "Time conflict: " &
+                    GetTeacherReference(teacherConflict) &
+                    " already has " &
+                    GetSubjectReference(teacherConflict) &
+                    " on " &
+                    request.Day &
+                    " at " &
+                    NormalizeSession(teacherConflict.Session) &
+                    "."
+            End If
+
+            Dim roomConflict As TeacherScheduleRecord = FindRoomConflict(request, schedules)
+            If roomConflict IsNot Nothing Then
+                Return "Time conflict: room " &
+                    request.Room &
+                    " is already assigned to " &
+                    GetTeacherReference(roomConflict) &
+                    " for " &
+                    GetSubjectReference(roomConflict) &
+                    " on " &
+                    request.Day &
+                    " at " &
+                    NormalizeSession(roomConflict.Session) &
+                    "."
+            End If
+
+            Dim sectionConflict As TeacherScheduleRecord = FindSectionConflict(request, schedules)
+            If sectionConflict IsNot Nothing Then
+                Return "Time conflict: section " &
+                    request.Section &
+                    " already has " &
+                    GetSubjectReference(sectionConflict) &
+                    " with " &
+                    GetTeacherReference(sectionConflict) &
+                    " on " &
+                    request.Day &
+                    " at " &
+                    NormalizeSession(sectionConflict.Session) &
+                    "."
+            End If
+
+            Return String.Empty
+        End Function
+
+        Private Function FindTeacherConflict(request As TeacherScheduleSaveRequest,
+                                             schedules As IEnumerable(Of TeacherScheduleRecord)) As TeacherScheduleRecord
+            If request Is Nothing OrElse schedules Is Nothing Then
+                Return Nothing
+            End If
+
+            For Each schedule As TeacherScheduleRecord In schedules
+                If schedule Is Nothing OrElse ShouldSkipConflictCheck(schedule, request) Then
+                    Continue For
+                End If
+
+                If Not String.Equals(NormalizeText(schedule.TeacherId),
+                                     request.TeacherId,
+                                     StringComparison.OrdinalIgnoreCase) Then
+                    Continue For
+                End If
+
+                If Not IsSameNormalizedDay(schedule.Day, request.Day) Then
+                    Continue For
+                End If
+
+                If SessionRangesOverlap(schedule.Session, request.Session) Then
+                    Return schedule
+                End If
+            Next
+
+            Return Nothing
+        End Function
+
+        Private Function FindRoomConflict(request As TeacherScheduleSaveRequest,
+                                          schedules As IEnumerable(Of TeacherScheduleRecord)) As TeacherScheduleRecord
+            If request Is Nothing OrElse
+               schedules Is Nothing OrElse
+               String.IsNullOrWhiteSpace(request.Room) Then
+                Return Nothing
+            End If
+
+            For Each schedule As TeacherScheduleRecord In schedules
+                If schedule Is Nothing OrElse ShouldSkipConflictCheck(schedule, request) Then
+                    Continue For
+                End If
+
+                If Not IsSameNormalizedDay(schedule.Day, request.Day) Then
+                    Continue For
+                End If
+
+                If Not String.Equals(NormalizeText(schedule.Room),
+                                     request.Room,
+                                     StringComparison.OrdinalIgnoreCase) Then
+                    Continue For
+                End If
+
+                If SessionRangesOverlap(schedule.Session, request.Session) Then
+                    Return schedule
+                End If
+            Next
+
+            Return Nothing
+        End Function
+
+        Private Function FindSectionConflict(request As TeacherScheduleSaveRequest,
+                                             schedules As IEnumerable(Of TeacherScheduleRecord)) As TeacherScheduleRecord
+            If request Is Nothing OrElse
+               schedules Is Nothing OrElse
+               String.IsNullOrWhiteSpace(request.Section) Then
+                Return Nothing
+            End If
+
+            For Each schedule As TeacherScheduleRecord In schedules
+                If schedule Is Nothing OrElse ShouldSkipConflictCheck(schedule, request) Then
+                    Continue For
+                End If
+
+                If Not IsSameNormalizedDay(schedule.Day, request.Day) Then
+                    Continue For
+                End If
+
+                If Not String.Equals(NormalizeText(schedule.Section),
+                                     request.Section,
+                                     StringComparison.OrdinalIgnoreCase) Then
+                    Continue For
+                End If
+
+                If SessionRangesOverlap(schedule.Session, request.Session) Then
+                    Return schedule
+                End If
+            Next
+
+            Return Nothing
+        End Function
+
+        Private Function ShouldSkipConflictCheck(schedule As TeacherScheduleRecord,
+                                                 request As TeacherScheduleSaveRequest) As Boolean
+            If schedule Is Nothing OrElse request Is Nothing Then
+                Return True
+            End If
+
+            Return String.Equals(NormalizeText(schedule.TeacherId),
+                                 request.TeacherId,
+                                 StringComparison.OrdinalIgnoreCase) AndAlso
+                   IsSameNormalizedDay(schedule.Day, request.Day) AndAlso
+                   String.Equals(NormalizeSession(schedule.Session),
+                                 request.Session,
+                                 StringComparison.OrdinalIgnoreCase)
+        End Function
+
+        Private Function IsSameNormalizedDay(leftDay As String, rightDay As String) As Boolean
+            Return String.Equals(NormalizeDay(leftDay),
+                                 NormalizeDay(rightDay),
+                                 StringComparison.OrdinalIgnoreCase)
+        End Function
+
+        Private Function SessionRangesOverlap(leftSession As String, rightSession As String) As Boolean
+            Dim leftStart As Integer
+            Dim leftEnd As Integer
+            Dim rightStart As Integer
+            Dim rightEnd As Integer
+            Dim leftParsed As Boolean = TryParseSessionRange(leftSession, leftStart, leftEnd)
+            Dim rightParsed As Boolean = TryParseSessionRange(rightSession, rightStart, rightEnd)
+
+            If leftParsed AndAlso rightParsed Then
+                Return leftStart < rightEnd AndAlso rightStart < leftEnd
+            End If
+
+            Return String.Equals(NormalizeSession(leftSession),
+                                 NormalizeSession(rightSession),
+                                 StringComparison.OrdinalIgnoreCase)
+        End Function
+
+        Private Function GetTeacherReference(schedule As TeacherScheduleRecord) As String
+            If schedule Is Nothing Then
+                Return "this professor"
+            End If
+
+            Dim teacherName As String = NormalizeText(schedule.TeacherName)
+            If Not String.IsNullOrWhiteSpace(teacherName) Then
+                Return teacherName
+            End If
+
+            Dim teacherId As String = NormalizeText(schedule.TeacherId)
+            If Not String.IsNullOrWhiteSpace(teacherId) Then
+                Return teacherId
+            End If
+
+            Return "this professor"
+        End Function
+
+        Private Function GetSubjectReference(schedule As TeacherScheduleRecord) As String
+            If schedule Is Nothing Then
+                Return "another class"
+            End If
+
+            Dim subjectCode As String = NormalizeText(schedule.SubjectCode)
+            Dim subjectName As String = NormalizeText(schedule.SubjectName)
+            If Not String.IsNullOrWhiteSpace(subjectCode) AndAlso
+               Not String.IsNullOrWhiteSpace(subjectName) AndAlso
+               Not String.Equals(subjectCode, subjectName, StringComparison.OrdinalIgnoreCase) Then
+                Return subjectCode & " - " & subjectName
+            End If
+
+            If Not String.IsNullOrWhiteSpace(subjectCode) Then
+                Return subjectCode
+            End If
+
+            If Not String.IsNullOrWhiteSpace(subjectName) Then
+                Return subjectName
+            End If
+
+            Return "another class"
         End Function
 
         Private Function NormalizeDay(dayValue As String) As String

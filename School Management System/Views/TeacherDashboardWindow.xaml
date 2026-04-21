@@ -104,7 +104,7 @@
                             <Border Width="44"
                                     Height="44"
                                     CornerRadius="22"
-                                    Background="#032538"
+                                    Background="{StaticResource DashboardDeepAccentBrush}"
                                     VerticalAlignment="Center">
                                 <Image Source="/Resources/Images/prmsu-logo.png"
                                        Width="28"
@@ -145,25 +145,6 @@
                                                Grid.Column="1"
                                                Style="{StaticResource DashboardSidebarNavTextSelectedStyle}"
                                                Text="Dashboard"/>
-                                </Grid>
-                            </Button>
-
-                            <Button x:Name="ClassesNavButton"
-                                    Style="{StaticResource DashboardSidebarNavButtonStyle}"
-                                    Margin="0,6,0,0"
-                                    Click="ClassesNavButton_Click">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Border x:Name="ClassesNavIconBorder" Style="{StaticResource DashboardSidebarIconBadgeStyle}">
-                                        <TextBlock x:Name="ClassesNavIconText" Style="{StaticResource DashboardSidebarIconGlyphStyle}" Text="&#xE7BE;"/>
-                                    </Border>
-                                    <TextBlock x:Name="ClassesNavText"
-                                               Grid.Column="1"
-                                               Style="{StaticResource DashboardSidebarNavTextStyle}"
-                                               Text="My Classes"/>
                                 </Grid>
                             </Button>
 
@@ -312,18 +293,20 @@
                                     Height="26"
                                     Background="{StaticResource DashboardBorderBrush}"
                                     Margin="12,0"/>
-                            <Border Width="36"
+                            <Border x:Name="HeaderTeacherAvatarBorder"
+                                    Width="36"
                                     Height="36"
                                     CornerRadius="18"
-                                    Background="#DCE8F8"
+                                    Background="{StaticResource DashboardAvatarSurfaceBrush}"
                                     BorderBrush="{StaticResource DashboardBorderBrush}"
                                     BorderThickness="1">
-                                <TextBlock Text="T"
+                                <TextBlock x:Name="HeaderTeacherInitialTextBlock"
+                                           Text="T"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
                                            FontSize="12"
                                            FontWeight="Bold"
-                                           Foreground="#1F3E6F"/>
+                                           Foreground="{StaticResource DashboardAvatarForegroundBrush}"/>
                             </Border>
                             <StackPanel Margin="8,0,0,0">
                                 <TextBlock x:Name="HeaderTeacherNameTextBlock"
@@ -343,40 +326,7 @@
                 <Grid Grid.Row="1">
                     <ScrollViewer x:Name="DashboardContentScrollViewer" VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="20,18,20,22">
-                            <UniformGrid Columns="3">
-                                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,8,0">
-                                    <StackPanel Margin="16,14,16,12">
-                                        <TextBlock Text="Today's Classes"
-                                                   FontSize="13"
-                                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                        <TextBlock Text="0"
-                                                   FontSize="34"
-                                                   FontWeight="Bold"/>
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0">
-                                    <StackPanel Margin="16,14,16,12">
-                                        <TextBlock Text="Pending Submissions"
-                                                   FontSize="13"
-                                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                        <TextBlock Text="0"
-                                                   FontSize="34"
-                                                   FontWeight="Bold"/>
-                                    </StackPanel>
-                                </Border>
-                                <Border Style="{StaticResource DashboardCardBorderStyle}" Margin="8,0,0,0">
-                                    <StackPanel Margin="16,14,16,12">
-                                        <TextBlock Text="Advisory Alerts"
-                                                   FontSize="13"
-                                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                        <TextBlock Text="0"
-                                                   FontSize="34"
-                                                   FontWeight="Bold"/>
-                                    </StackPanel>
-                                </Border>
-                            </UniformGrid>
-
-                            <Grid Margin="0,18,0,0">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1.7*"/>
                                     <ColumnDefinition Width="1*"/>
@@ -384,7 +334,7 @@
 
                                 <Border Grid.Column="0" Style="{StaticResource DashboardCardBorderStyle}" Margin="0,0,10,0">
                                     <StackPanel Margin="18">
-                                        <TextBlock Text="Today's Teaching Schedule"
+                                        <TextBlock Text="Current Teaching Schedule"
                                                    FontSize="22"
                                                    FontWeight="Bold"/>
                                         <Border Margin="0,14,0,0"
@@ -392,46 +342,21 @@
                                                 BorderThickness="1"
                                                 CornerRadius="8"
                                                 Padding="0">
-                                            <DataGrid x:Name="DashboardTimetableDataGrid"
-                                                      AutoGenerateColumns="False"
-                                                      HeadersVisibility="Column"
-                                                      GridLinesVisibility="All"
-                                                      HorizontalGridLinesBrush="{StaticResource DashboardBorderBrush}"
-                                                      VerticalGridLinesBrush="{StaticResource DashboardBorderBrush}"
-                                                      IsReadOnly="True"
-                                                      BorderThickness="0"
-                                                      Background="Transparent"
-                                                      RowHeaderWidth="0"
-                                                      CanUserAddRows="False"
-                                                      CanUserDeleteRows="False"
-                                                      CanUserResizeRows="False"
-                                                      CanUserResizeColumns="False"
-                                                      CanUserSortColumns="False"
-                                                      SelectionUnit="Cell"
-                                                      SelectionMode="Single"
-                                                      ColumnWidth="*"
-                                                      MinColumnWidth="70">
-                                                <DataGrid.Resources>
-                                                    <Style TargetType="DataGridColumnHeader">
-                                                        <Setter Property="Background" Value="#F8FBFF"/>
-                                                        <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
-                                                        <Setter Property="FontWeight" Value="SemiBold"/>
-                                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                                        <Setter Property="Padding" Value="10,8"/>
-                                                        <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
-                                                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
-                                                    </Style>
-                                                    <Style TargetType="DataGridCell">
-                                                        <Setter Property="Padding" Value="10,12"/>
-                                                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-                                                        <Setter Property="Foreground" Value="{StaticResource DashboardTextMutedBrush}"/>
-                                                        <Setter Property="BorderThickness" Value="0"/>
-                                                    </Style>
-                                                    <Style TargetType="DataGridRow">
-                                                        <Setter Property="Background" Value="White"/>
-                                                    </Style>
-                                                </DataGrid.Resources>
-                                            </DataGrid>
+                                             <DataGrid x:Name="DashboardTimetableDataGrid"
+                                                       Style="{StaticResource DashboardManagementDataGridStyle}"
+                                                       ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                                       CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                                       RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                                       HeadersVisibility="Column"
+                                                       BorderThickness="0"
+                                                       ColumnWidth="*"
+                                                       RowHeaderWidth="0"
+                                                       CanUserSortColumns="False"
+                                                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                                       ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                       SelectionUnit="Cell"
+                                                       SelectionMode="Single"
+                                                       MinHeight="280"/>
                                         </Border>
                                     </StackPanel>
                                 </Border>
@@ -444,7 +369,7 @@
                                         <Border Margin="0,12,0,0"
                                                 Padding="12,10"
                                                 CornerRadius="8"
-                                                Background="#F8FBFF"
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="1">
                                             <StackPanel Orientation="Horizontal">
@@ -459,7 +384,7 @@
                                         <Border Margin="0,8,0,0"
                                                 Padding="12,10"
                                                 CornerRadius="8"
-                                                Background="#F8FBFF"
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="1">
                                             <StackPanel Orientation="Horizontal">
@@ -474,7 +399,7 @@
                                         <Border Margin="0,8,0,0"
                                                 Padding="12,10"
                                                 CornerRadius="8"
-                                                Background="#F8FBFF"
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="1">
                                             <StackPanel Orientation="Horizontal">
@@ -510,16 +435,16 @@
                                                        FontWeight="Bold"
                                                        HorizontalAlignment="Center"
                                                        Foreground="White"/>
-                                            <TextBlock Margin="0,8,0,0"
-                                                       MaxWidth="360"
-                                                       FontSize="14"
-                                                       Foreground="#D7E9FF"
-                                                       TextWrapping="Wrap"
-                                                       Text="Use the sidebar to manage classes, schedules, and grading activities."/>
-                                            <Button Margin="0,20,0,0"
-                                                    Width="140"
-                                                    Height="36"
-                                                    HorizontalAlignment="Center"
+                                             <TextBlock Margin="0,8,0,0"
+                                                        MaxWidth="360"
+                                                        FontSize="14"
+                                                        Foreground="{StaticResource DashboardHelpTextBrush}"
+                                                        TextWrapping="Wrap"
+                                                        Text="Use the sidebar to manage schedules, grading, and your profile updates."/>
+                                             <Button Margin="0,20,0,0"
+                                                     Width="140"
+                                                     Height="36"
+                                                     HorizontalAlignment="Center"
                                                     Style="{StaticResource DashboardPrimaryActionButtonStyle}"
                                                     Content="Open Help"/>
                                         </StackPanel>
@@ -536,9 +461,6 @@
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
-
-                    <local:TeacherClassesView x:Name="ClassesContentView"
-                                               Visibility="Collapsed"/>
 
                     <local:TeacherScheduleView x:Name="ScheduleContentView"
                                                Visibility="Collapsed"/>

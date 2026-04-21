@@ -85,7 +85,7 @@
                                         <Border Margin="0,0,0,10"
                                                 Padding="12"
                                                 CornerRadius="10"
-                                                Background="#F6F9FD">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <StackPanel>
                                                 <TextBlock Text="{Binding Title}"
                                                            FontSize="13"
@@ -128,7 +128,7 @@
                                     <Border Margin="0,0,0,10"
                                             Padding="12"
                                             CornerRadius="10"
-                                            Background="#F6F9FD">
+                                            Background="{StaticResource DashboardSoftSurfaceBrush}">
                                         <StackPanel>
                                             <TextBlock Text="{Binding Title}"
                                                        FontSize="14"
@@ -158,7 +158,7 @@
                             <TextBlock Margin="0,8,0,0"
                                        MaxWidth="360"
                                        FontSize="14"
-                                       Foreground="#D7E9FF"
+                                       Foreground="{StaticResource DashboardHelpTextBrush}"
                                        TextWrapping="Wrap"
                                        Text="Check our documentation for guides on how to manage students, set up exams, and organize departments effectively."/>
                             <Button Margin="0,20,0,0"

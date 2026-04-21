@@ -1,10 +1,12 @@
 Imports System.Collections.Generic
+Imports System.Globalization
 Imports System.IO
 Imports System.IO.Compression
 Imports System.Text
 Imports System.Text.Json
 Imports System.Windows.Documents
 Imports System.Windows.Media
+Imports School_Management_System.Backend.Common
 Imports Microsoft.Win32
 Imports School_Management_System.Backend.Models
 Imports School_Management_System.Backend.Services
@@ -198,9 +200,10 @@ Class AdminReportsView
             rows.Add(New String() {
                 NormalizeValue(record.StudentId),
                 NormalizeValue(record.FullName),
-                NormalizeValue(record.YearLevel),
+                StudentScheduleHelper.BuildYearLevelValue(record.YearLevel),
                 NormalizeValue(record.Course),
-                NormalizeValue(record.Section)
+                StudentScheduleHelper.BuildSectionValue(record.Section,
+                                                       record.YearLevel)
             })
         Next
 
@@ -453,19 +456,12 @@ Class AdminReportsView
             File.Delete(filePath)
         End If
 
+        Dim exportHeaders As List(Of String) = BuildExportHeaders(headers)
+        Dim exportRows As List(Of String()) = BuildExportRows(rows, exportHeaders.Count)
         Dim sheetName As String = BuildSafeSheetName(reportTitle)
 
         Using archive As ZipArchive = ZipFile.Open(filePath, ZipArchiveMode.Create)
-            WriteZipEntry(archive,
-                          "[Content_Types].xml",
-                          "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>" &
-                          "<Types xmlns=""http://schemas.openxmlformats.org/package/2006/content-types"">" &
-                          "<Default Extension=""rels"" ContentType=""application/vnd.openxmlformats-package.relationships+xml""/>" &
-                          "<Default Extension=""xml"" ContentType=""application/xml""/>" &
-                          "<Override PartName=""/xl/workbook.xml"" ContentType=""application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml""/>" &
-                          "<Override PartName=""/xl/worksheets/sheet1.xml"" ContentType=""application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml""/>" &
-                          "<Override PartName=""/xl/styles.xml"" ContentType=""application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml""/>" &
-                          "</Types>")
+            WriteZipEntry(archive, "[Content_Types].xml", BuildContentTypesXml())
 
             WriteZipEntry(archive,
                           "_rels/.rels",
@@ -491,7 +487,9 @@ Class AdminReportsView
                           "</Relationships>")
 
             WriteZipEntry(archive, "xl/styles.xml", BuildStylesXml())
-            WriteZipEntry(archive, "xl/worksheets/sheet1.xml", BuildWorksheetXml(reportTitle, reportSubtitle, headers, rows))
+            WriteZipEntry(archive,
+                          "xl/worksheets/sheet1.xml",
+                          BuildWorksheetXml(reportTitle, reportSubtitle, exportHeaders, exportRows))
         End Using
     End Sub
 
@@ -504,73 +502,255 @@ Class AdminReportsView
         End Using
     End Sub
 
+    Private Function BuildContentTypesXml() As String
+        Dim xml As New StringBuilder()
+        xml.Append("<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>")
+        xml.Append("<Types xmlns=""http://schemas.openxmlformats.org/package/2006/content-types"">")
+        xml.Append("<Default Extension=""rels"" ContentType=""application/vnd.openxmlformats-package.relationships+xml""/>")
+        xml.Append("<Default Extension=""xml"" ContentType=""application/xml""/>")
+        xml.Append("<Override PartName=""/xl/workbook.xml"" ContentType=""application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml""/>")
+        xml.Append("<Override PartName=""/xl/worksheets/sheet1.xml"" ContentType=""application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml""/>")
+        xml.Append("<Override PartName=""/xl/styles.xml"" ContentType=""application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml""/>")
+        xml.Append("</Types>")
+        Return xml.ToString()
+    End Function
+
     Private Function BuildStylesXml() As String
-        Return "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>" &
-               "<styleSheet xmlns=""http://schemas.openxmlformats.org/spreadsheetml/2006/main"">" &
-               "<fonts count=""2"">" &
-               "<font><sz val=""11""/><color rgb=""FF1F2937""/><name val=""Segoe UI""/><family val=""2""/></font>" &
-               "<font><b/><sz val=""11""/><color rgb=""FF1F2937""/><name val=""Segoe UI""/><family val=""2""/></font>" &
-               "</fonts>" &
-               "<fills count=""2""><fill><patternFill patternType=""none""/></fill><fill><patternFill patternType=""gray125""/></fill></fills>" &
-               "<borders count=""1""><border><left/><right/><top/><bottom/><diagonal/></border></borders>" &
-               "<cellStyleXfs count=""1""><xf numFmtId=""0"" fontId=""0"" fillId=""0"" borderId=""0""/></cellStyleXfs>" &
-               "<cellXfs count=""2"">" &
-               "<xf numFmtId=""0"" fontId=""0"" fillId=""0"" borderId=""0"" xfId=""0"" applyAlignment=""1""><alignment vertical=""top"" wrapText=""1""/></xf>" &
-               "<xf numFmtId=""0"" fontId=""1"" fillId=""0"" borderId=""0"" xfId=""0"" applyAlignment=""1""><alignment vertical=""top"" wrapText=""1""/></xf>" &
-               "</cellXfs>" &
-               "<cellStyles count=""1""><cellStyle name=""Normal"" xfId=""0"" builtinId=""0""/></cellStyles>" &
-               "</styleSheet>"
+        Dim xml As New StringBuilder()
+        xml.Append("<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>")
+        xml.Append("<styleSheet xmlns=""http://schemas.openxmlformats.org/spreadsheetml/2006/main"">")
+        xml.Append("<fonts count=""3"">")
+        xml.Append("<font><sz val=""11""/><color rgb=""FF000000""/><name val=""Segoe UI""/><family val=""2""/></font>")
+        xml.Append("<font><b/><sz val=""14""/><color rgb=""FF000000""/><name val=""Segoe UI Semibold""/><family val=""2""/></font>")
+        xml.Append("<font><b/><sz val=""11""/><color rgb=""FF000000""/><name val=""Segoe UI Semibold""/><family val=""2""/></font>")
+        xml.Append("</fonts>")
+        xml.Append("<fills count=""2"">")
+        xml.Append("<fill><patternFill patternType=""none""/></fill>")
+        xml.Append("<fill><patternFill patternType=""gray125""/></fill>")
+        xml.Append("</fills>")
+        xml.Append("<borders count=""2"">")
+        xml.Append("<border><left/><right/><top/><bottom/><diagonal/></border>")
+        xml.Append("<border><left style=""thin""><color rgb=""FF000000""/></left><right style=""thin""><color rgb=""FF000000""/></right><top style=""thin""><color rgb=""FF000000""/></top><bottom style=""thin""><color rgb=""FF000000""/></bottom><diagonal/></border>")
+        xml.Append("</borders>")
+        xml.Append("<cellStyleXfs count=""1""><xf numFmtId=""0"" fontId=""0"" fillId=""0"" borderId=""0""/></cellStyleXfs>")
+        xml.Append("<cellXfs count=""4"">")
+        xml.Append("<xf numFmtId=""0"" fontId=""0"" fillId=""0"" borderId=""0"" xfId=""0"" applyFont=""1"" applyAlignment=""1""><alignment vertical=""center"" wrapText=""1""/></xf>")
+        xml.Append("<xf numFmtId=""0"" fontId=""1"" fillId=""0"" borderId=""0"" xfId=""0"" applyFont=""1"" applyAlignment=""1""><alignment horizontal=""left"" vertical=""center"" wrapText=""1""/></xf>")
+        xml.Append("<xf numFmtId=""0"" fontId=""2"" fillId=""0"" borderId=""1"" xfId=""0"" applyFont=""1"" applyBorder=""1"" applyAlignment=""1""><alignment horizontal=""left"" vertical=""center"" wrapText=""1""/></xf>")
+        xml.Append("<xf numFmtId=""0"" fontId=""0"" fillId=""0"" borderId=""1"" xfId=""0"" applyFont=""1"" applyBorder=""1"" applyAlignment=""1""><alignment vertical=""top"" wrapText=""1""/></xf>")
+        xml.Append("</cellXfs>")
+        xml.Append("<cellStyles count=""1""><cellStyle name=""Normal"" xfId=""0"" builtinId=""0""/></cellStyles>")
+        xml.Append("</styleSheet>")
+        Return xml.ToString()
     End Function
 
     Private Function BuildWorksheetXml(reportTitle As String,
                                        reportSubtitle As String,
                                        headers As IList(Of String),
                                        rows As IList(Of String())) As String
+        Dim totalColumns As Integer = Math.Max(1, headers.Count)
+        Dim lastColumnName As String = GetColumnName(totalColumns)
+        Dim hasData As Boolean = rows.Count > 0
+        Dim lastRowIndex As Integer = If(hasData, WorksheetTableHeaderRowIndex + rows.Count, WorksheetFirstDataRowIndex)
         Dim body As New StringBuilder()
-        Dim rowIndex As Integer = 1
 
-        AppendTextRow(body, rowIndex, New String() {reportTitle}, True)
-        rowIndex += 1
-        AppendTextRow(body, rowIndex, New String() {reportSubtitle}, False)
-        rowIndex += 1
-        AppendTextRow(body, rowIndex, New String() {"Generated on " & DateTime.Now.ToString("MMMM d, yyyy h:mm tt")}, False)
-        rowIndex += 2
+        AppendStyledTextRow(body,
+                            WorksheetReportTitleRowIndex,
+                            New String() {reportTitle},
+                            1,
+                            24)
+        AppendStyledTextRow(body,
+                            WorksheetReportInfoRowIndex,
+                            New String() {BuildWorksheetInfoText(reportSubtitle, rows.Count)},
+                            0,
+                            18)
+        AppendStyledTextRow(body,
+                            WorksheetTableHeaderRowIndex,
+                            headers,
+                            2,
+                            22,
+                            totalColumns)
 
-        AppendTextRow(body, rowIndex, headers, True)
-        rowIndex += 1
-
-        If rows Is Nothing OrElse rows.Count = 0 Then
-            AppendTextRow(body, rowIndex, New String() {"No records available."}, False)
-        Else
+        If hasData Then
+            Dim rowIndex As Integer = WorksheetFirstDataRowIndex
             For Each dataRow As String() In rows
-                AppendTextRow(body, rowIndex, dataRow, False)
+                AppendStyledTextRow(body, rowIndex, dataRow, 3, 20, totalColumns)
                 rowIndex += 1
             Next
+        Else
+            AppendStyledTextRow(body,
+                                WorksheetFirstDataRowIndex,
+                                New String() {"No records available."},
+                                3,
+                                20)
         End If
 
-        Return "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>" &
-               "<worksheet xmlns=""http://schemas.openxmlformats.org/spreadsheetml/2006/main"">" &
-               "<sheetData>" & body.ToString() & "</sheetData>" &
-               "</worksheet>"
+        Dim xml As New StringBuilder()
+        xml.Append("<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>")
+        xml.Append("<worksheet xmlns=""http://schemas.openxmlformats.org/spreadsheetml/2006/main"" ")
+        xml.Append("xmlns:r=""http://schemas.openxmlformats.org/officeDocument/2006/relationships"">")
+        xml.Append("<dimension ref=""").Append(BuildSheetDimension(lastColumnName, lastRowIndex)).Append("""/>")
+        xml.Append("<sheetViews><sheetView tabSelected=""1"" workbookViewId=""0"">")
+        xml.Append("<pane ySplit=""").Append(WorksheetFrozenRowCount.ToString()).Append(""" topLeftCell=""A")
+        xml.Append((WorksheetFrozenRowCount + 1).ToString()).Append(""" activePane=""bottomLeft"" state=""frozen""/>")
+        xml.Append("</sheetView></sheetViews>")
+        xml.Append("<sheetFormatPr defaultRowHeight=""20""/>")
+        xml.Append(BuildColumnsXml(headers, rows))
+        xml.Append("<sheetData>").Append(body.ToString()).Append("</sheetData>")
+        xml.Append(BuildMergeCellsXml(lastColumnName, Not hasData))
+        xml.Append("<pageMargins left=""0.35"" right=""0.35"" top=""0.6"" bottom=""0.6"" header=""0.3"" footer=""0.3""/>")
+        xml.Append("<pageSetup orientation=""landscape"" fitToWidth=""1"" fitToHeight=""0""/>")
+        xml.Append("</worksheet>")
+        Return xml.ToString()
     End Function
 
-    Private Sub AppendTextRow(builder As StringBuilder, rowIndex As Integer, values As IEnumerable(Of String), isHeader As Boolean)
-        builder.Append("<row r=""").Append(rowIndex.ToString()).Append(""">")
+    Private Sub AppendStyledTextRow(builder As StringBuilder,
+                                    rowIndex As Integer,
+                                    values As IEnumerable(Of String),
+                                    styleIndex As Integer,
+                                    rowHeight As Double,
+                                    Optional expectedColumnCount As Integer = 0)
+        builder.Append("<row r=""").Append(rowIndex.ToString()).Append(""" ht=""")
+        builder.Append(rowHeight.ToString("0.##", CultureInfo.InvariantCulture))
+        builder.Append(""" customHeight=""1"">")
 
         Dim columnIndex As Integer = 1
         If values IsNot Nothing Then
             For Each value As String In values
-                Dim styleIndex As Integer = If(isHeader, 1, 0)
-                Dim cellReference As String = GetCellReference(columnIndex, rowIndex)
-                builder.Append("<c r=""").Append(cellReference).Append(""" t=""inlineStr"" s=""").Append(styleIndex.ToString()).Append("""><is><t>")
-                builder.Append(EscapeXml(NormalizeValue(value)))
-                builder.Append("</t></is></c>")
+                AppendInlineStringCell(builder, rowIndex, columnIndex, NormalizeValue(value), styleIndex)
                 columnIndex += 1
             Next
         End If
 
+        While expectedColumnCount > 0 AndAlso columnIndex <= expectedColumnCount
+            AppendInlineStringCell(builder, rowIndex, columnIndex, "--", styleIndex)
+            columnIndex += 1
+        End While
+
         builder.Append("</row>")
     End Sub
+
+    Private Sub AppendInlineStringCell(builder As StringBuilder,
+                                       rowIndex As Integer,
+                                       columnIndex As Integer,
+                                       value As String,
+                                       styleIndex As Integer)
+        builder.Append("<c r=""").Append(GetCellReference(columnIndex, rowIndex)).Append(""" t=""inlineStr"" s=""")
+        builder.Append(styleIndex.ToString()).Append("""><is><t>")
+        builder.Append(EscapeXml(value))
+        builder.Append("</t></is></c>")
+    End Sub
+
+    Private Function BuildColumnsXml(headers As IList(Of String), rows As IList(Of String())) As String
+        Dim xml As New StringBuilder()
+        xml.Append("<cols>")
+
+        For columnIndex As Integer = 0 To headers.Count - 1
+            xml.Append("<col min=""").Append((columnIndex + 1).ToString()).Append(""" max=""")
+            xml.Append((columnIndex + 1).ToString()).Append(""" width=""")
+            xml.Append(CalculateColumnWidth(headers, rows, columnIndex).ToString("0.##", CultureInfo.InvariantCulture))
+            xml.Append(""" customWidth=""1""/>")
+        Next
+
+        xml.Append("</cols>")
+        Return xml.ToString()
+    End Function
+
+    Private Function CalculateColumnWidth(headers As IList(Of String),
+                                          rows As IList(Of String()),
+                                          columnIndex As Integer) As Double
+        Dim maxLength As Integer = 14
+
+        If headers IsNot Nothing AndAlso columnIndex < headers.Count Then
+            maxLength = Math.Max(maxLength, NormalizeValue(headers(columnIndex)).Length)
+        End If
+
+        If rows IsNot Nothing Then
+            For Each row As String() In rows
+                If row IsNot Nothing AndAlso columnIndex < row.Length Then
+                    maxLength = Math.Max(maxLength, NormalizeValue(row(columnIndex)).Length)
+                End If
+            Next
+        End If
+
+        Dim calculatedWidth As Double = Math.Ceiling((maxLength * 1.12) + 2)
+        Return Math.Max(14.0, Math.Min(34.0, calculatedWidth))
+    End Function
+
+    Private Function BuildMergeCellsXml(lastColumnName As String, includeEmptyStateRow As Boolean) As String
+        Dim xml As New StringBuilder()
+        Dim mergeCount As Integer = If(includeEmptyStateRow, 3, 2)
+        xml.Append("<mergeCells count=""").Append(mergeCount.ToString()).Append(""">")
+        xml.Append("<mergeCell ref=""A").Append(WorksheetReportTitleRowIndex.ToString()).Append(":")
+        xml.Append(lastColumnName).Append(WorksheetReportTitleRowIndex.ToString()).Append("""/>")
+        xml.Append("<mergeCell ref=""A").Append(WorksheetReportInfoRowIndex.ToString()).Append(":")
+        xml.Append(lastColumnName).Append(WorksheetReportInfoRowIndex.ToString()).Append("""/>")
+
+        If includeEmptyStateRow Then
+            xml.Append("<mergeCell ref=""A").Append(WorksheetFirstDataRowIndex.ToString()).Append(":")
+            xml.Append(lastColumnName).Append(WorksheetFirstDataRowIndex.ToString()).Append("""/>")
+        End If
+
+        xml.Append("</mergeCells>")
+        Return xml.ToString()
+    End Function
+
+    Private Function BuildSheetDimension(lastColumnName As String, lastRowIndex As Integer) As String
+        Return "A1:" & lastColumnName & lastRowIndex.ToString()
+    End Function
+
+    Private Function BuildWorksheetInfoText(reportSubtitle As String, recordCount As Integer) As String
+        Return NormalizeValue(reportSubtitle) &
+               " | Generated on " &
+               DateTime.Now.ToString("MMMM d, yyyy h:mm tt") &
+               " | Total records: " &
+               recordCount.ToString()
+    End Function
+
+    Private Function BuildExportHeaders(headers As IList(Of String)) As List(Of String)
+        Dim exportHeaders As New List(Of String)()
+
+        If headers IsNot Nothing Then
+            For Each header As String In headers
+                exportHeaders.Add(NormalizeValue(header))
+            Next
+        End If
+
+        If exportHeaders.Count = 0 Then
+            exportHeaders.Add("Data")
+        End If
+
+        Return exportHeaders
+    End Function
+
+    Private Function BuildExportRows(rows As IList(Of String()), columnCount As Integer) As List(Of String())
+        Dim exportRows As New List(Of String())()
+        If rows Is Nothing Then
+            Return exportRows
+        End If
+
+        For Each sourceRow As String() In rows
+            Dim normalizedRow(columnCount - 1) As String
+
+            For columnIndex As Integer = 0 To columnCount - 1
+                If sourceRow IsNot Nothing AndAlso columnIndex < sourceRow.Length Then
+                    normalizedRow(columnIndex) = NormalizeValue(sourceRow(columnIndex))
+                Else
+                    normalizedRow(columnIndex) = "--"
+                End If
+            Next
+
+            exportRows.Add(normalizedRow)
+        Next
+
+        Return exportRows
+    End Function
+
+    Private Const WorksheetReportTitleRowIndex As Integer = 1
+    Private Const WorksheetReportInfoRowIndex As Integer = 2
+    Private Const WorksheetTableHeaderRowIndex As Integer = 4
+    Private Const WorksheetFirstDataRowIndex As Integer = 5
+    Private Const WorksheetFrozenRowCount As Integer = 4
 
     Private Function GetCellReference(columnIndex As Integer, rowIndex As Integer) As String
         Return GetColumnName(columnIndex) & rowIndex.ToString()

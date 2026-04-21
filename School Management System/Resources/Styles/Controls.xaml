@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Style x:Key="RoleOptionButtonStyle" TargetType="RadioButton">
-        <Setter Property="Foreground" Value="#7C8DA8"/>
+        <Setter Property="Foreground" Value="#7A6A33"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Background" Value="Transparent"/>
@@ -18,11 +18,11 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="OptionSurface" Property="Background" Value="#E9EEF8"/>
+                            <Setter TargetName="OptionSurface" Property="Background" Value="{StaticResource Brush.PrimarySurface}"/>
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="OptionSurface" Property="Background" Value="{StaticResource Brush.Primary}"/>
-                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="Foreground" Value="{StaticResource Brush.OnPrimary}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -45,7 +45,7 @@
     <Style x:Key="PrimaryActionButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource Brush.Primary}"/>
         <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Foreground" Value="{StaticResource Brush.OnPrimary}"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -97,10 +97,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ButtonSurface" Property="Background" Value="#11000000"/>
+                            <Setter TargetName="ButtonSurface" Property="Background" Value="#14F2D009"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="ButtonSurface" Property="Background" Value="#1E000000"/>
+                            <Setter TargetName="ButtonSurface" Property="Background" Value="#24E0BC00"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -127,10 +127,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="TitleBarButtonSurface" Property="Background" Value="#1FFFFFFF"/>
+                            <Setter TargetName="TitleBarButtonSurface" Property="Background" Value="#26F7E37A"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="TitleBarButtonSurface" Property="Background" Value="#30FFFFFF"/>
+                            <Setter TargetName="TitleBarButtonSurface" Property="Background" Value="#3DF2D009"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

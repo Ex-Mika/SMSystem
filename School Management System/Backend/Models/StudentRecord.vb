@@ -1,3 +1,5 @@
+Imports System.Globalization
+
 Namespace Backend.Models
     Public Class StudentRecord
         Public Property StudentRecordId As Integer
@@ -50,18 +52,7 @@ Namespace Backend.Models
                     Return String.Empty
                 End If
 
-                Select Case YearLevel.Value
-                    Case 1
-                        Return "1st Year"
-                    Case 2
-                        Return "2nd Year"
-                    Case 3
-                        Return "3rd Year"
-                    Case 4
-                        Return "4th Year"
-                    Case Else
-                        Return YearLevel.Value.ToString() & "th Year"
-                End Select
+                Return YearLevel.Value.ToString(CultureInfo.InvariantCulture)
             End Get
         End Property
     End Class

@@ -8,7 +8,7 @@
         <Style x:Key="ReportOptionCardStyle" TargetType="Border">
             <Setter Property="Width" Value="430"/>
             <Setter Property="Margin" Value="6"/>
-            <Setter Property="Background" Value="#FCFDFE"/>
+            <Setter Property="Background" Value="{StaticResource DashboardSoftSurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="10"/>
@@ -27,7 +27,7 @@
         <Style x:Key="ReportExportButtonStyle"
                TargetType="Button"
                BasedOn="{StaticResource ReportActionButtonStyle}">
-            <Setter Property="Background" Value="#F3F6FA"/>
+            <Setter Property="Background" Value="{StaticResource DashboardSoftSurfaceAltBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
         </Style>
     </UserControl.Resources>
@@ -66,13 +66,13 @@
                                 <Border Width="42"
                                         Height="42"
                                         CornerRadius="21"
-                                        Background="#EAF4FF"
+                                        Background="{StaticResource DashboardPrimarySoftBrush}"
                                         BorderBrush="{StaticResource DashboardBorderBrush}"
                                         BorderThickness="1">
                                     <TextBlock FontFamily="Segoe MDL2 Assets"
                                                Text="&#xE77B;"
                                                FontSize="18"
-                                               Foreground="{StaticResource DashboardPrimaryBrush}"
+                                               Foreground="{StaticResource DashboardAccentTextBrush}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"/>
                                 </Border>
@@ -89,8 +89,7 @@
                                 <UniformGrid Columns="2" Margin="0,14,0,0">
                                     <Button Margin="0,0,6,0"
                                             Style="{StaticResource ReportActionButtonStyle}"
-                                            Background="#137FEC"
-                                            Foreground="White"
+                                            Background="{StaticResource DashboardPrimaryBrush}" Foreground="{StaticResource DashboardOnPrimaryBrush}"
                                             Click="PrintStudentsReportButton_Click"
                                             Content="Print"/>
                                     <Button Margin="6,0,0,0"
@@ -226,13 +225,13 @@
                                 <Border Width="42"
                                         Height="42"
                                         CornerRadius="21"
-                                        Background="#E8F7FF"
+                                        Background="{StaticResource DashboardPrimarySoftBrush}"
                                         BorderBrush="{StaticResource DashboardBorderBrush}"
                                         BorderThickness="1">
                                     <TextBlock FontFamily="Segoe MDL2 Assets"
                                                Text="&#xE8EF;"
                                                FontSize="18"
-                                               Foreground="#0B74A5"
+                                               Foreground="{StaticResource DashboardAccentTextBrush}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"/>
                                 </Border>
@@ -249,8 +248,7 @@
                                 <UniformGrid Columns="2" Margin="0,14,0,0">
                                     <Button Margin="0,0,6,0"
                                             Style="{StaticResource ReportActionButtonStyle}"
-                                            Background="#0B74A5"
-                                            Foreground="White"
+                                            Background="{StaticResource DashboardPrimaryBrush}" Foreground="{StaticResource DashboardOnPrimaryBrush}"
                                             Click="PrintSubjectsReportButton_Click"
                                             Content="Print"/>
                                     <Button Margin="6,0,0,0"

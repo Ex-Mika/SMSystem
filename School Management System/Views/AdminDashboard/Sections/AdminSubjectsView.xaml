@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="AdminSubjectsView"
+<UserControl x:Class="AdminSubjectsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -20,14 +20,14 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="Background" Value="{StaticResource DashboardSoftSurfaceBrush}"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
         <Style x:Key="SubjectDetailsValueBorderStyle" TargetType="Border">
             <Setter Property="Margin" Value="0,6,0,0"/>
             <Setter Property="Padding" Value="10,8"/>
-            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="Background" Value="{StaticResource DashboardSoftSurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="8"/>
@@ -37,6 +37,34 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
             <Setter Property="Text" Value="--"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="SubjectDataGridHeaderStyle"
+               TargetType="DataGridColumnHeader"
+               BasedOn="{StaticResource DashboardManagementDataGridHeaderStyle}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="SubjectDataGridCellStyle"
+               TargetType="DataGridCell"
+               BasedOn="{StaticResource DashboardManagementDataGridCellStyle}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="SubjectDataGridRowStyle"
+               TargetType="DataGridRow"
+               BasedOn="{StaticResource DashboardManagementDataGridRowStyle}">
+            <Setter Property="Height" Value="56"/>
+        </Style>
+
+        <Style x:Key="SubjectDataGridTextStyle" TargetType="TextBlock">
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
     </UserControl.Resources>
@@ -94,7 +122,7 @@
                                                 Padding="18,14"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="0,0,0,1"
-                                                Background="#FCFDFE">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <StackPanel>
                                                 <TextBlock Text="Subject Details"
                                                            FontSize="20"
@@ -141,21 +169,20 @@
                                                 Padding="18,14"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="0,1,0,0"
-                                                Background="#FCFDFE">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <UniformGrid Columns="3">
                                                 <Button Height="38"
                                                         Margin="0,0,6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#137FEC"
-                                                        Foreground="White"
+                                                        Background="{StaticResource DashboardPrimaryBrush}" Foreground="{StaticResource DashboardOnPrimaryBrush}"
                                                         Click="OpenAddSubjectButton_Click"
                                                         Content="New"/>
                                                 <Button x:Name="EditSelectedSubjectButton"
                                                         Height="38"
                                                         Margin="6,0,6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#EAF4FF"
-                                                        Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                        Background="{StaticResource DashboardPrimarySoftBrush}"
+                                                        Foreground="{StaticResource DashboardAccentTextBrush}"
                                                         Click="EditSelectedSubjectButton_Click"
                                                         Content="Edit"/>
                                                 <Button x:Name="DeleteSelectedSubjectButton"
@@ -181,7 +208,7 @@
                                                 Padding="18,14"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="0,0,0,1"
-                                                Background="#FCFDFE">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <StackPanel>
                                                 <TextBlock x:Name="SubjectFormTitleTextBlock"
                                                            Text="Add Subject"
@@ -219,20 +246,19 @@
                                                 Padding="18,14"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="0,1,0,0"
-                                                Background="#FCFDFE">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <UniformGrid Columns="2">
                                                 <Button x:Name="SaveSubjectFormButton"
                                                         Height="38"
                                                         Margin="0,0,6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#137FEC"
-                                                        Foreground="White"
+                                                        Background="{StaticResource DashboardPrimaryBrush}" Foreground="{StaticResource DashboardOnPrimaryBrush}"
                                                         Click="SaveSubjectFormButton_Click"
                                                         Content="Add Subject"/>
                                                 <Button Height="38"
                                                         Margin="6,0,0,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#F3F6FA"
+                                                        Background="{StaticResource DashboardSoftSurfaceAltBrush}"
                                                         Foreground="{StaticResource DashboardTextMutedBrush}"
                                                         Click="CancelSubjectFormButton_Click"
                                                         Content="Cancel"/>
@@ -252,9 +278,9 @@
                                     SnapsToDevicePixels="True">
                                 <DataGrid x:Name="SubjectsDataGrid"
                                           Style="{StaticResource DashboardManagementDataGridStyle}"
-                                          ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
-                                          CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
-                                          RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                          ColumnHeaderStyle="{StaticResource SubjectDataGridHeaderStyle}"
+                                          CellStyle="{StaticResource SubjectDataGridCellStyle}"
+                                          RowStyle="{StaticResource SubjectDataGridRowStyle}"
                                           BorderThickness="0"
                                           ColumnWidth="*"
                                           local:RoundedClipHelper.CornerRadius="10"
@@ -263,11 +289,11 @@
                                           SelectionChanged="SubjectsDataGrid_SelectionChanged"
                                           MinHeight="640">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Subject Code" Binding="{Binding [Subject Code]}" SortMemberPath="Subject Code" Width="*"/>
-                                        <DataGridTextColumn Header="Subject Name" Binding="{Binding [Subject Name]}" SortMemberPath="Subject Name" Width="*"/>
-                                        <DataGridTextColumn Header="Course" Binding="{Binding [Course]}" SortMemberPath="Course" Width="*"/>
-                                        <DataGridTextColumn Header="Year Level" Binding="{Binding [Year Level]}" SortMemberPath="Year Level" Width="*"/>
-                                        <DataGridTextColumn Header="Units" Binding="{Binding [Units]}" SortMemberPath="Units" Width="*"/>
+                                        <DataGridTextColumn Header="Subject Code" Binding="{Binding [Subject Code]}" SortMemberPath="Subject Code" Width="*" ElementStyle="{StaticResource SubjectDataGridTextStyle}"/>
+                                        <DataGridTextColumn Header="Subject Name" Binding="{Binding [Subject Name]}" SortMemberPath="Subject Name" Width="*" ElementStyle="{StaticResource SubjectDataGridTextStyle}"/>
+                                        <DataGridTextColumn Header="Course" Binding="{Binding [Course]}" SortMemberPath="Course" Width="*" ElementStyle="{StaticResource SubjectDataGridTextStyle}"/>
+                                        <DataGridTextColumn Header="Year Level" Binding="{Binding [Year Level]}" SortMemberPath="Year Level" Width="*" ElementStyle="{StaticResource SubjectDataGridTextStyle}"/>
+                                        <DataGridTextColumn Header="Units" Binding="{Binding [Units]}" SortMemberPath="Units" Width="*" ElementStyle="{StaticResource SubjectDataGridTextStyle}"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Border>

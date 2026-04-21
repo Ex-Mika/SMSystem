@@ -20,14 +20,14 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="Background" Value="{StaticResource DashboardSoftSurfaceBrush}"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
         <Style x:Key="DepartmentDetailsValueBorderStyle" TargetType="Border">
             <Setter Property="Margin" Value="0,6,0,0"/>
             <Setter Property="Padding" Value="10,8"/>
-            <Setter Property="Background" Value="#F8FBFF"/>
+            <Setter Property="Background" Value="{StaticResource DashboardSoftSurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource DashboardBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="8"/>
@@ -37,6 +37,34 @@
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="{StaticResource DashboardTextPrimaryBrush}"/>
             <Setter Property="Text" Value="--"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="DepartmentDataGridHeaderStyle"
+               TargetType="DataGridColumnHeader"
+               BasedOn="{StaticResource DashboardManagementDataGridHeaderStyle}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="DepartmentDataGridCellStyle"
+               TargetType="DataGridCell"
+               BasedOn="{StaticResource DashboardManagementDataGridCellStyle}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="DepartmentDataGridRowStyle"
+               TargetType="DataGridRow"
+               BasedOn="{StaticResource DashboardManagementDataGridRowStyle}">
+            <Setter Property="Height" Value="56"/>
+        </Style>
+
+        <Style x:Key="DepartmentDataGridTextStyle" TargetType="TextBlock">
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
     </UserControl.Resources>
@@ -94,7 +122,7 @@
                                                 Padding="18,14"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="0,0,0,1"
-                                                Background="#FCFDFE">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <StackPanel>
                                                 <TextBlock Text="Department Details"
                                                            FontSize="20"
@@ -136,21 +164,20 @@
                                                 Padding="18,14"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="0,1,0,0"
-                                                Background="#FCFDFE">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <UniformGrid Columns="3">
                                                 <Button Height="38"
                                                         Margin="0,0,6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#137FEC"
-                                                        Foreground="White"
+                                                        Background="{StaticResource DashboardPrimaryBrush}" Foreground="{StaticResource DashboardOnPrimaryBrush}"
                                                         Click="OpenAddDepartmentButton_Click"
                                                         Content="New"/>
                                                 <Button x:Name="EditSelectedDepartmentButton"
                                                         Height="38"
                                                         Margin="6,0,6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#EAF4FF"
-                                                        Foreground="{StaticResource DashboardPrimaryBrush}"
+                                                        Background="{StaticResource DashboardPrimarySoftBrush}"
+                                                        Foreground="{StaticResource DashboardAccentTextBrush}"
                                                         Click="EditSelectedDepartmentButton_Click"
                                                         Content="Edit"/>
                                                 <Button x:Name="DeleteSelectedDepartmentButton"
@@ -176,7 +203,7 @@
                                                 Padding="18,14"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="0,0,0,1"
-                                                Background="#FCFDFE">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <StackPanel>
                                                 <TextBlock x:Name="DepartmentFormTitleTextBlock"
                                                            Text="Add Department"
@@ -213,20 +240,19 @@
                                                 Padding="18,14"
                                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                                 BorderThickness="0,1,0,0"
-                                                Background="#FCFDFE">
+                                                Background="{StaticResource DashboardSoftSurfaceBrush}">
                                             <UniformGrid Columns="2">
                                                 <Button x:Name="SaveDepartmentFormButton"
                                                         Height="38"
                                                         Margin="0,0,6,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#137FEC"
-                                                        Foreground="White"
+                                                        Background="{StaticResource DashboardPrimaryBrush}" Foreground="{StaticResource DashboardOnPrimaryBrush}"
                                                         Click="SaveDepartmentFormButton_Click"
                                                         Content="Add Department"/>
                                                 <Button Height="38"
                                                         Margin="6,0,0,0"
                                                         Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                                                        Background="#F3F6FA"
+                                                        Background="{StaticResource DashboardSoftSurfaceAltBrush}"
                                                         Foreground="{StaticResource DashboardTextMutedBrush}"
                                                         Click="CancelDepartmentFormButton_Click"
                                                         Content="Cancel"/>
@@ -246,9 +272,9 @@
                                     SnapsToDevicePixels="True">
                                 <DataGrid x:Name="DepartmentsDataGrid"
                                           Style="{StaticResource DashboardManagementDataGridStyle}"
-                                          ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
-                                          CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
-                                          RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                          ColumnHeaderStyle="{StaticResource DepartmentDataGridHeaderStyle}"
+                                          CellStyle="{StaticResource DepartmentDataGridCellStyle}"
+                                          RowStyle="{StaticResource DepartmentDataGridRowStyle}"
                                           BorderThickness="0"
                                           ColumnWidth="*"
                                           local:RoundedClipHelper.CornerRadius="10"
@@ -263,15 +289,18 @@
                                         <DataGridTextColumn Header="Department ID"
                                                             Binding="{Binding [Department ID]}"
                                                             SortMemberPath="Department ID"
-                                                            Width="1.2*"/>
+                                                            Width="*"
+                                                            ElementStyle="{StaticResource DepartmentDataGridTextStyle}"/>
                                         <DataGridTextColumn Header="Department Name"
                                                             Binding="{Binding [Department Name]}"
                                                             SortMemberPath="Department Name"
-                                                            Width="1.6*"/>
+                                                            Width="*"
+                                                            ElementStyle="{StaticResource DepartmentDataGridTextStyle}"/>
                                         <DataGridTextColumn Header="Head"
                                                             Binding="{Binding [Head]}"
                                                             SortMemberPath="Head"
-                                                            Width="1.4*"/>
+                                                            Width="*"
+                                                            ElementStyle="{StaticResource DepartmentDataGridTextStyle}"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Border>

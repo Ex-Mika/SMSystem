@@ -30,7 +30,7 @@
                                    FontSize="32"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                        <TextBlock Text="Review pending checks, publish results, and monitor class performance."
+                        <TextBlock Text="Grade the students currently enrolled in your handled subjects and release results to their dashboards."
                                    Margin="0,6,0,0"
                                    FontSize="13"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"
@@ -49,31 +49,67 @@
                         <Border Width="76"
                                 Height="76"
                                 CornerRadius="38"
-                                Background="#E4F0FF"
-                                BorderBrush="#C9DDF7"
+                                Background="{StaticResource DashboardPrimarySoftBrush}"
+                                BorderBrush="{StaticResource DashboardSoftBorderBrush}"
                                 BorderThickness="1">
                             <TextBlock Text="&#xE9D9;"
                                        FontFamily="Segoe MDL2 Assets"
                                        FontSize="28"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                                       Foreground="{StaticResource DashboardAccentTextBrush}"/>
                         </Border>
                         <WrapPanel Margin="0,12,0,0"
                                    HorizontalAlignment="Right">
                             <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
-                                <TextBlock Text="Score Review"
+                                <TextBlock Text="Current Roster"
                                            FontSize="11"
                                            FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                                           Foreground="{StaticResource DashboardAccentTextBrush}"/>
                             </Border>
                             <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
-                                <TextBlock Text="Publishing"
+                                <TextBlock Text="Student Dashboard Sync"
                                            FontSize="11"
                                            FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                                           Foreground="{StaticResource DashboardAccentTextBrush}"/>
                             </Border>
                         </WrapPanel>
+                        <TextBlock Margin="0,12,0,0"
+                                   HorizontalAlignment="Right"
+                                   Text="Student List Scope"
+                                   Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <ComboBox x:Name="ExportStudentListTargetComboBox"
+                                  Width="260"
+                                  Height="36"
+                                  Margin="0,6,0,0"
+                                  HorizontalAlignment="Right"
+                                  Style="{StaticResource DashboardFilterComboBoxStyle}"
+                                  TextSearch.TextPath="DisplayLabel"
+                                  SelectionChanged="ExportStudentListTargetComboBox_SelectionChanged">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayLabel}"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button x:Name="ExportStudentListPdfButton"
+                                Width="170"
+                                Height="36"
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Right"
+                                Style="{StaticResource DashboardSecondaryActionButtonStyle}"
+                                Click="ExportStudentListPdfButton_Click"
+                                Content="Export Student List"/>
+                        <TextBlock x:Name="StudentListExportStatusTextBlock"
+                                   Width="260"
+                                   Margin="0,8,0,0"
+                                   HorizontalAlignment="Right"
+                                   TextAlignment="Right"
+                                   FontSize="11"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   Text="Choose a handled subject and section to export."
+                                   TextWrapping="Wrap"/>
                     </StackPanel>
 
                     <UniformGrid Grid.Row="1"
@@ -84,7 +120,8 @@
                             <StackPanel>
                                 <TextBlock Text="Pending Checks"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="0"
+                                <TextBlock x:Name="PendingChecksTextBlock"
+                                           Text="0"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -93,7 +130,8 @@
                             <StackPanel>
                                 <TextBlock Text="Published Grades"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="0"
+                                <TextBlock x:Name="PublishedGradesTextBlock"
+                                           Text="0"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -102,7 +140,8 @@
                             <StackPanel>
                                 <TextBlock Text="Class Average"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="0.00"
+                                <TextBlock x:Name="ClassAverageTextBlock"
+                                           Text="0.00"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -121,7 +160,7 @@
                     <StackPanel>
                         <TextBlock Text="Grading Workflow"
                                    Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                        <TextBlock Text="Switch between pending checks, published results, and term history."
+                        <TextBlock Text="Switch between pending roster entries, published grades, and recent grading history."
                                    Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
                     </StackPanel>
 
@@ -164,41 +203,268 @@
                         </Grid>
 
                         <Grid Grid.Row="1" Margin="0,14,0,0">
-                            <StackPanel x:Name="PendingTabView">
-                                <TextBlock Text="Pending Activities"
-                                           Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                                <TextBlock Text="Assessments waiting for review and scoring."
-                                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
-                                <Border Margin="0,12,0,0"
-                                        Style="{StaticResource DashboardProfileSectionCardStyle}">
-                                    <TextBlock Text="No pending grading tasks."
-                                               Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                </Border>
-                            </StackPanel>
+                            <Grid x:Name="RosterContentPanel">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.7*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
 
-                            <StackPanel x:Name="PublishedTabView"
-                                        Visibility="Collapsed">
-                                <TextBlock Text="Published Scores"
-                                           Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                                <TextBlock Text="Latest published grades per handled section."
-                                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
-                                <Border Margin="0,12,0,0"
+                                <Border Grid.Column="0"
+                                        Margin="0,0,10,0"
                                         Style="{StaticResource DashboardProfileSectionCardStyle}">
-                                    <TextBlock Text="No published scores yet."
-                                               Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                                </Border>
-                            </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock x:Name="RosterPanelTitleTextBlock"
+                                                   Text="Students Ready for Grading"
+                                                   Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                                        <TextBlock x:Name="RosterPanelSubtitleTextBlock"
+                                                   Text="Current enrolled students in your handled subjects."
+                                                   Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                                        <TextBlock x:Name="TeacherGradingStatusTextBlock"
+                                                   Margin="0,10,0,0"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                   TextWrapping="Wrap"/>
 
-                            <StackPanel x:Name="HistoryTabView"
-                                        Visibility="Collapsed">
-                                <TextBlock Text="Grade History"
-                                           Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                                <TextBlock Text="Archived grading activity by term."
-                                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
-                                <Border Margin="0,12,0,0"
+                                        <Border Margin="0,14,0,0"
+                                                BorderBrush="{StaticResource DashboardBorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="8">
+                                            <DataGrid x:Name="GradingRosterDataGrid"
+                                                      Style="{StaticResource DashboardManagementDataGridStyle}"
+                                                      ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                                      CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                                      RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                                      AutoGenerateColumns="False"
+                                                      BorderThickness="0"
+                                                      CanUserAddRows="False"
+                                                      CanUserDeleteRows="False"
+                                                      CanUserResizeRows="False"
+                                                      CanUserSortColumns="True"
+                                                      IsReadOnly="True"
+                                                      SelectionMode="Single"
+                                                      SelectionUnit="FullRow"
+                                                      RowHeaderWidth="0"
+                                                      MinHeight="380"
+                                                      SelectionChanged="GradingRosterDataGrid_SelectionChanged">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Subject"
+                                                                        Binding="{Binding SubjectDisplayLabel}"
+                                                                        Width="2*"/>
+                                                    <DataGridTextColumn Header="Student"
+                                                                        Binding="{Binding StudentName}"
+                                                                        Width="1.6*"/>
+                                                    <DataGridTextColumn Header="Section"
+                                                                        Binding="{Binding SectionDisplayLabel}"
+                                                                        Width="1*"/>
+                                                    <DataGridTextColumn Header="Final Grade"
+                                                                        Binding="{Binding FinalGradeLabel}"
+                                                                        Width="0.9*"/>
+                                                    <DataGridTextColumn Header="Remarks"
+                                                                        Binding="{Binding RemarksLabel}"
+                                                                        Width="1*"/>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="1"
+                                        Margin="10,0,0,0"
                                         Style="{StaticResource DashboardProfileSectionCardStyle}">
-                                    <TextBlock Text="No grading history loaded."
-                                               Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                    <StackPanel>
+                                        <TextBlock Text="Grade Editor"
+                                                   Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                                        <TextBlock Text="Select a student row, enter scores from 0 to 100, then save the grade."
+                                                   Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+
+                                        <StackPanel Margin="0,14,0,0">
+                                            <TextBlock Text="Student"
+                                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                            <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
+                                                <TextBlock x:Name="SelectedStudentTextBlock"
+                                                           Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                                           Text="Select a student from the roster."/>
+                                            </Border>
+                                        </StackPanel>
+
+                                        <StackPanel Margin="0,10,0,0">
+                                            <TextBlock Text="Subject"
+                                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                            <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
+                                                <TextBlock x:Name="SelectedSubjectTextBlock"
+                                                           Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                                           Text="--"/>
+                                            </Border>
+                                        </StackPanel>
+
+                                        <StackPanel Margin="0,10,0,0">
+                                            <TextBlock Text="Section"
+                                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                            <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
+                                                <TextBlock x:Name="SelectedSectionTextBlock"
+                                                           Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                                           Text="--"/>
+                                            </Border>
+                                        </StackPanel>
+
+                                        <Grid Margin="0,14,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                                <TextBlock Text="Quiz Score"
+                                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                                <TextBox x:Name="QuizScoreTextBox"
+                                                         Margin="0,6,0,0"
+                                                         Style="{StaticResource DashboardProfileInputTextBoxStyle}"
+                                                         TextChanged="ScoreInputTextBox_TextChanged"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                                <TextBlock Text="Project Score"
+                                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                                <TextBox x:Name="ProjectScoreTextBox"
+                                                         Margin="0,6,0,0"
+                                                         Style="{StaticResource DashboardProfileInputTextBoxStyle}"
+                                                         TextChanged="ScoreInputTextBox_TextChanged"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Grid Margin="0,10,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                                <TextBlock Text="Midterm Score"
+                                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                                <TextBox x:Name="MidtermScoreTextBox"
+                                                         Margin="0,6,0,0"
+                                                         Style="{StaticResource DashboardProfileInputTextBoxStyle}"
+                                                         TextChanged="ScoreInputTextBox_TextChanged"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                                <TextBlock Text="Final Exam Score"
+                                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                                <TextBox x:Name="FinalExamScoreTextBox"
+                                                         Margin="0,6,0,0"
+                                                         Style="{StaticResource DashboardProfileInputTextBoxStyle}"
+                                                         TextChanged="ScoreInputTextBox_TextChanged"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Grid Margin="0,14,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                                <TextBlock Text="Computed Final Grade"
+                                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                                <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
+                                                    <TextBlock x:Name="ComputedFinalGradeTextBlock"
+                                                               Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                                               Text="--"/>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                                <TextBlock Text="Remarks"
+                                                           Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                                                <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
+                                                    <TextBlock x:Name="ComputedRemarksTextBlock"
+                                                               Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                                               Text="Pending"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TextBlock x:Name="GradeEditorStatusTextBlock"
+                                                   Margin="0,12,0,0"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                                   Text="Choose a student record to begin grading."
+                                                   TextWrapping="Wrap"/>
+
+                                        <WrapPanel Margin="0,14,0,0">
+                                            <Button x:Name="SaveGradeButton"
+                                                    Width="120"
+                                                    Height="36"
+                                                    Margin="0,0,10,8"
+                                                    Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                                    Click="SaveGradeButton_Click"
+                                                    Content="Save Grade"/>
+                                            <Button x:Name="ResetGradeEditorButton"
+                                                    Width="100"
+                                                    Height="36"
+                                                    Margin="0,0,0,8"
+                                                    Style="{StaticResource DashboardSecondaryActionButtonStyle}"
+                                                    Click="ResetGradeEditorButton_Click"
+                                                    Content="Reset"/>
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <StackPanel x:Name="HistoryPanel"
+                                        Visibility="Collapsed">
+                                <TextBlock Text="Recent Grading Activity"
+                                           Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
+                                <TextBlock Text="Saved grades that are already visible to students in the dashboard."
+                                           Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                                <TextBlock x:Name="HistoryStatusTextBlock"
+                                           Margin="0,10,0,0"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                                           TextWrapping="Wrap"/>
+
+                                <Border Margin="0,14,0,0"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                    <DataGrid x:Name="GradingHistoryDataGrid"
+                                              Style="{StaticResource DashboardManagementDataGridStyle}"
+                                              ColumnHeaderStyle="{StaticResource DashboardManagementDataGridHeaderStyle}"
+                                              CellStyle="{StaticResource DashboardManagementDataGridCellStyle}"
+                                              RowStyle="{StaticResource DashboardManagementDataGridRowStyle}"
+                                              AutoGenerateColumns="False"
+                                              BorderThickness="0"
+                                              CanUserAddRows="False"
+                                              CanUserDeleteRows="False"
+                                              CanUserResizeRows="False"
+                                              CanUserSortColumns="True"
+                                              IsReadOnly="True"
+                                              RowHeaderWidth="0"
+                                              MinHeight="380">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Student"
+                                                                Binding="{Binding StudentName}"
+                                                                Width="1.8*"/>
+                                            <DataGridTextColumn Header="Subject"
+                                                                Binding="{Binding SubjectDisplayLabel}"
+                                                                Width="2*"/>
+                                            <DataGridTextColumn Header="Section"
+                                                                Binding="{Binding SectionDisplayLabel}"
+                                                                Width="1*"/>
+                                            <DataGridTextColumn Header="Final Grade"
+                                                                Binding="{Binding FinalGradeLabel}"
+                                                                Width="0.9*"/>
+                                            <DataGridTextColumn Header="Remarks"
+                                                                Binding="{Binding RemarksLabel}"
+                                                                Width="1*"/>
+                                            <DataGridTextColumn Header="Updated"
+                                                                Binding="{Binding UpdatedAtLabel}"
+                                                                Width="1.2*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
                                 </Border>
                             </StackPanel>
                         </Grid>

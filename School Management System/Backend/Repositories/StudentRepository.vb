@@ -204,6 +204,26 @@ Namespace Backend.Repositories
             End Using
         End Function
 
+        Public Function UpdateSection(studentRecordId As Integer,
+                                      sectionName As String) As Boolean
+            If studentRecordId <= 0 Then
+                Return False
+            End If
+
+            Using connection As MySqlConnection = Database.DatabaseModule.OpenConnection()
+                Using command As New MySqlCommand(
+                    "UPDATE students " &
+                    "SET section_name = @sectionName " &
+                    "WHERE student_id = @studentRecordId;",
+                    connection)
+                    command.Parameters.AddWithValue("@sectionName",
+                                                    NormalizeNullableValue(sectionName))
+                    command.Parameters.AddWithValue("@studentRecordId", studentRecordId)
+                    Return command.ExecuteNonQuery() > 0
+                End Using
+            End Using
+        End Function
+
         Private Function MapStudent(reader As MySqlDataReader) As StudentRecord
             Dim yearLevelOrdinal As Integer = reader.GetOrdinal("year_level")
             Dim courseIdOrdinal As Integer = reader.GetOrdinal("course_id")

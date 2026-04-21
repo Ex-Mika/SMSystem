@@ -5,8 +5,8 @@
         <Setter Property="Margin" Value="16,10,16,0"/>
         <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="BorderBrush" Value="#447AA2E8"/>
-        <Setter Property="Background" Value="#1B0A1F4F"/>
+        <Setter Property="BorderBrush" Value="#66F4D94A"/>
+        <Setter Property="Background" Value="#382E2200"/>
     </Style>
 
     <Style x:Key="LoginTitleBarBrandTextStyle" TargetType="TextBlock">
@@ -19,7 +19,7 @@
 
     <Style x:Key="LoginTitleBarGlyphStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
-        <Setter Property="Foreground" Value="#E8ECF7"/>
+        <Setter Property="Foreground" Value="#FFFBE6"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
@@ -34,10 +34,10 @@
         <Setter Property="Background" Value="White"/>
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect Color="#0B245F"
+                <DropShadowEffect Color="#7A5A00"
                                   BlurRadius="28"
                                   ShadowDepth="0"
-                                  Opacity="0.35"/>
+                                  Opacity="0.28"/>
             </Setter.Value>
         </Setter>
     </Style>
@@ -45,7 +45,7 @@
     <Style x:Key="LoginHeaderTitleStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="24"/>
         <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Foreground" Value="#102243"/>
+        <Setter Property="Foreground" Value="#3A2D00"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="Width" Value="200"/>
@@ -54,18 +54,18 @@
     <Style x:Key="LoginHeaderSubtitleStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="0,12,0,0"/>
         <Setter Property="FontSize" Value="15"/>
-        <Setter Property="Foreground" Value="#7D8DA8"/>
+        <Setter Property="Foreground" Value="#7A6A33"/>
     </Style>
 
     <Style x:Key="LoginFieldLabelStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="Foreground" Value="#273753"/>
+        <Setter Property="Foreground" Value="#493B0A"/>
     </Style>
 
     <Style x:Key="LoginFieldIconStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
-        <Setter Property="Foreground" Value="#A7B6CC"/>
+        <Setter Property="Foreground" Value="#B29639"/>
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -75,7 +75,7 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="FontSize" Value="16"/>
-        <Setter Property="Foreground" Value="#0D1E3D"/>
+        <Setter Property="Foreground" Value="#302500"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
@@ -83,28 +83,28 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="FontSize" Value="16"/>
-        <Setter Property="Foreground" Value="#0D1E3D"/>
+        <Setter Property="Foreground" Value="#302500"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
     <Style x:Key="LoginPlaceholderTextStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="16"/>
-        <Setter Property="Foreground" Value="#B3C1D6"/>
+        <Setter Property="Foreground" Value="#C4B470"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="IsHitTestVisible" Value="False"/>
     </Style>
 
     <Style x:Key="LoginFooterBorderStyle" TargetType="Border">
-        <Setter Property="BorderBrush" Value="#ECF1F8"/>
+        <Setter Property="BorderBrush" Value="#F0E3A2"/>
         <Setter Property="CornerRadius" Value="0,0,12,12"/>
         <Setter Property="BorderThickness" Value="0,1,0,0"/>
-        <Setter Property="Background" Value="#F8FAFD"/>
+        <Setter Property="Background" Value="#FFFBEA"/>
         <Setter Property="Padding" Value="16,14"/>
     </Style>
 
     <Style x:Key="LoginFooterTextStyle" TargetType="TextBlock">
         <Setter Property="TextAlignment" Value="Center"/>
-        <Setter Property="Foreground" Value="#7E8EA7"/>
+        <Setter Property="Foreground" Value="#786A38"/>
         <Setter Property="FontSize" Value="12"/>
     </Style>
 </ResourceDictionary>

@@ -21,7 +21,8 @@
                 <StackPanel>
                     <TextBlock Text="Quiz Avg"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0"
+                    <TextBlock x:Name="QuizAverageTextBlock"
+                               Text="0.00"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -31,7 +32,8 @@
                 <StackPanel>
                     <TextBlock Text="Project Avg"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0"
+                    <TextBlock x:Name="ProjectAverageTextBlock"
+                               Text="0.00"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -41,7 +43,8 @@
                 <StackPanel>
                     <TextBlock Text="Exam Avg"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0"
+                    <TextBlock x:Name="ExamAverageTextBlock"
+                               Text="0.00"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -56,6 +59,12 @@
                            FontSize="16"/>
                 <TextBlock Text="Score distribution used to compute your term grade."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+                <TextBlock x:Name="GradeBreakdownStatusTextBlock"
+                           Margin="0,10,0,0"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                           TextWrapping="Wrap"/>
 
                 <Grid Margin="0,14,0,0">
                     <Grid.RowDefinitions>
@@ -64,8 +73,8 @@
                     </Grid.RowDefinitions>
 
                     <Border Grid.Row="0"
-                            Background="#F5F9FF"
-                            BorderBrush="#DCE8F8"
+                            Background="{StaticResource DashboardSoftSurfaceBrush}"
+                            BorderBrush="{StaticResource DashboardSoftBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="12,10">
@@ -94,37 +103,64 @@
                         </Grid>
                     </Border>
 
-                    <Border Grid.Row="1"
+                    <Border x:Name="GradeBreakdownEmptyStateBorder"
+                            Grid.Row="1"
                             Margin="0,8,0,0"
                             Background="White"
                             BorderBrush="{StaticResource DashboardBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="12,11">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1*"/>
-                                <ColumnDefinition Width="1*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="No breakdown data available."
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="1"
-                                       Text="0"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="2"
-                                       Text="0"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="3"
-                                       Text="0"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="4"
-                                       Text="0"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                        </Grid>
+                        <TextBlock x:Name="GradeBreakdownEmptyTextBlock"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
                     </Border>
+
+                    <ItemsControl x:Name="GradeBreakdownItemsControl"
+                                  Grid.Row="1"
+                                  Margin="0,8,0,0"
+                                  Visibility="Collapsed">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,0,0,8"
+                                        Background="White"
+                                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12,11">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding SubjectName}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   TextWrapping="Wrap"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding QuizScore}"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding ProjectScore}"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{Binding MidtermScore}"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="4"
+                                                   Text="{Binding FinalExamScore}"
+                                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                                   VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
             </StackPanel>
         </Border>

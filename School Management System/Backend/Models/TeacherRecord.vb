@@ -23,12 +23,12 @@ Namespace Backend.Models
                     parts.Add(FirstName.Trim())
                 End If
 
-                If Not String.IsNullOrWhiteSpace(LastName) Then
-                    parts.Add(LastName.Trim())
-                End If
-
                 If Not String.IsNullOrWhiteSpace(MiddleName) Then
                     parts.Add(MiddleName.Trim())
+                End If
+
+                If Not String.IsNullOrWhiteSpace(LastName) Then
+                    parts.Add(LastName.Trim())
                 End If
 
                 Return String.Join(" ", parts)

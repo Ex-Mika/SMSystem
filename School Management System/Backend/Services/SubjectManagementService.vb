@@ -44,6 +44,11 @@ Namespace Backend.Services
             Catch ex As MySqlException
                 Return ServiceResult(Of List(Of SubjectRecord)).Failure(
                     BuildDatabaseErrorMessage("load", ex))
+            Catch ex As Exception
+                Return ServiceResult(Of List(Of SubjectRecord)).Failure(
+                    "Unable to load subject records." &
+                    Environment.NewLine &
+                    ex.Message)
             End Try
         End Function
 

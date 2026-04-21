@@ -22,16 +22,16 @@
                     <StackPanel Grid.Row="0"
                                 Grid.Column="0"
                                 Margin="0,0,18,0">
-                        <TextBlock Text="Enrollment"
+                        <TextBlock Text="Class Schedule"
                                    FontSize="12"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                        <TextBlock Text="Student Enrollment"
+                        <TextBlock Text="Student Timetable"
                                    Margin="0,4,0,0"
                                    FontSize="32"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                        <TextBlock Text="Plan your load, review available classes, and submit enrollment for approval."
+                        <TextBlock Text="Review your timetable, enroll in eligible subjects, and prepare your load for submission."
                                    Margin="0,6,0,0"
                                    FontSize="13"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"
@@ -51,31 +51,16 @@
                         <Border Width="76"
                                 Height="76"
                                 CornerRadius="38"
-                                Background="#E4F0FF"
-                                BorderBrush="#C9DDF7"
+                                Background="{StaticResource DashboardPrimarySoftBrush}"
+                                BorderBrush="{StaticResource DashboardSoftBorderBrush}"
                                 BorderThickness="1">
                             <TextBlock Text="&#xE823;"
                                        FontFamily="Segoe MDL2 Assets"
                                        FontSize="28"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Foreground="{StaticResource DashboardPrimaryBrush}"/>
+                                       Foreground="{StaticResource DashboardAccentTextBrush}"/>
                         </Border>
-                        <WrapPanel Margin="0,12,0,0"
-                                   HorizontalAlignment="Right">
-                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
-                                <TextBlock Text="Open Term"
-                                           FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
-                            </Border>
-                            <Border Style="{StaticResource DashboardProfileTagBorderStyle}">
-                                <TextBlock Text="Adviser Review"
-                                           FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardPrimaryBrush}"/>
-                            </Border>
-                        </WrapPanel>
                     </StackPanel>
 
                     <UniformGrid Grid.Row="1"
@@ -86,7 +71,8 @@
                             <StackPanel>
                                 <TextBlock Text="Selected Subjects"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="0"
+                                <TextBlock x:Name="ScheduleSelectedSubjectsTextBlock"
+                                           Text="0"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -95,7 +81,8 @@
                             <StackPanel>
                                 <TextBlock Text="Total Units"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="0"
+                                <TextBlock x:Name="ScheduleTotalUnitsTextBlock"
+                                           Text="0"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -104,7 +91,8 @@
                             <StackPanel>
                                 <TextBlock Text="Enrollment Status"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="Draft"
+                                <TextBlock x:Name="ScheduleEnrollmentStatusTextBlock"
+                                           Text="Open"
                                            Margin="0,4,0,0"
                                            Style="{StaticResource DashboardProfileStatValueStyle}"/>
                             </StackPanel>
@@ -120,10 +108,10 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel>
-                        <TextBlock Text="Enrollment Workflow"
+                        <StackPanel>
+                            <TextBlock Text="Schedule Workspace"
                                    Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-                        <TextBlock Text="Review offerings, build your load, and finalize your submission."
+                        <TextBlock Text="Review your timetable, manage your self-enrollment, and check submission readiness."
                                    Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
                     </StackPanel>
 
@@ -146,15 +134,15 @@
                                     Width="132"
                                     Style="{StaticResource DashboardProfileSegmentSelectedButtonStyle}"
                                     Click="AvailableSubjectsSectionButton_Click"
-                                    Content="Available Subjects"/>
+                                    Content="Weekly Schedule"/>
 
                             <Button x:Name="SelectedLoadSectionButton"
                                     Grid.Column="1"
-                                    Width="114"
+                                    Width="104"
                                     Margin="8,0,0,0"
                                     Style="{StaticResource DashboardProfileSegmentButtonStyle}"
                                     Click="SelectedLoadSectionButton_Click"
-                                    Content="Selected Load"/>
+                                    Content="Enrollment"/>
 
                             <Button x:Name="SubmissionSectionButton"
                                     Grid.Column="2"

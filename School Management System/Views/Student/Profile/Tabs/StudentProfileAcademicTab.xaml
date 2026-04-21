@@ -28,8 +28,9 @@
                     <TextBlock Text="Program"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                     <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock Style="{StaticResource DashboardProfileFieldValueStyle}"
-                                   Text="Not set"/>
+                        <TextBlock x:Name="ProgramValueTextBlock"
+                                   Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                    Text="Not set"/>
                     </Border>
                 </StackPanel>
 
@@ -37,8 +38,9 @@
                     <TextBlock Text="Year Level"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                     <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock Style="{StaticResource DashboardProfileFieldValueStyle}"
-                                   Text="Not set"/>
+                        <TextBlock x:Name="YearLevelValueTextBlock"
+                                   Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                    Text="Not set"/>
                     </Border>
                 </StackPanel>
 
@@ -46,8 +48,9 @@
                     <TextBlock Text="Section"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
                     <Border Style="{StaticResource DashboardProfileFieldValueContainerStyle}">
-                        <TextBlock Style="{StaticResource DashboardProfileFieldValueStyle}"
-                                   Text="Not set"/>
+                        <TextBlock x:Name="SectionValueTextBlock"
+                                   Style="{StaticResource DashboardProfileFieldValueStyle}"
+                                    Text="Not set"/>
                     </Border>
                 </StackPanel>
             </StackPanel>

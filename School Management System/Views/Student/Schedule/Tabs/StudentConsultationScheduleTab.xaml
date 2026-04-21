@@ -7,8 +7,15 @@
     <StackPanel>
         <TextBlock Text="Submission"
                    Style="{StaticResource DashboardProfileSectionTitleStyle}"/>
-        <TextBlock Text="Finalize your enrollment details and send your request for approval."
+        <TextBlock Text="Review whether your profile and selected load are ready for adviser review."
                    Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+
+        <TextBlock x:Name="SubmissionStatusTextBlock"
+                   Margin="0,10,0,0"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                   TextWrapping="Wrap"/>
 
         <UniformGrid Margin="0,14,0,0"
                      Columns="2">
@@ -16,7 +23,8 @@
                 <StackPanel>
                     <TextBlock Text="Requirements Complete"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="0%"
+                    <TextBlock x:Name="RequirementsCompleteValueTextBlock"
+                               Text="0%"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -26,7 +34,8 @@
                 <StackPanel>
                     <TextBlock Text="Adviser Approval"
                                Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                    <TextBlock Text="Pending"
+                    <TextBlock x:Name="AdviserApprovalValueTextBlock"
+                               Text="Pending"
                                Margin="0,4,0,0"
                                Style="{StaticResource DashboardProfileStatValueStyle}"/>
                 </StackPanel>
@@ -39,100 +48,193 @@
                 <TextBlock Text="Enrollment Checklist"
                            Style="{StaticResource DashboardProfileSectionTitleStyle}"
                            FontSize="16"/>
-                <TextBlock Text="Complete all required steps before submitting your load."
+                <TextBlock Text="Complete the items below before handing your load over for adviser review."
                            Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
 
-                <Grid Margin="0,14,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <Border Margin="0,14,0,0"
+                        Background="{StaticResource DashboardSoftSurfaceBrush}"
+                        BorderBrush="{StaticResource DashboardSoftBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.4*"/>
+                            <ColumnDefinition Width="0.9*"/>
+                            <ColumnDefinition Width="1.7*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Requirement"
+                                   Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="Status"
+                                   Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                        <TextBlock Grid.Column="2"
+                                   Text="Notes"
+                                   Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+                    </Grid>
+                </Border>
 
-                    <Border Grid.Row="0"
-                            Background="#F5F9FF"
-                            BorderBrush="#DCE8F8"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="12,10">
-                        <Grid>
+                <Border Margin="0,8,0,0"
+                        Background="White"
+                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,11">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.4*"/>
+                            <ColumnDefinition Width="0.9*"/>
+                            <ColumnDefinition Width="1.7*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Year Level Assigned"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock x:Name="YearLevelStatusTextBlock"
+                                   Grid.Column="1"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                        <TextBlock x:Name="YearLevelNoteTextBlock"
+                                   Grid.Column="2"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
+                    </Grid>
+                </Border>
+
+                <Border Margin="0,8,0,0"
+                        Background="White"
+                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,11">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.4*"/>
+                            <ColumnDefinition Width="0.9*"/>
+                            <ColumnDefinition Width="1.7*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Section Assigned"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock x:Name="SectionStatusTextBlock"
+                                   Grid.Column="1"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                        <TextBlock x:Name="SectionNoteTextBlock"
+                                   Grid.Column="2"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
+                    </Grid>
+                </Border>
+
+                <Border Margin="0,8,0,0"
+                        Background="White"
+                        BorderBrush="{StaticResource DashboardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,11">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.4*"/>
+                            <ColumnDefinition Width="0.9*"/>
+                            <ColumnDefinition Width="1.7*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Selected Subjects"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
+                        <TextBlock x:Name="SelectedLoadStatusTextBlock"
+                                   Grid.Column="1"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                        <TextBlock x:Name="SelectedLoadNoteTextBlock"
+                                   Grid.Column="2"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
+                    </Grid>
+                </Border>
+
+                <Border Margin="0,16,0,0"
+                        Background="{StaticResource DashboardSoftSurfaceBrush}"
+                        BorderBrush="{StaticResource DashboardSoftBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="14,13">
+                    <StackPanel>
+                        <TextBlock Text="Choose Section"
+                                   Style="{StaticResource DashboardProfileSectionTitleStyle}"
+                                   FontSize="15"/>
+                        <TextBlock Text="Pick from the sections already scheduled for teachers."
+                                   Style="{StaticResource DashboardProfileSectionSubtitleStyle}"/>
+
+                        <Grid Margin="0,14,0,0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.8*"/>
-                                <ColumnDefinition Width="1.2*"/>
-                                <ColumnDefinition Width="1.2*"/>
-                                <ColumnDefinition Width="1.2*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Requirement"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="1"
-                                       Text="Status"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="2"
-                                       Text="Updated"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                            <TextBlock Grid.Column="3"
-                                       Text="Notes"
-                                       Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
+
+                            <ComboBox x:Name="SectionSelectionComboBox"
+                                      Height="38"
+                                      Style="{StaticResource DashboardFilterComboBoxStyle}"
+                                      SelectedValuePath="SectionValue"
+                                      TextSearch.TextPath="SectionLabel">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding SectionLabel}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <Button x:Name="SaveSectionButton"
+                                    Grid.Column="1"
+                                    Width="124"
+                                    Height="38"
+                                    Margin="10,0,0,0"
+                                    Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                    Click="SaveSectionButton_Click"
+                                    Content="Save Section"/>
                         </Grid>
-                    </Border>
 
-                    <Border Grid.Row="1"
-                            Margin="0,8,0,0"
-                            Background="White"
-                            BorderBrush="{StaticResource DashboardBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="12,11">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.8*"/>
-                                <ColumnDefinition Width="1.2*"/>
-                                <ColumnDefinition Width="1.2*"/>
-                                <ColumnDefinition Width="1.2*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="No checklist generated."
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="1"
-                                       Text="--"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <TextBlock Grid.Column="2"
-                                       Text="--"
-                                       Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            <Border Grid.Column="3"
-                                    HorizontalAlignment="Left"
-                                    Padding="8,3"
-                                    CornerRadius="999"
-                                    Background="#EFF4FB"
-                                    BorderBrush="#D4DFED"
-                                    BorderThickness="1">
-                                <TextBlock Text="Pending"
-                                           FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource DashboardTextMutedBrush}"/>
-                            </Border>
-                        </Grid>
-                    </Border>
-                </Grid>
+                        <TextBlock x:Name="SectionSelectionStatusTextBlock"
+                                   Margin="0,10,0,0"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
 
-                <Grid Margin="0,16,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <TextBlock x:Name="SubmissionHelperTextBlock"
+                           Margin="0,16,0,0"
+                           Foreground="{StaticResource DashboardTextMutedBrush}"
+                           TextWrapping="Wrap"/>
 
-                    <Button Width="124"
-                            Height="36"
-                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                            Background="#EFF4FB"
-                            Foreground="{StaticResource DashboardTextMutedBrush}"
-                            Content="Save Draft"/>
+                <Border Margin="0,16,0,0"
+                        Style="{StaticResource DashboardProfileSectionCardStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="1"
-                            Margin="10,0,0,0"
-                            Width="172"
-                            Height="36"
-                            Style="{StaticResource DashboardPrimaryActionButtonStyle}"
-                            Content="Submit Enrollment"/>
-                </Grid>
+                        <StackPanel>
+                            <TextBlock Text="Certificate of Enrollment"
+                                       Style="{StaticResource DashboardProfileSectionTitleStyle}"
+                                       FontSize="15"/>
+                            <TextBlock x:Name="CertificateExportHintTextBlock"
+                                       Text="Finish enrollment to unlock the certificate export."
+                                       Style="{StaticResource DashboardProfileSectionSubtitleStyle}"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock x:Name="CertificateExportStatusTextBlock"
+                                       Margin="0,10,0,0"
+                                       Foreground="{StaticResource DashboardTextMutedBrush}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <Button x:Name="ExportCertificateButton"
+                                Grid.Column="1"
+                                Width="130"
+                                Height="38"
+                                Margin="16,0,0,0"
+                                VerticalAlignment="Top"
+                                Style="{StaticResource DashboardSecondaryActionButtonStyle}"
+                                Click="ExportCertificateButton_Click"
+                                Content="Export PDF"/>
+                    </Grid>
+                </Border>
             </StackPanel>
         </Border>
     </StackPanel>

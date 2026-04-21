@@ -4,11 +4,14 @@ Imports System.Globalization
 Imports System.Windows.Data
 Imports System.Windows.Input
 Imports System.Windows.Media
+Imports School_Management_System.Backend.Common
 Imports School_Management_System.Backend.Models
 Imports School_Management_System.Backend.Services
 
 Class AdminSchedulingView
     Private ReadOnly _dayHeaders As String() = New String() {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"}
+    Private Const TimetableSessionColumnName As String = "__Session"
+    Private Const TimetableSearchColumnName As String = "__Search"
 
     Private _teacherOptions As New List(Of TeacherOption)()
     Private _subjectOptions As New List(Of SubjectOption)()
@@ -63,6 +66,7 @@ Class AdminSchedulingView
         Public Property SubjectCode As String
         Public Property SubjectName As String
         Public Property Department As String
+        Public Property YearLevel As String
 
         Public ReadOnly Property DisplayName As String
             Get
@@ -433,10 +437,13 @@ Class AdminSchedulingView
                 department = NormalizeText(record.CourseDisplayName)
             End If
 
+            Dim yearLevel As String = NormalizeText(record.YearLevel)
+
             options.Add(New SubjectOption With {
                 .SubjectCode = subjectCode,
                 .SubjectName = subjectName,
-                .Department = department
+                .Department = department,
+                .YearLevel = yearLevel
             })
         Next
 
@@ -460,7 +467,8 @@ Class AdminSchedulingView
             Dim code As String = NormalizeText(candidate.SubjectCode)
             Dim name As String = NormalizeText(candidate.SubjectName)
             Dim department As String = NormalizeText(candidate.Department)
-            Dim key As String = code & "|" & name & "|" & department
+            Dim yearLevel As String = NormalizeText(candidate.YearLevel)
+            Dim key As String = code & "|" & name & "|" & department & "|" & yearLevel
             If seenKeys.Contains(key) Then
                 Continue For
             End If
@@ -469,7 +477,8 @@ Class AdminSchedulingView
             deduped.Add(New SubjectOption With {
                 .SubjectCode = code,
                 .SubjectName = name,
-                .Department = department
+                .Department = department,
+                .YearLevel = yearLevel
             })
         Next
 
@@ -659,7 +668,8 @@ Class AdminSchedulingView
             Return
         End If
 
-        Dim sessionValue As String = NormalizeSession(ReadRowValue(selectedRowView.Row, "Session"))
+        Dim sessionValue As String =
+            NormalizeSession(ReadRowValue(selectedRowView.Row, TimetableSessionColumnName))
         If Not String.IsNullOrWhiteSpace(sessionValue) AndAlso Not String.Equals(sessionValue, "--", StringComparison.OrdinalIgnoreCase) Then
             SetSessionInputsFromSession(sessionValue)
         Else
@@ -678,24 +688,19 @@ Class AdminSchedulingView
 
         DayComboBox.SelectedItem = selectedDay
 
-        Dim cellValue As String = NormalizeText(ReadRowValue(selectedRowView.Row, selectedDay))
-        If String.IsNullOrWhiteSpace(cellValue) OrElse String.Equals(cellValue, "--", StringComparison.OrdinalIgnoreCase) Then
+        Dim matchingRecord As TeacherScheduleRecord =
+            FindScheduleRecord(_selectedTeacherId, selectedDay, sessionValue)
+        If matchingRecord Is Nothing Then
             SectionTextBox.Text = String.Empty
             RoomTextBox.Text = String.Empty
             Return
         End If
 
-        Dim subjectToken As String = ExtractSubjectToken(cellValue)
-        Dim sectionToken As String = ExtractSectionToken(cellValue)
-        Dim roomToken As String = ExtractRoomToken(cellValue)
-
-        SelectSubjectByToken(subjectToken)
-        SectionTextBox.Text = sectionToken
-        If Not String.IsNullOrWhiteSpace(roomToken) Then
-            RoomTextBox.Text = roomToken
-        Else
-            RoomTextBox.Text = String.Empty
+        If Not SelectSubjectByCode(matchingRecord.SubjectCode) Then
+            SelectSubjectByToken(matchingRecord.SubjectName)
         End If
+        SectionTextBox.Text = NormalizeText(matchingRecord.Section)
+        RoomTextBox.Text = NormalizeText(matchingRecord.Room)
     End Sub
 
     Private Sub RefreshProfessorContext(Optional preferredSubjectCode As String = Nothing)
@@ -772,12 +777,7 @@ Class AdminSchedulingView
         End If
 
         For Each sessionEntry As String In orderedSessions
-            Dim row As DataRow = table.NewRow()
-            row("Session") = sessionEntry
-            For Each dayHeader As String In _dayHeaders
-                row(dayHeader) = "--"
-            Next
-            table.Rows.Add(row)
+            AddTimetableRow(table, sessionEntry)
         Next
 
         For Each schedule As TeacherScheduleRecord In schedules
@@ -789,23 +789,23 @@ Class AdminSchedulingView
 
             Dim targetRow As DataRow = FindSessionRow(table, normalizedSession)
             If targetRow Is Nothing Then
-                targetRow = table.NewRow()
-                targetRow("Session") = normalizedSession
-                For Each dayHeader As String In _dayHeaders
-                    targetRow(dayHeader) = "--"
-                Next
-                table.Rows.Add(targetRow)
+                AddTimetableRow(table, normalizedSession)
+                targetRow = FindSessionRow(table, normalizedSession)
             End If
 
-            targetRow(normalizedDay) = BuildTimetableCellDisplay(schedule)
+            If targetRow IsNot Nothing Then
+                targetRow(normalizedDay) = BuildTimetableCellDisplay(schedule)
+            End If
         Next
 
+        UpdateTimetableSearchValues(table)
         Return table
     End Function
 
     Private Function CreateTimetableStructure() As DataTable
         Dim table As New DataTable()
-        table.Columns.Add("Session", GetType(String))
+        table.Columns.Add(TimetableSessionColumnName, GetType(String))
+        table.Columns.Add(TimetableSearchColumnName, GetType(String))
         For Each dayHeader As String In _dayHeaders
             table.Columns.Add(dayHeader, GetType(String))
         Next
@@ -823,11 +823,28 @@ Class AdminSchedulingView
             Return
         End If
 
+        AddTimetableRow(table, "--")
+        UpdateTimetableSearchValues(table)
+    End Sub
+
+    Private Sub AddTimetableRow(table As DataTable, sessionValue As String)
+        If table Is Nothing Then
+            Return
+        End If
+
+        Dim normalizedSession As String = NormalizeSession(sessionValue)
+        If String.IsNullOrWhiteSpace(normalizedSession) Then
+            normalizedSession = "--"
+        End If
+
         Dim row As DataRow = table.NewRow()
-        row("Session") = "--"
+        row(TimetableSessionColumnName) = normalizedSession
+        row(TimetableSearchColumnName) = normalizedSession
+
         For Each dayHeader As String In _dayHeaders
             row(dayHeader) = "--"
         Next
+
         table.Rows.Add(row)
     End Sub
 
@@ -836,15 +853,40 @@ Class AdminSchedulingView
             Return Nothing
         End If
 
+        Dim normalizedSession As String = NormalizeSession(sessionValue)
+
         For Each row As DataRow In table.Rows
-            Dim candidate As String = NormalizeSession(ReadRowValue(row, "Session"))
-            If String.Equals(candidate, sessionValue, StringComparison.OrdinalIgnoreCase) Then
+            Dim candidateSession As String =
+                NormalizeSession(ReadRowValue(row, TimetableSessionColumnName))
+            If String.Equals(candidateSession, normalizedSession, StringComparison.OrdinalIgnoreCase) Then
                 Return row
             End If
         Next
 
         Return Nothing
     End Function
+
+    Private Sub UpdateTimetableSearchValues(table As DataTable)
+        If table Is Nothing Then
+            Return
+        End If
+
+        For Each row As DataRow In table.Rows
+            Dim searchTokens As New List(Of String)()
+            searchTokens.Add(ReadRowValue(row, TimetableSessionColumnName))
+
+            For Each dayHeader As String In _dayHeaders
+                Dim cellValue As String = ReadRowValue(row, dayHeader)
+                If Not String.IsNullOrWhiteSpace(cellValue) AndAlso
+                   Not String.Equals(cellValue, "--", StringComparison.OrdinalIgnoreCase) Then
+                    searchTokens.Add(cellValue)
+                End If
+            Next
+
+            row(TimetableSearchColumnName) =
+                NormalizeText(String.Join(" ", searchTokens.ToArray()))
+        Next
+    End Sub
 
     Private Function GetOrderedSessions(schedules As IEnumerable(Of TeacherScheduleRecord)) As List(Of String)
         Dim orderedSessions As New List(Of String)()
@@ -909,17 +951,6 @@ Class AdminSchedulingView
         centeredTextStyle.Setters.Add(New Setter(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center))
         centeredTextStyle.Setters.Add(New Setter(TextBlock.TextWrappingProperty, TextWrapping.Wrap))
 
-        Dim sessionColumn As New DataGridTextColumn() With {
-            .Header = "Session",
-            .Binding = New Binding(BuildDataTableBindingPath("Session")),
-            .IsReadOnly = True,
-            .CanUserSort = False,
-            .MinWidth = 120,
-            .Width = New DataGridLength(1.2, DataGridLengthUnitType.Star),
-            .ElementStyle = centeredTextStyle
-        }
-        SchedulingTimetableDataGrid.Columns.Add(sessionColumn)
-
         For Each dayHeader As String In _dayHeaders
             If Not sourceTable.Columns.Contains(dayHeader) Then
                 Continue For
@@ -930,6 +961,7 @@ Class AdminSchedulingView
                 .Binding = New Binding(BuildDataTableBindingPath(dayHeader)),
                 .IsReadOnly = True,
                 .CanUserSort = False,
+                .MinWidth = 120,
                 .Width = New DataGridLength(1, DataGridLengthUnitType.Star),
                 .ElementStyle = centeredTextStyle
             }
@@ -947,15 +979,8 @@ Class AdminSchedulingView
             _timetableTable.DefaultView.RowFilter = String.Empty
         Else
             Dim escapedTerm As String = EscapeLikeValue(_searchTerm)
-            Dim filterParts As New List(Of String) From {
-                "[Session] LIKE '*" & escapedTerm & "*'"
-            }
-
-            For Each dayHeader As String In _dayHeaders
-                filterParts.Add("[" & dayHeader & "] LIKE '*" & escapedTerm & "*'")
-            Next
-
-            _timetableTable.DefaultView.RowFilter = String.Join(" OR ", filterParts)
+            _timetableTable.DefaultView.RowFilter =
+                "[" & TimetableSearchColumnName & "] LIKE '*" & escapedTerm & "*'"
         End If
 
         UpdateTimetableSummary()
@@ -1103,6 +1128,34 @@ Class AdminSchedulingView
 
     Private Function CountSlotsForTeacher(teacherId As String) As Integer
         Return GetSchedulesForTeacher(teacherId).Count
+    End Function
+
+    Private Function FindScheduleRecord(teacherId As String,
+                                        dayValue As String,
+                                        sessionValue As String) As TeacherScheduleRecord
+        Dim normalizedTeacherId As String = NormalizeText(teacherId)
+        Dim normalizedDay As String = NormalizeDayLabel(dayValue)
+        Dim normalizedSession As String = NormalizeSession(sessionValue)
+        If String.IsNullOrWhiteSpace(normalizedTeacherId) OrElse
+           String.IsNullOrWhiteSpace(normalizedDay) OrElse
+           String.IsNullOrWhiteSpace(normalizedSession) OrElse
+           String.Equals(normalizedSession, "--", StringComparison.OrdinalIgnoreCase) Then
+            Return Nothing
+        End If
+
+        For Each record As TeacherScheduleRecord In _scheduleRecords
+            If record Is Nothing Then
+                Continue For
+            End If
+
+            If String.Equals(NormalizeText(record.TeacherId), normalizedTeacherId, StringComparison.OrdinalIgnoreCase) AndAlso
+               String.Equals(NormalizeDayLabel(record.Day), normalizedDay, StringComparison.OrdinalIgnoreCase) AndAlso
+               String.Equals(NormalizeSession(record.Session), normalizedSession, StringComparison.OrdinalIgnoreCase) Then
+                Return record
+            End If
+        Next
+
+        Return Nothing
     End Function
 
     Private Function NormalizeScheduleRecord(record As TeacherScheduleRecord) As TeacherScheduleRecord
@@ -1397,92 +1450,132 @@ Class AdminSchedulingView
             Return "--"
         End If
 
+        Dim sessionValue As String = NormalizeSession(record.Session)
         Dim subjectCode As String = NormalizeText(record.SubjectCode)
         Dim subjectName As String = NormalizeText(record.SubjectName)
-        Dim section As String = NormalizeText(record.Section)
-        Dim room As String = NormalizeText(record.Room)
-
-        Dim subjectToken As String = subjectCode
-        If String.IsNullOrWhiteSpace(subjectToken) Then
-            subjectToken = subjectName
+        Dim sectionValue As String = NormalizeText(record.Section)
+        Dim yearLevelValue As String = ResolveSubjectYearLevel(record)
+        Dim sectionLine As String = BuildCompactSectionLabel(sectionValue, yearLevelValue)
+        Dim subjectValue As String = subjectCode
+        If Not String.IsNullOrWhiteSpace(subjectCode) AndAlso
+           Not String.IsNullOrWhiteSpace(subjectName) AndAlso
+           Not String.Equals(subjectCode, subjectName, StringComparison.OrdinalIgnoreCase) Then
+            subjectValue = subjectCode & " - " & subjectName
+        ElseIf String.IsNullOrWhiteSpace(subjectValue) Then
+            subjectValue = subjectName
         End If
 
-        If String.IsNullOrWhiteSpace(subjectToken) Then
-            subjectToken = "--"
+        Dim roomValue As String = NormalizeText(record.Room)
+        If String.IsNullOrWhiteSpace(sessionValue) Then
+            sessionValue = "--"
+        End If
+        If String.IsNullOrWhiteSpace(subjectValue) Then
+            subjectValue = "--"
+        End If
+        If String.IsNullOrWhiteSpace(roomValue) Then
+            roomValue = "--"
         End If
 
-        If Not String.IsNullOrWhiteSpace(section) Then
-            subjectToken &= " [Sec: " & section & "]"
-        End If
-
-        If Not String.IsNullOrWhiteSpace(room) Then
-            subjectToken &= " (" & room & ")"
-        End If
-
-        Return subjectToken
+        Return String.Join(Environment.NewLine, New String() {
+            sessionValue,
+            subjectValue,
+            sectionLine,
+            roomValue
+        })
     End Function
 
-    Private Function ExtractSubjectToken(cellDisplayValue As String) As String
-        Dim normalized As String = RemoveRoomSuffix(cellDisplayValue)
-        If String.IsNullOrWhiteSpace(normalized) Then
-            Return String.Empty
-        End If
-
-        Dim sectionStartIndex As Integer = normalized.LastIndexOf(" [Sec:", StringComparison.OrdinalIgnoreCase)
-        If sectionStartIndex > 0 AndAlso normalized.EndsWith("]", StringComparison.Ordinal) Then
-            Return NormalizeText(normalized.Substring(0, sectionStartIndex))
-        End If
-
-        Return normalized
+    Private Function BuildCompactSectionLabel(sectionValue As String, yearLevelValue As String) As String
+        Return StudentScheduleHelper.BuildCompactSectionValue(sectionValue,
+                                                              yearLevelValue)
     End Function
 
-    Private Function ExtractSectionToken(cellDisplayValue As String) As String
-        Dim normalized As String = RemoveRoomSuffix(cellDisplayValue)
-        If String.IsNullOrWhiteSpace(normalized) Then
+    Private Function NormalizeSectionToken(sectionValue As String) As String
+        Dim normalizedSection As String = NormalizeText(sectionValue)
+        If String.IsNullOrWhiteSpace(normalizedSection) Then
             Return String.Empty
         End If
 
-        Dim sectionStartIndex As Integer = normalized.LastIndexOf(" [Sec:", StringComparison.OrdinalIgnoreCase)
-        If sectionStartIndex <= 0 OrElse Not normalized.EndsWith("]", StringComparison.Ordinal) Then
-            Return String.Empty
+        If normalizedSection.StartsWith("Section:", StringComparison.OrdinalIgnoreCase) Then
+            normalizedSection = NormalizeText(normalizedSection.Substring("Section:".Length))
+        ElseIf normalizedSection.StartsWith("Section ", StringComparison.OrdinalIgnoreCase) Then
+            normalizedSection = NormalizeText(normalizedSection.Substring("Section ".Length))
         End If
 
-        Dim tokenStartIndex As Integer = sectionStartIndex + " [Sec:".Length
-        If tokenStartIndex >= normalized.Length - 1 Then
-            Return String.Empty
-        End If
-
-        Dim tokenLength As Integer = normalized.Length - tokenStartIndex - 1
-        Return NormalizeText(normalized.Substring(tokenStartIndex, tokenLength))
+        Return normalizedSection.Replace(" ", String.Empty)
     End Function
 
-    Private Function ExtractRoomToken(cellDisplayValue As String) As String
-        Dim normalized As String = NormalizeText(cellDisplayValue)
-        If String.IsNullOrWhiteSpace(normalized) Then
+    Private Function NormalizeYearLevelToken(yearLevelValue As String) As String
+        Dim normalizedYearLevel As String = NormalizeText(yearLevelValue)
+        If String.IsNullOrWhiteSpace(normalizedYearLevel) Then
             Return String.Empty
         End If
 
-        Dim roomStartIndex As Integer = normalized.LastIndexOf(" (", StringComparison.Ordinal)
-        If roomStartIndex <= 0 OrElse Not normalized.EndsWith(")", StringComparison.Ordinal) Then
-            Return String.Empty
+        Dim compactDigits As String = String.Empty
+        For Each characterValue As Char In normalizedYearLevel
+            If Char.IsDigit(characterValue) Then
+                compactDigits &= characterValue
+            ElseIf compactDigits.Length > 0 Then
+                Exit For
+            End If
+        Next
+
+        If compactDigits.Length > 0 Then
+            Return compactDigits
         End If
 
-        Dim roomValue As String = normalized.Substring(roomStartIndex + 2, normalized.Length - roomStartIndex - 3)
-        Return NormalizeText(roomValue)
+        Dim lowerYearLevel As String = normalizedYearLevel.ToLowerInvariant()
+        If lowerYearLevel.Contains("first") Then
+            Return "1"
+        End If
+        If lowerYearLevel.Contains("second") Then
+            Return "2"
+        End If
+        If lowerYearLevel.Contains("third") Then
+            Return "3"
+        End If
+        If lowerYearLevel.Contains("fourth") Then
+            Return "4"
+        End If
+        If lowerYearLevel.Contains("fifth") Then
+            Return "5"
+        End If
+        If lowerYearLevel.Contains("sixth") Then
+            Return "6"
+        End If
+
+        Return normalizedYearLevel.Replace(" ", String.Empty)
     End Function
 
-    Private Function RemoveRoomSuffix(cellDisplayValue As String) As String
-        Dim normalized As String = NormalizeText(cellDisplayValue)
-        If String.IsNullOrWhiteSpace(normalized) Then
+    Private Function ResolveSubjectYearLevel(record As TeacherScheduleRecord) As String
+        If record Is Nothing Then
             Return String.Empty
         End If
 
-        Dim roomStartIndex As Integer = normalized.LastIndexOf(" (", StringComparison.Ordinal)
-        If roomStartIndex > 0 AndAlso normalized.EndsWith(")", StringComparison.Ordinal) Then
-            Return NormalizeText(normalized.Substring(0, roomStartIndex))
-        End If
+        Dim subjectCode As String = NormalizeText(record.SubjectCode)
+        Dim subjectName As String = NormalizeText(record.SubjectName)
 
-        Return normalized
+        For Each optionEntry As SubjectOption In _subjectOptions
+            If optionEntry Is Nothing Then
+                Continue For
+            End If
+
+            If Not String.IsNullOrWhiteSpace(subjectCode) AndAlso
+               String.Equals(NormalizeText(optionEntry.SubjectCode),
+                             subjectCode,
+                             StringComparison.OrdinalIgnoreCase) Then
+                Return NormalizeText(optionEntry.YearLevel)
+            End If
+
+            If String.IsNullOrWhiteSpace(subjectCode) AndAlso
+               Not String.IsNullOrWhiteSpace(subjectName) AndAlso
+               String.Equals(NormalizeText(optionEntry.SubjectName),
+                             subjectName,
+                             StringComparison.OrdinalIgnoreCase) Then
+                Return NormalizeText(optionEntry.YearLevel)
+            End If
+        Next
+
+        Return String.Empty
     End Function
 
     Private Sub SelectTimetableCell(sessionValue As String, dayHeader As String)
@@ -1497,7 +1590,8 @@ Class AdminSchedulingView
         End If
 
         For Each rowView As DataRowView In _timetableTable.DefaultView
-            Dim candidateSession As String = NormalizeSession(If(rowView("Session"), String.Empty).ToString())
+            Dim candidateSession As String =
+                NormalizeSession(ReadRowValue(rowView.Row, TimetableSessionColumnName))
             If Not String.Equals(candidateSession, normalizedSession, StringComparison.OrdinalIgnoreCase) Then
                 Continue For
             End If
@@ -1508,8 +1602,11 @@ Class AdminSchedulingView
                 End If
 
                 If String.Equals(NormalizeText(column.Header.ToString()), normalizedDay, StringComparison.OrdinalIgnoreCase) Then
-                    SchedulingTimetableDataGrid.SelectedItem = rowView
-                    SchedulingTimetableDataGrid.CurrentCell = New DataGridCellInfo(rowView, column)
+                    Dim targetCell As New DataGridCellInfo(rowView, column)
+
+                    SchedulingTimetableDataGrid.UnselectAllCells()
+                    SchedulingTimetableDataGrid.CurrentCell = targetCell
+                    SchedulingTimetableDataGrid.SelectedCells.Add(targetCell)
                     SchedulingTimetableDataGrid.ScrollIntoView(rowView, column)
                     Return
                 End If

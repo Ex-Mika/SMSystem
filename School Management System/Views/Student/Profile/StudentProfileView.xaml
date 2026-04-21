@@ -27,47 +27,56 @@
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"/>
                         <TextBlock x:Name="ProfileHeaderNameTextBlock"
-                                    Text="Student"
                                    Margin="0,4,0,0"
                                    FontSize="32"
                                    FontWeight="Bold"
-                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"/>
-                        <TextBlock Text="Track your profile information, records, and account status."
-                                   Margin="0,6,0,0"
+                                   Foreground="{StaticResource DashboardTextPrimaryBrush}"
+                                   Text="Student"/>
+                        <TextBlock Margin="0,6,0,0"
                                    FontSize="13"
-                                   Foreground="{StaticResource DashboardTextMutedBrush}"/>
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   Text="Track your profile information, records, and account status."/>
                         <TextBlock x:Name="ProfileHeaderIdTextBlock"
                                    Margin="0,8,0,0"
                                    FontSize="12"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource DashboardTextMutedBrush}"
                                    Text=""/>
-              
+                        <TextBlock x:Name="ProfileHeaderStatusTextBlock"
+                                   Margin="0,10,0,0"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource DashboardTextMutedBrush}"
+                                   TextWrapping="Wrap"
+                                   Visibility="Collapsed"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="0"
                                 Grid.Column="1"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top">
-                        <Border Width="78"
+                        <Border x:Name="ProfileHeaderAvatarBorder"
+                                Width="78"
                                 Height="78"
                                 CornerRadius="39"
-                                Background="#DCE8F8"
+                                Background="{StaticResource DashboardAvatarSurfaceBrush}"
                                 BorderBrush="{StaticResource DashboardBorderBrush}"
                                 BorderThickness="1">
                             <TextBlock x:Name="ProfileHeaderInitialTextBlock"
-                                       Text="S"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
                                        FontSize="30"
                                        FontWeight="Bold"
-                                       Foreground="#1F3E6F"/>
+                                       Foreground="{StaticResource DashboardAvatarForegroundBrush}"
+                                       Text="S"/>
                         </Border>
-                        <Button Width="138"
+                        <Button x:Name="EditProfileButton"
+                                Width="138"
                                 Height="36"
                                 Margin="0,12,0,0"
                                 VerticalAlignment="Center"
-                                Style="{StaticResource DashboardPrimaryActionButtonStyle}">
+                                Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                Click="EditProfileButton_Click">
                             <StackPanel Orientation="Horizontal"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center">
@@ -77,28 +86,47 @@
                                 <TextBlock Text="Edit Profile"/>
                             </StackPanel>
                         </Button>
+                        <StackPanel x:Name="EditProfileActionsPanel"
+                                    Margin="0,12,0,0"
+                                    Visibility="Collapsed">
+                            <Button x:Name="SaveProfileButton"
+                                    Width="138"
+                                    Height="36"
+                                    Background="{StaticResource DashboardPrimaryBrush}" Foreground="{StaticResource DashboardOnPrimaryBrush}"
+                                    Style="{StaticResource DashboardPrimaryActionButtonStyle}"
+                                    Click="SaveProfileButton_Click"
+                                    Content="Save Changes"/>
+                            <Button x:Name="CancelEditProfileButton"
+                                    Width="138"
+                                    Height="36"
+                                    Margin="0,8,0,0"
+                                    Style="{StaticResource DashboardSecondaryActionButtonStyle}"
+                                    Click="CancelEditProfileButton_Click"
+                                    Content="Cancel"/>
+                        </StackPanel>
                     </StackPanel>
 
                     <UniformGrid Grid.Row="1"
                                  Grid.ColumnSpan="2"
                                  Columns="2"
                                  Margin="0,20,0,0">
-                        <Border Style="{StaticResource DashboardProfileStatCardStyle}" Margin="0,0,10,0">
+                        <Border Style="{StaticResource DashboardProfileStatCardStyle}"
+                                Margin="0,0,10,0">
                             <StackPanel>
                                 <TextBlock Text="Current GPA"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="--"
-                                           Margin="0,4,0,0"
-                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                                <TextBlock Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"
+                                           Text="--"/>
                             </StackPanel>
                         </Border>
                         <Border Style="{StaticResource DashboardProfileStatCardStyle}">
                             <StackPanel>
                                 <TextBlock Text="Enrolled Units"
                                            Style="{StaticResource DashboardProfileFieldLabelStyle}"/>
-                                <TextBlock Text="--"
-                                           Margin="0,4,0,0"
-                                           Style="{StaticResource DashboardProfileStatValueStyle}"/>
+                                <TextBlock Margin="0,4,0,0"
+                                           Style="{StaticResource DashboardProfileStatValueStyle}"
+                                           Text="--"/>
                             </StackPanel>
                         </Border>
                     </UniformGrid>
@@ -126,7 +154,6 @@
                                 Style="{StaticResource DashboardProfileSegmentSelectedButtonStyle}"
                                 Click="PersonalSectionButton_Click"
                                 Content="Personal"/>
-
                         <Button x:Name="AcademicSectionButton"
                                 Grid.Column="1"
                                 Width="110"
@@ -134,7 +161,6 @@
                                 Style="{StaticResource DashboardProfileSegmentButtonStyle}"
                                 Click="AcademicSectionButton_Click"
                                 Content="Academic"/>
-
                         <Button x:Name="AccountSectionButton"
                                 Grid.Column="2"
                                 Width="110"
@@ -146,10 +172,8 @@
 
                     <Grid Grid.Row="1" Margin="0,14,0,0">
                         <local:StudentProfilePersonalTab x:Name="PersonalTabView"/>
-
                         <local:StudentProfileAcademicTab x:Name="AcademicTabView"
                                                          Visibility="Collapsed"/>
-
                         <local:StudentProfileAccountTab x:Name="AccountTabView"
                                                         Visibility="Collapsed"/>
                     </Grid>

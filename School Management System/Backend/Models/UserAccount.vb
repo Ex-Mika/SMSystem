@@ -7,5 +7,7 @@ Namespace Backend.Models
         Public Property PasswordHash As String = String.Empty
         Public Property IsActive As Boolean
         Public Property ReferenceCode As String = String.Empty
+        Public Property PhotoPath As String = String.Empty
+        Public Property ProfileTitle As String = String.Empty
     End Class
 End Namespace

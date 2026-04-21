@@ -36,7 +36,7 @@
                 </Image.Effect>
             </Image>
             <Rectangle Fill="{StaticResource Brush.PageGradient}" Opacity="0.72"/>
-            <Rectangle Fill="#22030B1A"/>
+            <Rectangle Fill="#26180F00"/>
         </Grid>
         <Border Grid.Row="0"
                 Style="{StaticResource LoginTitleBarBorderStyle}"
@@ -54,7 +54,7 @@
                     <Border Width="26"
                             Height="26"
                             CornerRadius="6"
-                            Background="#EAF1FF">
+                            Background="#FFF6BF">
                         <Image Source="/Resources/Images/prmsu-logo.png" Stretch="Uniform"/>
                     </Border>
                     <TextBlock Text="President Ramon Magsaysay State University"
@@ -105,7 +105,7 @@
                             <Border Width="88"
                                     Height="88"
                                     CornerRadius="14"
-                                    Background="#EAF1FF"
+                                    Background="#FFF6BF"
                                     Margin="0,0,14,0">
                                 <Image Source="/Resources/Images/prmsu-logo.png"
                                        Width="88"
@@ -123,9 +123,9 @@
                             Margin="30,0,30,0"
                             Height="44"
                             CornerRadius="8"
-                            BorderBrush="#E1EAF6"
+                            BorderBrush="#E6D897"
                             BorderThickness="1"
-                            Background="#F4F8FD">
+                            Background="#FDF9DB">
                         <UniformGrid Columns="3">
                             <RadioButton x:Name="StudentRoleRadioButton"
                                          Content="Student"
@@ -220,7 +220,7 @@
                                         <Rectangle x:Name="PasswordEyeOpenIcon"
                                                    Width="18"
                                                    Height="18"
-                                                   Fill="#A7B6CC">
+                                                   Fill="#AF9541">
                                             <Rectangle.OpacityMask>
                                                 <ImageBrush ImageSource="/Resources/Images/Icons/eye-open.png"
                                                             Stretch="Uniform"/>
@@ -229,7 +229,7 @@
                                         <Rectangle x:Name="PasswordEyeClosedIcon"
                                                    Width="18"
                                                    Height="18"
-                                                   Fill="#A7B6CC"
+                                                   Fill="#AF9541"
                                                    Visibility="Collapsed">
                                             <Rectangle.OpacityMask>
                                                 <ImageBrush ImageSource="/Resources/Images/Icons/eye-closed.png"
@@ -249,7 +249,7 @@
                                       Content="Remember me"
                                       FontSize="14"
                                       VerticalAlignment="Center"
-                                      Foreground="#7D8DA8"/>
+                                      Foreground="#7A6A33"/>
                        
                         </Grid>
                         <TextBlock x:Name="LoginStatusTextBlock"
@@ -283,7 +283,7 @@
                     <Border Grid.Row="3" Style="{StaticResource LoginFooterBorderStyle}">
                         <TextBlock Style="{StaticResource LoginFooterTextStyle}">
                             <Run Text="(c) 2026 Appsenso. "/>
-                            <Hyperlink Foreground="#4B5F7D">Contact Support</Hyperlink>
+                            <Hyperlink Foreground="#8C6A00">Contact Support</Hyperlink>
                         </TextBlock>
                     </Border>
                 </Grid>
